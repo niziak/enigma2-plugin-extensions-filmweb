@@ -1,0 +1,6 @@
+#!/bin/sh
+echo "... removing Filmweb plugin"
+rm -r /usr/lib/enigma2/python/Plugins/Extensions/Filmweb > /dev/null 2>&1
+
+echo "Plugin removed! You should restart enigma2 now!"
+exit 0

@@ -1,0 +1,11 @@
+#!/bin/sh
+echo ""
+echo "********************************************************"
+echo "*  Filweb Plugin                              "
+echo "*  Marcin Slowik <marcin.slowik@gmail.com>"
+echo "*  (c) 2012"
+echo "********************************************************"
+echo ""
+echo "Filmweb Plugin successfully installed! You should restart enigma2 now"
+echo ""
+exit 0
