@@ -29,8 +29,11 @@ from os import path
 #import re
     
 from Screens.Screen import Screen
+from Screens.InputBox import InputBox
+from Screens.MessageBox import MessageBox
 from Screens.EpgSelection import EPGSelection
 
+from Components.Input import Input
 from Components.AVSwitch import AVSwitch
 from Components.Sources.StaticText import StaticText
 from Components.MenuList import MenuList
@@ -40,7 +43,7 @@ from Components.Pixmap import Pixmap
 from Components.ScrollLabel import ScrollLabel
 from Components.Button import Button
 from Components.ActionMap import ActionMap
-from Screens.InfoBarGenerics import InfoBarEPG
+#from Screens.InfoBarGenerics import InfoBarEPG
 
 VT_MENU = 'MENU'
 VT_DETAILS = 'DETAILS'
@@ -183,6 +186,8 @@ class Filmweb(Screen):
             size = len(self.resultlist)
             print_info("The movies list size", str(size))
             self["title_label"].setText('')
+            if size == 0:
+                self.inputMovieName()
             if size == 1:
                 to_mode = VT_DETAILS
                 self.loadDetails(self.resultlist[0][1], self.resultlist[0][0])
@@ -492,7 +497,24 @@ class Filmweb(Screen):
         print_info("org title first", title)  
         if title != '':
             self["title_label"].setText(self["title_label"].getText() + " (" + title + ")")
-                                        
+    
+    def inputMovieName(self):
+        dlg = self.session.openWithCallback(self.askForName, InputBox, 
+                                      windowTitle = _("Input the name of movie to search"),
+                                       title=_("Enter movie title to search for"), 
+                                       text=self.eventName + " ", 
+                                       maxSize=55, 
+                                       type=Input.TEXT)
+        dlg["input"].end()
+            
+    def askForName(self, word): 
+        if word is None:
+            pass 
+        else:
+            self.eventName = word.strip()
+            self.getData()
+            #self.session.open(MessageBox,_(word.strip()), MessageBox.TYPE_INFO)
+                               
     def search(self):     
         print_info("search", "started")   
         
