@@ -1,4 +1,3 @@
-# Enigma2 Filmweb.pl Plugin
 
 = Introduction =
 
@@ -14,3 +13,15 @@ This plugin will do a query on Filmweb.pl for movies from EPG and will show the 
 You could run plugin from two places:
  * from Extension Manager - automatically searches the currently watched movie
  * using INFO button for a long time and than when the list of entries is showed selecting the movie position 
+
+= Change log =
+
+== ver. 1.0.2 ==
+ * fixed cookies handling - the Filmweb.pl shows the adverts and checks when advs are read by checking the cookies
+ * fixed handling DETAILS page when there are 0 movies in menu
+  
+== ver. 1.0.1 ==
+build scripts fixed so the binary installation package is deployable now
+
+== ver. 1.0 ==
+the first release
