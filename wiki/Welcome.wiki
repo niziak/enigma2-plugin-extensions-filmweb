@@ -15,15 +15,15 @@ You could run plugin from two places:
 
 = Change log =
 
-== ver. 1.0.3 ==
+=== ver. 1.0.3 ===
  * when the result list has 0 elements the input box is showed 
 
-== ver. 1.0.2 ==
+=== ver. 1.0.2 ===
  * fixed cookies handling - the Filmweb.pl shows the adverts and checks when advs are read by checking the cookies
  * fixed handling DETAILS page when there are 0 movies in menu
   
-== ver. 1.0.1 ==
+=== ver. 1.0.1 ===
 build scripts fixed so the binary installation package is deployable now
 
-== ver. 1.0 ==
+=== ver. 1.0 ===
 the first release
