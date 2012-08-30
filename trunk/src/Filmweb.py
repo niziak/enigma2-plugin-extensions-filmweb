@@ -46,6 +46,8 @@ VT_MENU = 'MENU'
 VT_DETAILS = 'DETAILS'
 VT_EXTRAS = 'EXTRAS'
 
+COOKIES = {}
+
 def print_info(nfo, data):
     mautils.print_info("FILMWEB", nfo, data)    
 
@@ -121,7 +123,8 @@ class Filmweb(Screen):
         self.session = session
         self.eventName = eventName
         self.mode = ''
-        self.resultlist = []
+        self.resultlist = []  
+        self.loopx = 0      
                 
         self.createGUI()
         self.initActions()
@@ -184,8 +187,11 @@ class Filmweb(Screen):
                 to_mode = VT_DETAILS
                 self.loadDetails(self.resultlist[0][1], self.resultlist[0][0])
         elif to_mode == VT_DETAILS:
-            if self.mode == VT_MENU:                
-                self.loadDetails(link=self["menu"].getCurrent()[1], title=self["menu"].getCurrent()[0])
+            if self.mode == VT_MENU:
+                if self["menu"].getCurrent():                
+                    self.loadDetails(link=self["menu"].getCurrent()[1], title=self["menu"].getCurrent()[0])
+                else:
+                    to_mode = VT_MENU
             elif self.mode == VT_EXTRAS:
                 pass
         self.switchGUI(to_mode)
@@ -194,7 +200,8 @@ class Filmweb(Screen):
         print_info("LOAD DETAILS", "link: " + link + ", title: " + title)
         self["status_bar"].setText(_("Seraching details for: %s...") % (title))
         print_info("Filmweb Details Query ", link)
-        getPage(link).addCallback(self.fetchDetailsOK).addErrback(self.fetchFailed) 
+                
+        getPage(link, cookies=COOKIES).addCallback(self.fetchDetailsOK).addErrback(self.fetchFailed) 
                 
     def switchGUI(self, to_mode=VT_MENU):
         self.mode = to_mode
@@ -292,11 +299,12 @@ class Filmweb(Screen):
             fetchurl = "http://www.filmweb.pl/search/film?q=" + self.event_quoted
             #print_info("Filmweb Query " + fetchurl + " to ", localfile)
             print_info("Filmweb Query ", fetchurl)
-            getPage(fetchurl).addCallback(self.fetchOK).addErrback(self.fetchFailed)            
+            getPage(fetchurl, cookies=COOKIES).addCallback(self.fetchOK).addErrback(self.fetchFailed)            
         else:
             self["status_bar"].setText(_("Unknown Eventname"))
 
     def fetchDetailsOK(self, txt_):
+        print_info("fetch details OK", str(COOKIES))
         self["status_bar"].setText(_("Movie details loading completed"))
         self.inhtml = mautils.html2utf8(txt_)   
         if self.inhtml:
@@ -328,17 +336,22 @@ class Filmweb(Screen):
         else:
             self["status_bar"].setText(_("Movie details parsing error"))
         
-    def fetchOK(self, txt_):
-        print_info("Fetch OK", "")        
+    def fetchOK(self, txt_):        
+        print_info("Fetch OK", str(COOKIES))                
         self["status_bar"].setText(_("Filmweb Download completed"))
         self.inhtml = mautils.html2utf8(txt_)
         if self.inhtml:
+            if self.inhtml.find('Automatyczne przekierowanie') > -1:
+                if self.loopx == 0:
+                    self.loopx = 1
+                    self.getData()
+                return;
             self.search() 
         self["menu"].l.setList(self.resultlist)  
         self.switchView(to_mode='MENU')
                 
     def fetchPosterOK(self, data):
-        print_info("Fetch Poster OK", "") 
+        print_info("Fetch Poster OK", str(COOKIES)) 
         self["status_bar"].setText(_("Poster downloading finished"))
         rpath = path.realpath("/tmp/poster.jpg")
         print_info("Poster local real path", rpath)
@@ -370,7 +383,7 @@ class Filmweb(Screen):
             self["status_bar"].setText(_("Downloading Movie Poster: %s...") % (posterUrl))
             localfile = "/tmp/poster.jpg"
             print_info("Downloading poster", posterUrl + " to " + localfile)
-            downloadPage(posterUrl,localfile).addCallback(self.fetchPosterOK).addErrback(self.fetchFailed)            
+            downloadPage(posterUrl, localfile).addCallback(self.fetchPosterOK).addErrback(self.fetchFailed)            
             
     def parsePlot(self):
         print_info("parsePlot", "started")
@@ -482,6 +495,12 @@ class Filmweb(Screen):
                                         
     def search(self):     
         print_info("search", "started")   
+        
+        #output = open('/tmp/test.html', 'w')
+        #f = self.inhtml.splitlines()
+        #for line in f:
+        #    output.write(line.rstrip() + '\n') 
+
         fidx = self.inhtml.find('Filmy (')
         print_info("search idx", str(fidx))  
         if fidx > -1:
