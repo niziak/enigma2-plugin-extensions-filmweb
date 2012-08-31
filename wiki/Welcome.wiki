@@ -15,6 +15,7 @@ You could run plugin from two places:
 
 = Change log =
 === ver. 1.0.4 ===
+  * Movie runtime showing added
   * Added actions on main window context menu
     * action for enter the movie name to search
     * action for channel selection from EPG
