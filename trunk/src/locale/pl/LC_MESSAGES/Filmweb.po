@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Filmweb 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-08-30 22:51+0100\n"
-"PO-Revision-Date: 2012-08-30 22:52+0100\n"
+"POT-Creation-Date: 2012-08-31 09:55+0100\n"
+"PO-Revision-Date: 2012-08-31 09:56+0100\n"
 "Last-Translator: Marcin Słowik <masl@op.pl>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -13,118 +13,135 @@ msgstr ""
 "X-Poedit-Basepath: /--HomeData--/enigma2-plugins/enigma2-filmweb/src\n"
 "X-Poedit-SearchPath-0: .\n"
 
-#: Filmweb.py:67
+#: Filmweb.py:68
+msgid "Channel Selection"
+msgstr "Wybór kanału"
+
+#: Filmweb.py:100
 msgid "Lookup"
 msgstr "Wyszukaj"
 
-#: Filmweb.py:206
+#: Filmweb.py:218
+#, fuzzy
+msgid "Enter movie title"
+msgstr "Wprowadź szukany tytuł"
+
+#: Filmweb.py:219
+msgid "Select from EPG"
+msgstr "Wybierz z EPG"
+
+#: Filmweb.py:267
 #, python-format
 msgid "Seraching details for: %s..."
 msgstr "Wyszukiwanie danych dla: %s…"
 
-#: Filmweb.py:225
+#: Filmweb.py:286
 msgid "Ambiguous results"
 msgstr "Wyszukano więcej niż jeden rezultat"
 
-#: Filmweb.py:226
+#: Filmweb.py:287
 msgid "Please select the matching entry"
 msgstr "Wybierz odpowiedni element"
 
-#: Filmweb.py:269
-msgid "The Filmweb Movie Database"
-msgstr "Baza filmów Filmweb.pl"
-
-#: Filmweb.py:282
-msgid "Exit"
-msgstr "Wyjście"
-
-#: Filmweb.py:283
-msgid "Title Menu"
-msgstr "Tytuły"
-
-#: Filmweb.py:284
+#: Filmweb.py:290 Filmweb.py:334
 msgid "Details"
 msgstr "Szczegóły"
 
-#: Filmweb.py:285
+#: Filmweb.py:304 Filmweb.py:333
+msgid "Title Menu"
+msgstr "Tytuły"
+
+#: Filmweb.py:335
 msgid "Extra"
 msgstr "Inf. dodatkowe"
 
-#: Filmweb.py:302
+#: Filmweb.py:346
+msgid "The Filmweb Movie Database"
+msgstr "Baza filmów Filmweb.pl"
+
+#: Filmweb.py:359
+msgid "Exit"
+msgstr "Wyjście"
+
+#: Filmweb.py:379
 #, python-format
 msgid "Query Filmweb: %s..."
 msgstr "Przeszukaj Filmweb: %s..."
 
-#: Filmweb.py:309
+#: Filmweb.py:386
 msgid "Unknown Eventname"
 msgstr "Nieznana nazwa zdarzenia"
 
-#: Filmweb.py:313
+#: Filmweb.py:390
 msgid "Movie details loading completed"
 msgstr "Pobieranie danych filmu zakończone"
 
-#: Filmweb.py:335
-msgid "Genre: "
-msgstr "Gatunek: "
-
-#: Filmweb.py:336
-msgid "Country: "
-msgstr "Produkcja: "
-
-#: Filmweb.py:337
-msgid "Director: "
-msgstr "Reżyseria: "
-
-#: Filmweb.py:338
-msgid "Writer: "
-msgstr "Scenariusz: "
-
-#: Filmweb.py:339
-msgid "Year: "
-msgstr "Rok: "
-
-#: Filmweb.py:342
+#: Filmweb.py:404
 msgid "Movie details parsing error"
 msgstr "Błąd przetwarzania danych filmu"
 
-#: Filmweb.py:346
+#: Filmweb.py:408
 msgid "Filmweb Download completed"
 msgstr "Pobieranie danych z Filmweb zakończone"
 
-#: Filmweb.py:360
+#: Filmweb.py:422
 msgid "Poster downloading finished"
 msgstr "Pobieranie plakatu zakończone"
 
-#: Filmweb.py:370
+#: Filmweb.py:432
 msgid "Filmweb Download failed"
 msgstr "Pobieranie danych z Filmweb zakończyło się niepowodzeniem"
 
-#: Filmweb.py:388
+#: Filmweb.py:450
 #, python-format
 msgid "Downloading Movie Poster: %s..."
 msgstr "Pobieranie plakatu: %s..."
 
-#: Filmweb.py:422
+#: Filmweb.py:484
 msgid " as "
 msgstr " jako "
 
-#: Filmweb.py:427
+#: Filmweb.py:489
 msgid "Cast: "
 msgstr "Obsada: "
 
-#: Filmweb.py:476
+#: Filmweb.py:538
 msgid "User Rating"
 msgstr "Ocena"
 
-#: Filmweb.py:480
+#: Filmweb.py:542
 msgid "no user rating yet"
 msgstr "brak oceny społeczności"
 
-#: Filmweb.py:503
+#: Filmweb.py:603
+msgid "Genre: "
+msgstr "Gatunek: "
+
+#: Filmweb.py:604
+msgid "Country: "
+msgstr "Produkcja: "
+
+#: Filmweb.py:605
+msgid "Director: "
+msgstr "Reżyseria: "
+
+#: Filmweb.py:606
+msgid "Writer: "
+msgstr "Scenariusz: "
+
+#: Filmweb.py:607
+msgid "Year: "
+msgstr "Rok: "
+
+#: Filmweb.py:608
+msgid "Runtime: "
+msgstr "Czas trwania:"
+
+#: Filmweb.py:613
 msgid "Input the name of movie to search"
 msgstr "Wprowadź nazwę filmu do wyszukania"
 
-#: Filmweb.py:504
+#: Filmweb.py:614
 msgid "Enter movie title to search for"
 msgstr "Wprowadź szukany tytuł"
 

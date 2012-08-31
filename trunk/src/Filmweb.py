@@ -22,7 +22,7 @@
 ######################################################################
 
 from twisted.web.client import downloadPage, getPage
-from enigma import ePicLoad, eServiceEvent
+from enigma import ePicLoad, eServiceReference, eServiceEvent
 import mautils
 import gettext
 from os import path
@@ -30,8 +30,11 @@ from os import path
     
 from Screens.Screen import Screen
 from Screens.InputBox import InputBox
-from Screens.MessageBox import MessageBox
+from Screens.ChoiceBox import ChoiceBox
+#from Screens.MessageBox import MessageBox
 from Screens.EpgSelection import EPGSelection
+#from Screens.InfoBarGenerics import InfoBarEPG
+from Screens.ChannelSelection import SimpleChannelSelection
 
 from Components.Input import Input
 from Components.AVSwitch import AVSwitch
@@ -43,8 +46,8 @@ from Components.Pixmap import Pixmap
 from Components.ScrollLabel import ScrollLabel
 from Components.Button import Button
 from Components.ActionMap import ActionMap
-#from Screens.InfoBarGenerics import InfoBarEPG
 
+VT_NONE = 'none'
 VT_MENU = 'MENU'
 VT_DETAILS = 'DETAILS'
 VT_EXTRAS = 'EXTRAS'
@@ -59,6 +62,36 @@ def _(txt):
     if t == txt:
         t = gettext.gettext(txt)
     return t
+
+class FilmwebChannelSelection(SimpleChannelSelection):
+    def __init__(self, session):
+        SimpleChannelSelection.__init__(self, session, _("Channel Selection"))
+        self.skinName = "SimpleChannelSelection"
+
+        self["ChannelSelectEPGActions"] = ActionMap(["ChannelSelectEPGActions"],
+            { "showEPGList": self.processSelected }
+        )
+
+    def processSelected(self):
+        ref = self.getCurrentSelection()
+        print_info("Channel selected", str(ref) + ", flags: " + str(ref and ref.flags))
+        # flagDirectory = isDirectory|mustDescent|canDescent
+        if (ref.flags & eServiceReference.flagDirectory) == eServiceReference.flagDirectory:
+            # when directory go to descent
+            self.enterPath(ref)
+        elif not (ref.flags & eServiceReference.isMarker):
+            # open the event selection screen and handle on close event
+            self.session.openWithCallback(
+                self.onClosed,
+                FilmwebEPGSelection,
+                ref,
+                openPlugin = False
+            )
+
+    def onClosed(self, ret = None):
+        print_info("EPG Closed", str(ret)) 
+        if ret:
+            self.close(ret)
     
 class FilmwebEPGSelection(EPGSelection):
     def __init__(self, session, ref, openPlugin = True):
@@ -88,6 +121,8 @@ class FilmwebEPGSelection(EPGSelection):
         if not evt: 
             return
         
+        # when openPlugin is TRUE - open filmweb data window
+        # otherwise only return the selected event name           
         if self.openPlugin:
             print_info("EVT short desc", str(evt.getShortDescription()))
             print_info("EVT ext desc", str(evt.getExtendedDescription()))
@@ -107,7 +142,7 @@ class Filmweb(Screen):
             <widget name="key_yellow" position="560,0" zPosition="1" size="140,40" font="Regular;20" valign="center" halign="center" backgroundColor="#a08500" transparent="1" />
             <widget name="key_blue" position="830,0" zPosition="1" size="140,40" font="Regular;20" valign="center" halign="center" backgroundColor="#18188b" transparent="1" />
             <widget name="title_label" position="10,45" size="850,30" valign="center" font="Regular;22" foregroundColor="#f0b400" transparent="1"/>
-            <widget name="details_label" position="150,80" size="970,120" font="Regular;20"  transparent="1"/>
+            <widget name="details_label" position="150,80" size="970,120" font="Regular;19"  transparent="1"/>
             <widget name="plot_label" position="150,200" size="970,110" font="Regular;17" transparent="1"/>
             <widget name="cast_label" position="10,290" size="1070,240" font="Regular;18" transparent="1"/>
             <widget name="extra_label" position="10,70" size="1070,450" font="Regular;18" transparent="1"/>
@@ -131,7 +166,7 @@ class Filmweb(Screen):
                 
         self.createGUI()
         self.initActions()
-        self.switchView(to_mode='xx')
+        self.switchView(to_mode=VT_NONE)
         self.getData()
     
     event_quoted = property(lambda self: mautils.quote(self.eventName.encode('utf8')))
@@ -176,8 +211,34 @@ class Filmweb(Screen):
     def showExtras(self):
         self.switchView(to_mode=VT_EXTRAS)        
     def contextMenuPressed(self):
-        pass
+        self.session.openWithCallback(
+            self.menuCallback,
+            ChoiceBox,
+            list = [
+                    (_("Enter movie title"), self.inputMovieName),
+                    (_("Select from EPG"), self.channelSelection),
+            ],
+        )
 
+    def menuCallback(self, ret = None):
+        v = ret and ret[1]()
+        print_info("Context menu selected value", str(v))
+        
+        
+    def channelSelection(self):        
+        self.session.openWithCallback(
+            self.serachSelectedChannel,
+            FilmwebChannelSelection
+        )
+                    
+    def serachSelectedChannel(self, ret = None):
+        if ret:
+            #self.switchView(to_mode=VT_MENU)
+            self.eventName = ret
+            self.resultlist = []
+            self.switchView(to_mode=VT_NONE)
+            self.getData()
+            
     def switchView(self, to_mode=VT_MENU):
         print_info("Switching view", "old mode=" + self.mode + ", new mode=" + to_mode)
         if self.mode == to_mode:
@@ -224,6 +285,10 @@ class Filmweb(Screen):
             
             self["title"].setText(_("Ambiguous results"))
             self["details_label"].setText(_("Please select the matching entry"))
+            
+            self["key_green"].setText("")
+            self["key_yellow"].setText(_("Details"))
+            self["key_blue"].setText("")
         elif self.mode == VT_DETAILS:
             self["rating_label"].show()
             self["cast_label"].show()
@@ -235,6 +300,10 @@ class Filmweb(Screen):
             
             self["menu"].hide()
             self["extra_label"].hide()
+            
+            self["key_green"].setText(_("Title Menu"))
+            self["key_yellow"].setText("")
+            self["key_blue"].setText("")
         elif self.mode == VT_EXTRAS:
             self["extra_label"].show()
             
@@ -246,6 +315,10 @@ class Filmweb(Screen):
             self["stars_bg"].hide()
             self["rating_label"].hide()
             self["menu"].hide()
+            
+            self["key_green"].setText("")
+            self["key_yellow"].setText("")
+            self["key_blue"].setText("")
         else:
             self["extra_label"].hide()            
             self["details_label"].hide()
@@ -256,6 +329,10 @@ class Filmweb(Screen):
             self["stars_bg"].hide()
             self["rating_label"].hide()
             self["menu"].hide()
+            
+            self["key_green"].setText(_("Title Menu"))
+            self["key_yellow"].setText(_("Details"))
+            self["key_blue"].setText(_("Extra"))
 
     def createGUI(self):
         self["title_label"] = Label()
@@ -280,9 +357,9 @@ class Filmweb(Screen):
         self["rating_label"] = Label("")        
         self["menu"] = MenuList(self.resultlist)
         self["key_red"] = Button(_("Exit"))
-        self["key_green"] = Button(_("Title Menu"))
-        self["key_yellow"] = Button(_("Details"))
-        self["key_blue"] = Button(_("Extra"))
+        self["key_green"] = Button()
+        self["key_yellow"] = Button()
+        self["key_blue"] = Button()
         
     def __str__(self):
         return "FILMWEB {Session: " + str(self.session) + ", EventName:" + str(self.eventName) + "}"
@@ -320,24 +397,9 @@ class Filmweb(Screen):
             self.parseRating()
             self.parsePoster()
             self.parseCast()
-            self.parsePlot()
+            self.parsePlot()            
             
-            genere = self.parseGenere()
-            print_info("Movie Genere", genere)
-            director = self.parseDirector()
-            print_info("Movie Director", director)
-            writer = self.parseWriter()
-            print_info("Movie Writer", writer)
-            country = self.parseCountry()
-            print_info("Movie Country", country)
-            year = self.parseYear()   
-            
-            self["details_label"].setText(_("Genre: ") + genere + "\n" + 
-                                          _("Country: ") +  country + "\n" + 
-                                          _("Director: ") + director + "\n" + 
-                                          _("Writer: ") + writer + "\n" +
-                                          _("Year: ") + year + "\n"                                           
-                                          )                     
+            self.parseDatails()
         else:
             self["status_bar"].setText(_("Movie details parsing error"))
         
@@ -498,6 +560,54 @@ class Filmweb(Screen):
         if title != '':
             self["title_label"].setText(self["title_label"].getText() + " (" + title + ")")
     
+    def parseRuntime(self):
+        print_info("parseRuntime", "started")
+        if mautils.between(self.inhtml, '<title>', '</title>').find('Serial TV') > -1: 
+            runtime = mautils.between(self.inhtml, "czas trwania:", '</strong>')
+            runtime = mautils.after(runtime, '<strong>')
+        else:  
+            runtime = mautils.between(self.inhtml, "czas trwania:", '</tr>')
+            runtime = mautils.after(runtime, '<td>')
+            runtime = mautils.before(runtime, '</td>')
+        runtime = runtime.replace(' ', '')
+        if not runtime:
+            return
+        str_m = ''
+        str_h = ''
+        if runtime.find('godz.') > -1:
+            str_h = mautils.before(runtime, 'godz.')
+            runtime = mautils.after(runtime, 'godz.')
+        if runtime.find('min.') > -1:
+            str_m = mautils.before(runtime, 'min.')
+        val_runtime = 0
+        if str_h:
+            val_runtime = 60 * int(float(str_h))
+        if str_m:
+            val_runtime += int(float(str_m))
+        return val_runtime
+        
+    def parseDetails(self):
+        genere = self.parseGenere()
+        print_info("Movie Genere", genere)
+        director = self.parseDirector()
+        print_info("Movie Director", director)
+        writer = self.parseWriter()
+        print_info("Movie Writer", writer)
+        country = self.parseCountry()
+        print_info("Movie Country", country)
+        year = self.parseYear()
+        print_info("Movie Year", str(year))
+        rt = self.parseRuntime()   
+        print_info("Movie Runtime", str(rt))
+        
+        self["details_label"].setText(_("Genre: ") + genere + "\n" + 
+                                      _("Country: ") +  country + "\n" + 
+                                      _("Director: ") + director + "\n" + 
+                                      _("Writer: ") + writer + "\n" +
+                                      _("Year: ") + year + "\n" + 
+                                      _("Runtime: ") + str(rt) + " min.\n"                                           
+                                      )                     
+
     def inputMovieName(self):
         dlg = self.session.openWithCallback(self.askForName, InputBox, 
                                       windowTitle = _("Input the name of movie to search"),
