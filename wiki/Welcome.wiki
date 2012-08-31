@@ -13,6 +13,8 @@ You could run plugin from two places:
   * from Extension Manager - automatically searches the currently watched movie
   * using INFO button for a long time and than when the list of entries is showed selecting the movie position 
 
+----
+
 = Change log =
 === ver. 1.0.4 ===
   * Movie runtime showing added
