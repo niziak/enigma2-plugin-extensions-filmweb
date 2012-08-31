@@ -3,22 +3,28 @@
 This plugin will do a query on Filmweb.pl for movies from EPG and will show the info in a popup window. When the query returns the ambigous results the list of items is presented so user could select correct movie. 
 
 = Installation =
- * SSH onto the dreambox
- * copy IPK file to /tmp folder
- * use manual IPK package installation option from Dreambox plugin menu
+  * SSH onto the dreambox
+  * copy IPK file to /tmp folder
+  * use manual IPK package installation option from Dreambox plugin menu
 
 = Usage =
 
 You could run plugin from two places:
- * from Extension Manager - automatically searches the currently watched movie
- * using INFO button for a long time and than when the list of entries is showed selecting the movie position 
+  * from Extension Manager - automatically searches the currently watched movie
+  * using INFO button for a long time and than when the list of entries is showed selecting the movie position 
 
 = Change log =
+=== ver. 1.0.4 ===
+  * Added actions on main window context menu
+    * action for enter the movie name to search
+    * action for channel selection from EPG
+  * Fixed swiching button labels regarding the active context  
+
 === ver. 1.0.3 ===
- * when the result list has 0 elements the input box is showed 
+  * when the result list has 0 elements the input box is showed 
 === ver. 1.0.2 ===
- * fixed cookies handling - the Filmweb.pl shows the adverts and checks when advs are read by checking the cookies
- * fixed handling DETAILS page when there are 0 movies in menu
+  * fixed cookies handling - the Filmweb.pl shows the adverts and checks when advs are read by checking the cookies
+  * fixed handling DETAILS page when there are 0 movies in menu
 === ver. 1.0.1 ===
 build scripts fixed so the binary installation package is deployable now
 === ver. 1.0 ===
