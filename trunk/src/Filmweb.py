@@ -22,12 +22,16 @@
 ######################################################################
 
 from twisted.web.client import downloadPage, getPage
-from enigma import ePicLoad, eServiceReference, eServiceEvent
+from enigma import eTimer, ePicLoad, eServiceReference, eServiceEvent, eListboxPythonMultiContent, RT_HALIGN_LEFT
 import mautils
 import gettext
 from os import path
 #import re
     
+from Tools.BoundFunction import boundFunction
+from Tools.LoadPixmap import LoadPixmap
+from Tools.Directories import resolveFilename, SCOPE_CURRENT_PLUGIN
+
 from Screens.Screen import Screen
 from Screens.InputBox import InputBox
 from Screens.ChoiceBox import ChoiceBox
@@ -36,6 +40,7 @@ from Screens.EpgSelection import EPGSelection
 #from Screens.InfoBarGenerics import InfoBarEPG
 from Screens.ChannelSelection import SimpleChannelSelection
 
+from Components.ChoiceList import ChoiceList, ChoiceEntryComponent
 from Components.Input import Input
 from Components.AVSwitch import AVSwitch
 from Components.Sources.StaticText import StaticText
@@ -62,6 +67,48 @@ def _(txt):
     if t == txt:
         t = gettext.gettext(txt)
     return t
+        
+actorPicload = {}
+
+def ActorEntryComponent(inst, img_url = "", text = ["--"], index=0):
+    res = [ text ]
+    #timer = eTimer()
+    #timer.callback.append(picloadTimeout)
+    
+    def paintImage(idx=None, picInfo=None):
+        print_info("Paint Actor Image", str(idx))
+        ptr = actorPicload[idx].getData()
+        if ptr != None:
+            #png = ptr.__deref__()
+            print_info("RES append", str(res) + " - img: " + str(ptr))
+            res.append((eListboxPythonMultiContent.TYPE_PIXMAP_ALPHATEST, 5, 0, 40, 45, ptr))
+            inst.l.invalidate()
+        del actorPicload[idx]        
+    
+    def fetchImgOK(data, idx):
+        print_info("fetchImgOK", str(idx))
+        rpath = path.realpath("/tmp/actor_img_" + str(idx) + ".jpg")
+        if path.exists(rpath):
+            sc = AVSwitch().getFramebufferScale()
+            actorPicload[idx].setPara((40, 45, sc[0], sc[1], False, 1, "#00000000"))
+            print_info("Decode Image", rpath)
+            actorPicload[idx].startDecode(rpath)
+    
+    def fetchImgFailed(data,idx):
+        pass
+    
+    if text[0] == "--" or img_url == '' or img_url.find("jpg") < 0:
+        res.append((eListboxPythonMultiContent.TYPE_TEXT, 0, 0, 800, 45, 0, RT_HALIGN_LEFT, "-"*200))
+    else:
+        actorPicload[index] = ePicLoad()
+        actorPicload[index].PictureData.get().append(boundFunction(paintImage, index)) 
+        res.append((eListboxPythonMultiContent.TYPE_TEXT, 45, 0, 750, 45, 0, RT_HALIGN_LEFT, text[0]))        
+        localfile = "/tmp/actor_img_" + str(index) + ".jpg"
+        print_info("Downloading actor img", img_url + " to " + localfile)
+        downloadPage(img_url, localfile).addCallback(fetchImgOK, index).addErrback(fetchImgFailed, index)
+    #inst.cast_list.append(res)
+    #inst["cast_label"].l.setList(inst.cast_list)
+    return res
 
 class FilmwebChannelSelection(SimpleChannelSelection):
     def __init__(self, session):
@@ -74,7 +121,7 @@ class FilmwebChannelSelection(SimpleChannelSelection):
 
     def processSelected(self):
         ref = self.getCurrentSelection()
-        print_info("Channel selected", str(ref) + ", flags: " + str(ref and ref.flags))
+        print_info("Channel selected", str(ref) + ", flags: " + str(ref.flags))
         # flagDirectory = isDirectory|mustDescent|canDescent
         if (ref.flags & eServiceReference.flagDirectory) == eServiceReference.flagDirectory:
             # when directory go to descent
@@ -132,26 +179,26 @@ class FilmwebEPGSelection(EPGSelection):
             self.close(evt.getEventName())              
         
 class Filmweb(Screen):
-    skin = """<screen name="FilmwebData" position="90,105" size="1100,560" title="Filmweb data" >
-            <ePixmap pixmap="skin_default/buttons/red.png" position="20,0" zPosition="0" size="140,40" transparent="1" alphatest="on" />
-            <ePixmap pixmap="skin_default/buttons/green.png" position="290,0" zPosition="0" size="140,40" transparent="1" alphatest="on" />
-            <ePixmap pixmap="skin_default/buttons/yellow.png" position="560,0" zPosition="0" size="140,40" transparent="1" alphatest="on" />
-            <ePixmap pixmap="skin_default/buttons/blue.png" position="830,0" zPosition="0" size="140,40" transparent="1" alphatest="on" />
-            <widget name="key_red" position="20,0" zPosition="1" size="140,40" font="Regular;20" valign="center" halign="center" backgroundColor="#9f1313" transparent="1" />
-            <widget name="key_green" position="290,0" zPosition="1" size="140,40" font="Regular;20" valign="center" halign="center" backgroundColor="#1f771f" transparent="1" />
-            <widget name="key_yellow" position="560,0" zPosition="1" size="140,40" font="Regular;20" valign="center" halign="center" backgroundColor="#a08500" transparent="1" />
-            <widget name="key_blue" position="830,0" zPosition="1" size="140,40" font="Regular;20" valign="center" halign="center" backgroundColor="#18188b" transparent="1" />
-            <widget name="title_label" position="10,45" size="850,30" valign="center" font="Regular;22" foregroundColor="#f0b400" transparent="1"/>
-            <widget name="details_label" position="150,80" size="970,120" font="Regular;19"  transparent="1"/>
-            <widget name="plot_label" position="150,200" size="970,110" font="Regular;17" transparent="1"/>
-            <widget name="cast_label" position="10,290" size="1070,240" font="Regular;18" transparent="1"/>
-            <widget name="extra_label" position="10,70" size="1070,450" font="Regular;18" transparent="1"/>
-            <widget name="rating_label" position="870,68" size="210,25" halign="center" font="Regular;18" foregroundColor="#f0b400" transparent="1"/>
-            <widget name="status_bar" position="10,530" size="1070,20" font="Regular;16" foregroundColor="#cccccc" transparent="1"/>
-            <widget name="poster" position="4,60" size="140,238" alphatest="on" />
-            <widget name="menu" position="10,120" size="1070,400" zPosition="3" scrollbarMode="showOnDemand" transparent="1"/>
-            <widget name="stars_bg" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/Filmweb/resource/starsbar_empty.png" position="870,45" zPosition="0" size="210,21" transparent="1" alphatest="on" />
-            <widget name="stars" position="870,45" size="210,21" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/Filmweb/resource/starsbar_filled.png" transparent="1" />
+    skin = """<screen name="FilmwebData" position="90,105" size="1100,560" title="Filmweb.pl" >
+            <ePixmap pixmap="/usr/share/enigma2/skin_default/buttons/red25.png" position="20,515" size="250,40" alphatest="on" />
+            <ePixmap pixmap="/usr/share/enigma2/skin_default/buttons/green25.png" position="290,515" size="250,40" alphatest="on" />
+            <ePixmap pixmap="/usr/share/enigma2/skin_default/buttons/yellow25.png" position="560,515" size="250,40"  alphatest="on" />
+            <ePixmap pixmap="/usr/share/enigma2/skin_default/buttons/blue25.png" position="830,515" size="250,40"  alphatest="on" />
+            <widget name="key_red" position="65,518" size="160,40" zPosition="2" font="Regular;24" valign="center" halign="center" backgroundColor="transpBlack" transparent="1" />
+            <widget name="key_green" position="344,518" size="160,40" zPosition="2" font="Regular;24" valign="center" halign="center" backgroundColor="transpBlack" transparent="1" />
+            <widget name="key_yellow" position="610,518" size="160,40" zPosition="2" font="Regular;24" valign="center" halign="center" backgroundColor="transpBlack" transparent="1" />
+            <widget name="key_blue" position="848,518" size="160,40" zPosition="2" font="Regular;24" valign="center" halign="center" backgroundColor="transpBlack" transparent="1" />
+            <widget name="title_label" position="10,5" size="850,30" valign="center" font="Regular;22" foregroundColor="#f0b400" transparent="1"/>
+            <widget name="details_label" position="170,40" size="900,228" font="Regular;19"  transparent="1"/>
+            <widget name="plot_label" position="550,250" size="535,240" font="Regular;18" transparent="1"/>
+            <widget name="cast_label" position="10,250" size="535,240" scrollbarMode="showOnDemand" transparent="1"/>
+            <widget name="extra_label" position="10,30" size="1070,450" font="Regular;18" transparent="1"/>
+            <widget name="rating_label" position="870,28" size="210,25" halign="center" font="Regular;18" foregroundColor="#f0b400" transparent="1"/>
+            <widget name="status_bar" position="10,490" size="1070,20" font="Regular;16" foregroundColor="#cccccc" transparent="1"/>
+            <widget name="poster" position="20,16" size="140,238" alphatest="on" />
+            <widget name="menu" position="10,80" size="1070,400" zPosition="3" scrollbarMode="showOnDemand" transparent="1"/>
+            <widget name="stars_bg" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/Filmweb/resource/starsbar_empty.png" position="870,5" zPosition="0" size="210,21" transparent="1" alphatest="on" />
+            <widget name="stars" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/Filmweb/resource/starsbar_filled.png" position="870,5" size="210,21" transparent="1" />
         </screen>"""
               
     def __init__(self, session, eventName):
@@ -162,6 +209,7 @@ class Filmweb(Screen):
         self.eventName = eventName
         self.mode = ''
         self.resultlist = []  
+        self.cast_list = []
         self.loopx = 0      
                 
         self.createGUI()
@@ -190,16 +238,18 @@ class Filmweb(Screen):
         if self.mode == VT_MENU:
             self["menu"].instance.moveSelection(self["menu"].instance.moveDown)
         elif self.mode == VT_DETAILS:
-            self["cast_label"].pageDown()
-            self["plot_label"].pageDown()
+            self["cast_label"].instance.moveSelection(self["cast_label"].instance.moveDown)
+            #self["cast_label"].pageDown()
+            #self["plot_label"].pageDown()
         else:
             self["extra_label"].pageDown()                
     def pageUp(self):
         if self.mode == VT_MENU:
             self["menu"].instance.moveSelection(self["menu"].instance.moveUp)
         elif self.mode == VT_DETAILS:
-            self["cast_label"].pageUp()
-            self["plot_label"].pageUp()
+            self["cast_label"].instance.moveSelection(self["cast_label"].instance.moveUp)
+            #self["cast_label"].pageUp()
+            #self["plot_label"].pageUp()
         else:
             self["extra_label"].pageUp()                    
     def exit(self):
@@ -223,18 +273,21 @@ class Filmweb(Screen):
     def menuCallback(self, ret = None):
         v = ret and ret[1]()
         print_info("Context menu selected value", str(v))
+        return v
         
         
-    def channelSelection(self):        
+    def channelSelection(self):      
+        print_info("Channel selection", "exec")  
         self.session.openWithCallback(
             self.serachSelectedChannel,
             FilmwebChannelSelection
         )
                     
     def serachSelectedChannel(self, ret = None):
+        print_info("Serach Selected Channel", str(ret)) 
         if ret:
             #self.switchView(to_mode=VT_MENU)
-            self.eventName = ret
+            self.eventName = ret.getName()
             self.resultlist = []
             self.switchView(to_mode=VT_NONE)
             self.getData()
@@ -348,10 +401,16 @@ class Filmweb(Screen):
         self.picload = ePicLoad()
         self.picload.PictureData.get().append(self.paintPoster)
         self["stars"] = ProgressBar()
-        self["stars_bg"] = Pixmap()        
+        #path=resolveFilename(SCOPE_CURRENT_PLUGIN, 'Filmweb/resource/starsbar_filled.png')
+        #print_info("Current Path", str(path))
+        #self["stars"].instance.setPixmap(LoadPixmap(cached=True, path=path))
+        self["stars_bg"] = Pixmap()      
+        #self["stars_bg"].instance.setPixmap(LoadPixmap(cached=True, path=resolveFilename(SCOPE_CURRENT_PLUGIN, 'Filmweb/resource/starsbar_empty.png')))  
         self["details_label"] = Label("")
         self["plot_label"] = ScrollLabel("")
-        self["cast_label"] = ScrollLabel("")
+        self["cast_label"] = ChoiceList(self.cast_list)
+        #self.l.setFont(0, gFont("Regular", 20))
+        self["cast_label"].l.setItemHeight(50)
         self["extra_label"] = ScrollLabel("")
         self["status_bar"] = Label("")
         self["rating_label"] = Label("")        
@@ -399,7 +458,7 @@ class Filmweb(Screen):
             self.parseCast()
             self.parsePlot()            
             
-            self.parseDatails()
+            self.parseDetails()
         else:
             self["status_bar"].setText(_("Movie details parsing error"))
         
@@ -478,16 +537,35 @@ class Filmweb(Screen):
             
     def parseCast(self):
         print_info("parseCast", "started")  
-        cast = mautils.between(self.inhtml, '<div class="castListWrapper cl">', '<div class="additional-info comBox">')
-        cast = mautils.before(cast, '</ul>')
-        cast = cast.replace('</span> ', '')
-        cast = cast.replace('<div>', _(" as "))
-        cast = cast.replace('</li>', "\n")
-        cast = mautils.strip_tags(cast)
-        cast = cast.replace('   ', '')
-        cast = cast.replace('  ', ' ')
-        self["cast_label"].setText(_("Cast: ") + "\n" + cast)
         
+        self.cast_list = []
+        fidx = self.inhtml.find('<div class="castListWrapper cl">')
+        if fidx > -1:
+            #cast = mautils.between(self.inhtml, '<div class="castListWrapper cl">', '<div class="additional-info comBox">')
+            cast = mautils.between(self.inhtml[fidx:], '<ul class=list>', '</ul>')
+            
+            elements = cast.split('<li')
+            no_elems = len(elements)
+            print_info("Cast list elements count", str(no_elems))
+            cidx = 0
+            if elements != '':
+                for element in elements:
+                    if element == '':
+                        continue
+                    element = mautils.after(element, '>')
+                    print_info("Actor", "EL=" + element)
+                    imge = mautils.between(element, '<img', '>')
+                    print_info("Actor data", "IMG=" + imge)
+                    imge = mautils.between(imge, 'src="', '"')
+                    stre = element.replace('<div>', _(" as "))
+                    stre = mautils.strip_tags(stre)
+                    stre = stre.replace('   ', '')
+                    stre = stre.replace('  ', ' ')
+                    print_info("Actor data", "IMG=" + imge + ", DATA=" + stre)  
+                    self.cast_list.append(ActorEntryComponent(self["cast_label"], img_url = imge, text = [stre], index=cidx))
+                    cidx += 1            
+            self["cast_label"].l.setList(self.cast_list)
+                    
     def parseCountry(self):
         print_info("parseCountry", "started")
         country = ''
@@ -662,6 +740,18 @@ class Filmweb(Screen):
                     element = mautils.after(element, 'searchResultTitle href="')
                     link = mautils.before(element, '"')
                     print_info("The movie link", link)
+                    cast = mautils.after(element, 'class=searchHitCast')                    
+                    cast =  mautils.between(cast, '>', '</div>')                    
+                    cast = mautils.strip_tags(cast)
+                    cast = cast.replace('\t', '')
+                    cast = cast.replace('\n', '')
+                    print_info("The movie cast", cast)
+                    rating = mautils.after(element, 'class=searchResultRating')                    
+                    rating =  mautils.between(rating, '>', '</div>')                    
+                    rating = mautils.strip_tags(rating)
+                    rating = rating.replace('\t', '')
+                    rating = rating.replace('\n', '')
+                    print_info("The movie rating", rating)                    
                     #self.links.append('http://www.filmweb.pl' + link)                    
                     title = mautils.between(element, '">', '</a>')
                     title = title.replace('\t', '')
@@ -680,9 +770,13 @@ class Filmweb(Screen):
                     if year:
                         element += ' (' + year.strip() + ')'
                     if country:
-                        element += ' - ' + country.strip()
+                        element += ' - ' + country.strip()                    
                     #element = mautils.convert_entities(element)
                     element = mautils.strip_tags(element)
+                    if rating:
+                        element += '\n' + rating.strip()
+                    if cast:
+                        element += '\n' + cast.strip()
                     print_info("The movie serach title", element)
                     #self.titles.append(element)
                     self.resultlist.append((element,'http://www.filmweb.pl' + link))
