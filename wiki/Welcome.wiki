@@ -20,6 +20,10 @@ You could run plugin from two places:
 = Change log =
 ----
 === ver. 1.0.4 ===
+  * Added extra menu on the CTX-MENU button
+  * Color buttons look redesigned
+  * GUI changed
+  * Cast list changed - actor pictures showing added
   * Movie runtime showing added
   * Added actions on main window context menu
     * action for enter the movie name to search
