@@ -19,6 +19,8 @@ You could run plugin from two places:
 
 = Change log =
 ----
+=== ver. 1.0.5 ===
+  * Dependency fixed ininstallation script
 === ver. 1.0.4 ===
   * Added extra menu on the CTX-MENU button
   * Color buttons look redesigned
