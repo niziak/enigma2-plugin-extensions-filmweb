@@ -29,8 +29,8 @@ from os import path
 #import re
     
 from Tools.BoundFunction import boundFunction
-from Tools.LoadPixmap import LoadPixmap
-from Tools.Directories import resolveFilename, SCOPE_CURRENT_PLUGIN
+#from Tools.LoadPixmap import LoadPixmap
+#from Tools.Directories import resolveFilename, SCOPE_CURRENT_PLUGIN
 
 from Screens.Screen import Screen
 from Screens.InputBox import InputBox
@@ -51,6 +51,8 @@ from Components.Pixmap import Pixmap
 from Components.ScrollLabel import ScrollLabel
 from Components.Button import Button
 from Components.ActionMap import ActionMap
+
+TITLE_MAX_SIZE = 67
 
 VT_NONE = 'none'
 VT_MENU = 'MENU'
@@ -180,22 +182,22 @@ class FilmwebEPGSelection(EPGSelection):
         
 class Filmweb(Screen):
     skin = """<screen name="FilmwebData" position="90,105" size="1100,560" title="Filmweb.pl" >
-            <ePixmap pixmap="/usr/share/enigma2/skin_default/buttons/red25.png" position="20,515" size="250,40" alphatest="on" />
-            <ePixmap pixmap="/usr/share/enigma2/skin_default/buttons/green25.png" position="290,515" size="250,40" alphatest="on" />
-            <ePixmap pixmap="/usr/share/enigma2/skin_default/buttons/yellow25.png" position="560,515" size="250,40"  alphatest="on" />
-            <ePixmap pixmap="/usr/share/enigma2/skin_default/buttons/blue25.png" position="830,515" size="250,40"  alphatest="on" />
-            <widget name="key_red" position="65,518" size="160,40" zPosition="2" font="Regular;24" valign="center" halign="center" backgroundColor="transpBlack" transparent="1" />
-            <widget name="key_green" position="344,518" size="160,40" zPosition="2" font="Regular;24" valign="center" halign="center" backgroundColor="transpBlack" transparent="1" />
-            <widget name="key_yellow" position="610,518" size="160,40" zPosition="2" font="Regular;24" valign="center" halign="center" backgroundColor="transpBlack" transparent="1" />
-            <widget name="key_blue" position="848,518" size="160,40" zPosition="2" font="Regular;24" valign="center" halign="center" backgroundColor="transpBlack" transparent="1" />
-            <widget name="title_label" position="10,5" size="850,30" valign="center" font="Regular;22" foregroundColor="#f0b400" transparent="1"/>
+            <ePixmap pixmap="/usr/share/enigma2/skin_default/buttons/red25.png" position="20,505" size="250,40" alphatest="on" />
+            <ePixmap pixmap="/usr/share/enigma2/skin_default/buttons/green25.png" position="290,505" size="250,40" alphatest="on" />
+            <ePixmap pixmap="/usr/share/enigma2/skin_default/buttons/yellow25.png" position="560,505" size="250,40"  alphatest="on" />
+            <ePixmap pixmap="/usr/share/enigma2/skin_default/buttons/blue25.png" position="830,505" size="250,40"  alphatest="on" />
+            <widget name="key_red" position="65,508" size="160,40" zPosition="2" font="Regular;24" valign="center" halign="center" backgroundColor="transpBlack" transparent="1" />
+            <widget name="key_green" position="344,508" size="160,40" zPosition="2" font="Regular;24" valign="center" halign="center" backgroundColor="transpBlack" transparent="1" />
+            <widget name="key_yellow" position="610,508" size="160,40" zPosition="2" font="Regular;24" valign="center" halign="center" backgroundColor="transpBlack" transparent="1" />
+            <widget name="key_blue" position="848,508" size="160,40" zPosition="2" font="Regular;24" valign="center" halign="center" backgroundColor="transpBlack" transparent="1" />
+            <widget name="title_label" position="10,0" size="850,30" valign="center" font="Regular;22" foregroundColor="#f0b400" transparent="1"/>
             <widget name="details_label" position="170,40" size="900,228" font="Regular;19"  transparent="1"/>
             <widget name="plot_label" position="550,250" size="535,240" font="Regular;18" transparent="1"/>
             <widget name="cast_label" position="10,250" size="535,240" scrollbarMode="showOnDemand" transparent="1"/>
             <widget name="extra_label" position="10,30" size="1070,450" font="Regular;18" transparent="1"/>
             <widget name="rating_label" position="870,28" size="210,25" halign="center" font="Regular;18" foregroundColor="#f0b400" transparent="1"/>
-            <widget name="status_bar" position="10,490" size="1070,20" font="Regular;16" foregroundColor="#cccccc" transparent="1"/>
-            <widget name="poster" position="20,16" size="140,238" alphatest="on" />
+            <widget name="status_bar" position="10,545" size="1070,20" font="Regular;16" foregroundColor="#cccccc" transparent="1"/>
+            <widget name="poster" position="20,26" size="140,216" alphatest="on" />
             <widget name="menu" position="10,80" size="1070,400" zPosition="3" scrollbarMode="showOnDemand" transparent="1"/>
             <widget name="stars_bg" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/Filmweb/resource/starsbar_empty.png" position="870,5" zPosition="0" size="210,21" transparent="1" alphatest="on" />
             <widget name="stars" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/Filmweb/resource/starsbar_filled.png" position="870,5" size="210,21" transparent="1" />
@@ -208,6 +210,7 @@ class Filmweb(Screen):
         self.session = session
         self.eventName = eventName
         self.mode = ''
+        self.detailDir = 0
         self.resultlist = []  
         self.cast_list = []
         self.loopx = 0      
@@ -225,6 +228,8 @@ class Filmweb(Screen):
             "cancel": self.exit,
             "down": self.pageDown,
             "up": self.pageUp,
+            "left": self.moveLeft,
+            "right": self.moveRight,
             "red": self.exit,
             "green": self.showMenu,
             "yellow": self.showDetails,
@@ -233,23 +238,31 @@ class Filmweb(Screen):
             "showEventInfo": self.showDetails
         }, -1)
         
-    # ---- ACTIONS ----    
+    # ---- ACTIONS ----  
+    def moveLeft(self):
+        if self.mode == VT_DETAILS:
+            self.detailDir = 0                
+    def moveRight(self):
+        if self.mode == VT_DETAILS:
+            self.detailDir = 1
     def pageDown(self):
         if self.mode == VT_MENU:
             self["menu"].instance.moveSelection(self["menu"].instance.moveDown)
         elif self.mode == VT_DETAILS:
-            self["cast_label"].instance.moveSelection(self["cast_label"].instance.moveDown)
-            #self["cast_label"].pageDown()
-            #self["plot_label"].pageDown()
+            if self.detailDir == 0:
+                self["cast_label"].instance.moveSelection(self["cast_label"].instance.moveDown)
+            else:
+                self["plot_label"].pageDown()
         else:
             self["extra_label"].pageDown()                
     def pageUp(self):
         if self.mode == VT_MENU:
             self["menu"].instance.moveSelection(self["menu"].instance.moveUp)
         elif self.mode == VT_DETAILS:
-            self["cast_label"].instance.moveSelection(self["cast_label"].instance.moveUp)
-            #self["cast_label"].pageUp()
-            #self["plot_label"].pageUp()
+            if self.detailDir == 0:
+                self["cast_label"].instance.moveSelection(self["cast_label"].instance.moveUp)
+            else:
+                self["plot_label"].pageUp()
         else:
             self["extra_label"].pageUp()                    
     def exit(self):
@@ -391,8 +404,8 @@ class Filmweb(Screen):
         self["title_label"] = Label()
         def setLText(txt):
             print_info("setLText - Title Label", str(txt))
-            if len(txt) > 57:
-                txt = txt[0:54] + "..."
+            if len(txt) > TITLE_MAX_SIZE:
+                txt = txt[0:TITLE_MAX_SIZE - 3] + "..."
             Label.setText(self["title_label"], txt)
         self["title_label"].setText = setLText
         self["title"] = StaticText('')        
@@ -451,7 +464,7 @@ class Filmweb(Screen):
         if self.inhtml:
             self.parseTitle()  
             ls = len(self["title_label"].getText())
-            if ls < 57:
+            if ls < TITLE_MAX_SIZE:
                 self.parseOrgTitle() 
             self.parseRating()
             self.parsePoster()
