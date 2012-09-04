@@ -21,6 +21,7 @@ You could run plugin from two places:
 ----
 === ver. 1.0.6 ===
   * Added Left/Right key actions handling on Details page to enable scrolling cast list or plot list
+  * Query screen changed - added rating and other info
 === ver. 1.0.5 ===
   * Dependency fixed ininstallation script
 === ver. 1.0.4 ===
