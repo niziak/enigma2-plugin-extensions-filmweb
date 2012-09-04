@@ -22,14 +22,14 @@
 ######################################################################
 
 from twisted.web.client import downloadPage, getPage
-from enigma import eTimer, ePicLoad, eServiceReference, eServiceEvent, eListboxPythonMultiContent, RT_HALIGN_LEFT
+from enigma import gFont, eTimer, ePicLoad, eServiceReference, eServiceEvent, eListboxPythonMultiContent, RT_HALIGN_LEFT
 import mautils
 import gettext
 from os import path
 #import re
     
 from Tools.BoundFunction import boundFunction
-#from Tools.LoadPixmap import LoadPixmap
+from Tools.LoadPixmap import LoadPixmap
 #from Tools.Directories import resolveFilename, SCOPE_CURRENT_PLUGIN
 
 from Screens.Screen import Screen
@@ -40,7 +40,8 @@ from Screens.EpgSelection import EPGSelection
 #from Screens.InfoBarGenerics import InfoBarEPG
 from Screens.ChannelSelection import SimpleChannelSelection
 
-from Components.ChoiceList import ChoiceList, ChoiceEntryComponent
+from Components.MultiContent import MultiContentEntryText, MultiContentEntryProgress, MultiContentTemplateColor
+from Components.ChoiceList import ChoiceList
 from Components.Input import Input
 from Components.AVSwitch import AVSwitch
 from Components.Sources.StaticText import StaticText
@@ -72,10 +73,28 @@ def _(txt):
         
 actorPicload = {}
 
+def MovieSearchEntryComponent(text = ["--"]):
+    res = [ text ]
+
+    if text[0] == "--":
+        res.append((eListboxPythonMultiContent.TYPE_TEXT, 0, 0, 800, 65, 0, RT_HALIGN_LEFT, "-"*200))
+    else:
+        offset = 0
+        for x in text.splitlines():
+            if offset == 0:            
+                color=0x00F0B400
+                font=1
+            else:
+                color=0x00FFFFFF
+                font=0                
+            res.append(MultiContentEntryText(pos=(0, offset), size=(800, 25), font=font, 
+                                             flags=RT_HALIGN_LEFT, text=x, 
+                                             color=color, color_sel=color))
+            offset = offset + 25        
+    return res      
+    
 def ActorEntryComponent(inst, img_url = "", text = ["--"], index=0):
     res = [ text ]
-    #timer = eTimer()
-    #timer.callback.append(picloadTimeout)
     
     def paintImage(idx=None, picInfo=None):
         print_info("Paint Actor Image", str(idx))
@@ -320,8 +339,9 @@ class Filmweb(Screen):
                 self.loadDetails(self.resultlist[0][1], self.resultlist[0][0])
         elif to_mode == VT_DETAILS:
             if self.mode == VT_MENU:
-                if self["menu"].getCurrent():                
-                    self.loadDetails(link=self["menu"].getCurrent()[1], title=self["menu"].getCurrent()[0])
+                if self["menu"].getCurrent():    
+                    idx = self["menu"].getSelectionIndex()        
+                    self.loadDetails(link=self.resultlist[idx][1], title=self.resultlist[idx][0])
                 else:
                     to_mode = VT_MENU
             elif self.mode == VT_EXTRAS:
@@ -396,9 +416,9 @@ class Filmweb(Screen):
             self["rating_label"].hide()
             self["menu"].hide()
             
-            self["key_green"].setText(_("Title Menu"))
-            self["key_yellow"].setText(_("Details"))
-            self["key_blue"].setText(_("Extra"))
+            self["key_green"].setText('')
+            self["key_yellow"].setText('')
+            self["key_blue"].setText('')
 
     def createGUI(self):
         self["title_label"] = Label()
@@ -413,21 +433,26 @@ class Filmweb(Screen):
         self["poster"] = Pixmap()
         self.picload = ePicLoad()
         self.picload.PictureData.get().append(self.paintPoster)
-        self["stars"] = ProgressBar()
+        self["stars"] = ProgressBar()        
+        
+        #self["stars"].instance.setPixmap(LoadPixmap(cached=True, path=mautils.getPluginPath() + '/resource/starsbar_filled.png'))        
         #path=resolveFilename(SCOPE_CURRENT_PLUGIN, 'Filmweb/resource/starsbar_filled.png')
         #print_info("Current Path", str(path))
-        #self["stars"].instance.setPixmap(LoadPixmap(cached=True, path=path))
+        
         self["stars_bg"] = Pixmap()      
         #self["stars_bg"].instance.setPixmap(LoadPixmap(cached=True, path=resolveFilename(SCOPE_CURRENT_PLUGIN, 'Filmweb/resource/starsbar_empty.png')))  
         self["details_label"] = Label("")
         self["plot_label"] = ScrollLabel("")
-        self["cast_label"] = ChoiceList(self.cast_list)
-        #self.l.setFont(0, gFont("Regular", 20))
+        self["cast_label"] = ChoiceList(self.cast_list)        
         self["cast_label"].l.setItemHeight(50)
         self["extra_label"] = ScrollLabel("")
         self["status_bar"] = Label("")
         self["rating_label"] = Label("")        
-        self["menu"] = MenuList(self.resultlist)
+        self["menu"] = ChoiceList(self.resultlist)
+        self["menu"].l.setItemHeight(70)
+        self["menu"].l.setFont(0, gFont("Regular", 16))
+        self["menu"].l.setFont(1, gFont("Regular", 20))        
+        
         self["key_red"] = Button(_("Exit"))
         self["key_green"] = Button()
         self["key_yellow"] = Button()
@@ -438,14 +463,19 @@ class Filmweb(Screen):
         
     def getData(self):
         self.resultlist = []
-        if not self.eventName:
+        if not self.eventName or len(self.eventName.strip()) == 0:
             s = self.session.nav.getCurrentService()
             info = s and s.info()
             print_info("Current Service Info", str(info))
-            event = info and info.getEvent(0) # 0 = now, 1 = next
+            event = info and info.getEvent(0) 
             print_info("Current Event", str(event))
             if event:
                 self.eventName = event.getEventName()
+            if len(str(self.eventName).strip()) == 0:
+                event = info and info.getEvent(1)
+                print_info("Next Event", str(event))
+                if event:
+                    self.eventName = event.getEventName()
         print_info("Getting data for event with name", self.eventName)
         if self.eventName:
             self["status_bar"].setText(_("Query Filmweb: %s...") % (self.eventName))
@@ -456,6 +486,8 @@ class Filmweb(Screen):
             getPage(fetchurl, cookies=COOKIES).addCallback(self.fetchOK).addErrback(self.fetchFailed)            
         else:
             self["status_bar"].setText(_("Unknown Eventname"))
+            self["title_label"].setText(_("Unknown Eventname"))
+            self.switchView(to_mode='')
 
     def fetchDetailsOK(self, txt_):
         print_info("fetch details OK", str(COOKIES))
@@ -484,9 +516,18 @@ class Filmweb(Screen):
                 if self.loopx == 0:
                     self.loopx = 1
                     self.getData()
+                else:
+                    self.loopx = 0
                 return;
-            self.search() 
-        self["menu"].l.setList(self.resultlist)  
+            self.search()
+        lista = []
+        for entry in self.resultlist:            
+            caption = entry[0]
+            link = entry[1]
+            print_info("LISTA", "caption: " + str(caption) + ", lnk: " + link)
+            lista.append(MovieSearchEntryComponent(text = caption))
+        self["menu"].l.setList(lista)
+        #self["menu"].l.setList(self.resultlist)  
         self.switchView(to_mode='MENU')
                 
     def fetchPosterOK(self, data):
