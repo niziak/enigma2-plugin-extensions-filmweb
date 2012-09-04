@@ -21,6 +21,7 @@
 # GNU General Public License, version 3 or later
 ######################################################################
 
+import os
 import re
 import string
 try:
@@ -32,6 +33,9 @@ except ImportError as ie:
     from urllib.parse import quote_plus
     iteritems = lambda d: d.items()
     
+def getPluginPath():
+    return os.path.dirname(os.path.realpath(__file__))
+  
 def quote(txt):
     return quote_plus(txt) 
 
