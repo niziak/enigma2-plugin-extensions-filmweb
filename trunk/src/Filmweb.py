@@ -28,6 +28,7 @@ import gettext
 from os import path
 #import re
     
+from ServiceReference import ServiceReference
 from Tools.BoundFunction import boundFunction
 #from Tools.LoadPixmap import LoadPixmap
 #from Tools.Directories import resolveFilename, SCOPE_CURRENT_PLUGIN
@@ -318,6 +319,7 @@ class Filmweb(Screen):
     def serachSelectedChannel(self, ret = None):
         print_info("Serach Selected Channel", str(ret)) 
         if ret:
+            sr = ServiceReference(ret)            
             #self.switchView(to_mode=VT_MENU)  
             serviceHandler = eServiceCenter.getInstance()  
             info = serviceHandler.info(ret)               
@@ -485,20 +487,6 @@ class Filmweb(Screen):
             evt = info and info.getEvent(ref) 
             print_info("Event", str(evt))               
             self.eventName = evt and evt.getEventName()  
-            
-            '''
-            info = s and s.info()
-            print_info("Current Service Info", str(info))
-            event = info and info.getEvent(0) 
-            print_info("Current Event", str(event))
-            if event:
-                self.eventName = event.getEventName()
-            if len(str(self.eventName).strip()) == 0:
-                event = info and info.getEvent(1)
-                print_info("Next Event", str(event))
-                if event:
-                    self.eventName = event.getEventName()
-            '''
         print_info("Getting data for event with name", self.eventName)
         if self.eventName:
             self["status_bar"].setText(_("Query Filmweb: %s...") % (self.eventName))
@@ -721,12 +709,13 @@ class Filmweb(Screen):
             runtime = mautils.between(self.inhtml, "czas trwania:", '</strong>')
             runtime = mautils.after(runtime, '<strong>')
         else:  
-            runtime = mautils.between(self.inhtml, "czas trwania:", '</tr>')
-            runtime = mautils.after(runtime, '<td>')
-            runtime = mautils.before(runtime, '</td>')
-        runtime = runtime.replace(' ', '')
+            runtime = mautils.between(self.inhtml, 'var filmTime="', '";')
+            #runtime = mautils.after(runtime, '<td>')
+            #runtime = mautils.before(runtime, '</td>')
+        runtime = runtime.replace(' ', '')        
         if not runtime:
             return
+        print_info("Runtime parsed", runtime)
         str_m = ''
         str_h = ''
         if runtime.find('godz.') > -1:
@@ -734,6 +723,7 @@ class Filmweb(Screen):
             runtime = mautils.after(runtime, 'godz.')
         if runtime.find('min.') > -1:
             str_m = mautils.before(runtime, 'min.')
+        print_info("Runtime", "godz: " + str_h + ", min: " + str_m)
         val_runtime = 0
         if str_h:
             val_runtime = 60 * int(float(str_h))
@@ -752,15 +742,15 @@ class Filmweb(Screen):
         print_info("Movie Country", country)
         year = self.parseYear()
         print_info("Movie Year", str(year))
-        rt = self.parseRuntime()   
-        print_info("Movie Runtime", str(rt))
+        rtm = self.parseRuntime()   
+        print_info("Movie Runtime", str(rtm))
         
         self["details_label"].setText(_("Genre: ") + genere + "\n" + 
                                       _("Country: ") +  country + "\n" + 
                                       _("Director: ") + director + "\n" + 
                                       _("Writer: ") + writer + "\n" +
                                       _("Year: ") + year + "\n" + 
-                                      _("Runtime: ") + str(rt) + " min.\n"                                           
+                                      _("Runtime: ") + str(rtm) + " min.\n"                                           
                                       )                     
 
     def inputMovieName(self):
