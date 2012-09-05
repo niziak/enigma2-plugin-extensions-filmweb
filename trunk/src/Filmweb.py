@@ -22,14 +22,14 @@
 ######################################################################
 
 from twisted.web.client import downloadPage, getPage
-from enigma import gFont, eTimer, ePicLoad, eServiceReference, eServiceEvent, eListboxPythonMultiContent, RT_HALIGN_LEFT
+from enigma import gFont, eTimer, ePicLoad, eServiceReference, eServiceCenter, eServiceEvent, eListboxPythonMultiContent, RT_HALIGN_LEFT
 import mautils
 import gettext
 from os import path
 #import re
     
 from Tools.BoundFunction import boundFunction
-from Tools.LoadPixmap import LoadPixmap
+#from Tools.LoadPixmap import LoadPixmap
 #from Tools.Directories import resolveFilename, SCOPE_CURRENT_PLUGIN
 
 from Screens.Screen import Screen
@@ -40,12 +40,12 @@ from Screens.EpgSelection import EPGSelection
 #from Screens.InfoBarGenerics import InfoBarEPG
 from Screens.ChannelSelection import SimpleChannelSelection
 
-from Components.MultiContent import MultiContentEntryText, MultiContentEntryProgress, MultiContentTemplateColor
+from Components.MultiContent import MultiContentEntryText #, MultiContentEntryProgress, MultiContentTemplateColor
 from Components.ChoiceList import ChoiceList
 from Components.Input import Input
 from Components.AVSwitch import AVSwitch
 from Components.Sources.StaticText import StaticText
-from Components.MenuList import MenuList
+#from Components.MenuList import MenuList
 from Components.ProgressBar import ProgressBar
 from Components.Label import Label
 from Components.Pixmap import Pixmap
@@ -318,8 +318,17 @@ class Filmweb(Screen):
     def serachSelectedChannel(self, ret = None):
         print_info("Serach Selected Channel", str(ret)) 
         if ret:
-            #self.switchView(to_mode=VT_MENU)
-            self.eventName = ret.getName()
+            #self.switchView(to_mode=VT_MENU)  
+            serviceHandler = eServiceCenter.getInstance()  
+            info = serviceHandler.info(ret)               
+            print_info("Service info", str(info)) 
+            #sname = info and info.getName(ret) or ""  
+            #print_info("Service name", str(sname))  
+            evt = info and info.getEvent(ret) 
+            print_info("Event", str(evt))  
+            #evtname = evt and evt.getEventName()
+            #print_info("Event name", str(evtname))  
+            self.eventName = evt and evt.getEventName()           
             self.resultlist = []
             self.switchView(to_mode=VT_NONE)
             self.getData()
@@ -460,11 +469,24 @@ class Filmweb(Screen):
         
     def __str__(self):
         return "FILMWEB {Session: " + str(self.session) + ", EventName:" + str(self.eventName) + "}"
-        
+                     
     def getData(self):
         self.resultlist = []
+        print_info("Getting data for event", str(self.eventName))
         if not self.eventName or len(self.eventName.strip()) == 0:
             s = self.session.nav.getCurrentService()
+            print_info("Current Service", str(s))
+            ref = self.session.nav.getCurrentlyPlayingServiceReference()
+            print_info("Current Service ref", str(ref))
+            
+            serviceHandler = eServiceCenter.getInstance()  
+            info = serviceHandler.info(ref)               
+            print_info("Service info", str(info))              
+            evt = info and info.getEvent(ref) 
+            print_info("Event", str(evt))               
+            self.eventName = evt and evt.getEventName()  
+            
+            '''
             info = s and s.info()
             print_info("Current Service Info", str(info))
             event = info and info.getEvent(0) 
@@ -476,6 +498,7 @@ class Filmweb(Screen):
                 print_info("Next Event", str(event))
                 if event:
                     self.eventName = event.getEventName()
+            '''
         print_info("Getting data for event with name", self.eventName)
         if self.eventName:
             self["status_bar"].setText(_("Query Filmweb: %s...") % (self.eventName))
