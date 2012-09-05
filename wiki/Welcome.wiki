@@ -21,6 +21,7 @@ You could run plugin from two places:
 ----
 === ver. 1.0.7 ===
   * Seraching by current event and by event from EPG fixed
+  * Runtime parsing fixed - changes on the Filmweb.pl page
 === ver. 1.0.6 ===
   * Added Left/Right key actions handling on Details page to enable scrolling cast list or plot list
   * Query screen changed - added rating and other info
