@@ -12,6 +12,6 @@ cd ../srcipts/control
 tar zcvf ../../tmp/control.tar.gz ./*
 cd ../../tmp
 cp ../srcipts/debian-binary ./
-ar -r ../enigma2-plugin-extensions-filmweb_1.0.7_all.ipk ./debian-binary ./data.tar.gz ./control.tar.gz
+ar -r ../enigma2-plugin-extensions-filmweb_1.0.9_mipsel.ipk ./debian-binary ./data.tar.gz ./control.tar.gz
 cd ..
 rm -rf tmp
