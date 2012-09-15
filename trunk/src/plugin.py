@@ -40,9 +40,9 @@ def _(txt):
 localeInit()
 language.addCallback(localeInit)
 
-def main(session, eventName="", **kwargs):
-    reload(Filmweb)
+def main(session, eventName="", **kwargs):    
     reload(mautils)
+    reload(Filmweb)
     try:
         session.open(Filmweb.Filmweb, eventName)
     except:
@@ -50,8 +50,8 @@ def main(session, eventName="", **kwargs):
         traceback.print_exc()
         
 def eventinfo(session, servicelist, **kwargs):
-    reload(Filmweb)
     reload(mautils)
+    reload(Filmweb)    
     try:
         ref = session.nav.getCurrentlyPlayingServiceReference()
         Filmweb.print_info("Current Service ref", str(ref))
