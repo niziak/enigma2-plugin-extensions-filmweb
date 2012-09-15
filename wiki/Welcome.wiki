@@ -1,24 +1,28 @@
 = Introduction =
 ----
-This plugin will do a query on Filmweb.pl for movies from EPG and will show the info in a popup window. When the query returns the ambigous results the list of items is presented so user could select correct movie. 
-
+This plugin will do a query on Filmweb.pl for movies from EPG and will show the info in a popup window. When the query returns the ambigous results the list of items is presented so user could select correct movie.  Plugin is prepared based on the resources from the BlackGlass-HD skin (default skin for BlackHole image), so if you want to use it in the other skin you should copy proper resources to the proper location - you should look at skin definition in the sources.
 
 = Installation =
 ----
   * SSH onto the dreambox
+  * install libs: python-html, python-twisted-web
   * copy IPK file to /tmp folder
   * use manual IPK package installation option from Dreambox plugin menu
-
 
 = Usage =
 ----
 You could run plugin from two places:
   * from Extension Manager - automatically searches the currently watched movie
   * using INFO button for a long time and than when the list of entries is showed selecting the movie position 
-
+ 
+I've assigned function from Extension Manager on the YELLOW key button using Multiquick plugin.
 
 = Change log =
 ----
+=== ver. 1.0.9 ===
+  * None
+=== ver. 1.0.8 ===
+  * Switching to version UNK and MIPSEL
 === ver. 1.0.7 ===
   * Seraching by current event and by event from EPG fixed
   * Runtime parsing fixed - changes on the Filmweb.pl page
