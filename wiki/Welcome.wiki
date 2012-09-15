@@ -20,7 +20,8 @@ I've assigned function from Extension Manager on the YELLOW key button using Mul
 = Change log =
 ----
 === ver. 1.0.9 ===
-  * None
+  * Series data fetching added
+  * New entry added to context menu in main window 
 === ver. 1.0.8 ===
   * Switching to version UNK and MIPSEL
 === ver. 1.0.7 ===
