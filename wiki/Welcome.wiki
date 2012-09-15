@@ -25,6 +25,7 @@ I've assigned function from Extension Manager on the YELLOW key button using Mul
   * Configuration entry added to the context menu 
   * Login to portal functionality implemented based on the configuration data
   * Added voting function entry to the context menu 
+  * Wallpapers fetching added
 === ver. 1.0.8 ===
   * Switching to version UNK and MIPSEL
 === ver. 1.0.7 ===
