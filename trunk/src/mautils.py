@@ -32,7 +32,35 @@ except ImportError as ie:
     from html import entities as htmlentitydefs
     from urllib.parse import quote_plus
     iteritems = lambda d: d.items()
+from enigma import ePicLoad
+from Components.Pixmap import Pixmap
+from Components.AVSwitch import AVSwitch
+
     
+class PixLoader(Pixmap):
+    def __init__(self, callback = None):
+        Pixmap.__init__(self)
+        self.picload = ePicLoad()
+        self.picload.PictureData.get().append(self.paintMe)
+        self.callback = callback
+        self.filename = None
+ 
+    def onShow(self):
+        Pixmap.onShow(self)
+        sc = AVSwitch().getFramebufferScale()
+        self.picload.setPara((self.instance.size().width(), self.instance.size().height(), sc[0], sc[1], False, 1, "#00000000"))
+ 
+    def paintMe(self, picInfo=None):
+        ptr = self.picload.getData()
+        if ptr != None:
+            self.instance.setPixmap(ptr.__deref__())
+        if self.callback is not None:
+            self.callback(self.filename)
+ 
+    def updateIcon(self, filename):
+        self.filename = filename
+        self.picload.startDecode(filename)
+        
 def getPluginPath():
     return os.path.dirname(os.path.realpath(__file__))
   

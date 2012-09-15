@@ -25,7 +25,8 @@ from twisted.web.client import downloadPage, getPage
 from enigma import gFont, eTimer, ePicLoad, eServiceReference, eServiceCenter, eServiceEvent, eListboxPythonMultiContent, RT_HALIGN_LEFT
 import mautils
 import gettext
-from os import path
+import os
+import urllib
 #import re
     
 from ServiceReference import ServiceReference
@@ -36,7 +37,7 @@ from Tools.BoundFunction import boundFunction
 from Screens.Screen import Screen
 from Screens.InputBox import InputBox
 from Screens.ChoiceBox import ChoiceBox
-#from Screens.MessageBox import MessageBox
+from Screens.MessageBox import MessageBox
 from Screens.EpgSelection import EPGSelection
 #from Screens.InfoBarGenerics import InfoBarEPG
 from Screens.ChannelSelection import SimpleChannelSelection
@@ -53,8 +54,16 @@ from Components.Pixmap import Pixmap
 from Components.ScrollLabel import ScrollLabel
 from Components.Button import Button
 from Components.ActionMap import ActionMap
+from Components.ConfigList import ConfigListScreen
+from Components.config import config, configfile, getConfigListEntry, ConfigPassword, ConfigText, ConfigSubsection
 
+USER_TOKEN = '_artuser_token'
+SESSION_KEY = '_artuser_sessionId'
+POSTER_PATH = "/tmp/poster.jpg"
 TITLE_MAX_SIZE = 67
+
+MT_MOVIE = 'film'
+MT_SERIE = 'serial'
 
 VT_NONE = 'none'
 VT_MENU = 'MENU'
@@ -62,6 +71,11 @@ VT_DETAILS = 'DETAILS'
 VT_EXTRAS = 'EXTRAS'
 
 COOKIES = {}
+
+config.plugins.mfilmweb = ConfigSubsection()
+config.plugins.mfilmweb.user = ConfigText(default = "", fixed_size = False)
+config.plugins.mfilmweb.password = ConfigPassword(default="",visible_width = 50,fixed_size = False)
+
 
 def print_info(nfo, data):
     mautils.print_info("FILMWEB", nfo, data)    
@@ -109,8 +123,8 @@ def ActorEntryComponent(inst, img_url = "", text = ["--"], index=0):
     
     def fetchImgOK(data, idx):
         print_info("fetchImgOK", str(idx))
-        rpath = path.realpath("/tmp/actor_img_" + str(idx) + ".jpg")
-        if path.exists(rpath):
+        rpath = os.path.realpath("/tmp/actor_img_" + str(idx) + ".jpg")
+        if os.path.exists(rpath):
             sc = AVSwitch().getFramebufferScale()
             actorPicload[idx].setPara((40, 45, sc[0], sc[1], False, 1, "#00000000"))
             print_info("Decode Image", rpath)
@@ -200,27 +214,70 @@ class FilmwebEPGSelection(EPGSelection):
         else:
             self.close(evt.getEventName())              
         
+class FilmwebConfig(Screen, ConfigListScreen):
+    skin = """<screen position="center,center" size="700,340" title="Filmweb Plugin Configuration">
+        <widget name="config" position="10,30" size="680,230" scrollbarMode="showOnDemand" transparent="1"/>
+        
+        <ePixmap pixmap="skin_default/buttons/red.png" position="140,270" size="140,40" alphatest="on" />
+        <ePixmap pixmap="skin_default/buttons/green.png" position="420,270" size="140,40"  alphatest="on" zPosition="1" />
+        
+        <widget name="key_red" position="140,270" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="red" transparent="1" />        
+        <widget name="key_green" position="420,270" zPosition="2" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="green" transparent="1" />
+    </screen>"""
+    
+    def __init__(self, session):
+        self.skin = FilmwebConfig.skin
+        self.session = session
+        Screen.__init__(self, session)
+        
+        self.list = []
+        ConfigListScreen.__init__(self, self.list)
+        self["key_red"] = Label(_("Cancel"))
+        self["key_green"] = Label(_("Save"))
+        
+        self["actions"] = ActionMap(["WizardActions", "ColorActions"],
+        {
+            "red": self.keyCancel,
+            "back": self.keyCancel,
+            "green": self.keySave,
+        }, -2)
+        self.list = []
+        self.list.append(getConfigListEntry(_("User Name"), config.plugins.mfilmweb.user))
+        self.list.append(getConfigListEntry(_("Password"), config.plugins.mfilmweb.password))
+        self["config"].list = self.list
+        self["config"].l.setList(self.list)     
+        
+    def keySave(self):            
+        config.plugins.mfilmweb.save()
+        configfile.save()
+        self.close()
+
+    def keyCancel(self):        
+        self.close()
+                
 class Filmweb(Screen):
     skin = """<screen name="FilmwebData" position="90,105" size="1100,560" title="Filmweb.pl" >
             <ePixmap pixmap="/usr/share/enigma2/skin_default/buttons/red25.png" position="20,505" size="250,40" alphatest="on" />
             <ePixmap pixmap="/usr/share/enigma2/skin_default/buttons/green25.png" position="290,505" size="250,40" alphatest="on" />
             <ePixmap pixmap="/usr/share/enigma2/skin_default/buttons/yellow25.png" position="560,505" size="250,40"  alphatest="on" />
             <ePixmap pixmap="/usr/share/enigma2/skin_default/buttons/blue25.png" position="830,505" size="250,40"  alphatest="on" />
-            <widget name="key_red" position="65,508" size="160,40" zPosition="2" font="Regular;24" valign="center" halign="center" backgroundColor="transpBlack" transparent="1" />
-            <widget name="key_green" position="344,508" size="160,40" zPosition="2" font="Regular;24" valign="center" halign="center" backgroundColor="transpBlack" transparent="1" />
-            <widget name="key_yellow" position="610,508" size="160,40" zPosition="2" font="Regular;24" valign="center" halign="center" backgroundColor="transpBlack" transparent="1" />
-            <widget name="key_blue" position="848,508" size="160,40" zPosition="2" font="Regular;24" valign="center" halign="center" backgroundColor="transpBlack" transparent="1" />
-            <widget name="title_label" position="10,0" size="850,30" valign="center" font="Regular;22" foregroundColor="#f0b400" transparent="1"/>
-            <widget name="details_label" position="170,40" size="900,228" font="Regular;19"  transparent="1"/>
-            <widget name="plot_label" position="550,250" size="535,240" font="Regular;18" transparent="1"/>
-            <widget name="cast_label" position="10,250" size="535,240" scrollbarMode="showOnDemand" transparent="1"/>
-            <widget name="extra_label" position="10,30" size="1070,450" font="Regular;18" transparent="1"/>
-            <widget name="rating_label" position="870,28" size="210,25" halign="center" font="Regular;18" foregroundColor="#f0b400" transparent="1"/>
-            <widget name="status_bar" position="10,545" size="1070,20" font="Regular;16" foregroundColor="#cccccc" transparent="1"/>
-            <widget name="poster" position="20,26" size="140,216" alphatest="on" />
-            <widget name="menu" position="10,80" size="1070,400" zPosition="3" scrollbarMode="showOnDemand" transparent="1"/>
-            <widget name="stars_bg" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/Filmweb/resource/starsbar_empty.png" position="870,5" zPosition="0" size="210,21" transparent="1" alphatest="on" />
-            <widget name="stars" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/Filmweb/resource/starsbar_filled.png" position="870,5" size="210,21" transparent="1" />
+            <widget name="key_red" position="20,508" size="250,40" zPosition="2" font="Regular;24" valign="center" halign="center" backgroundColor="transpBlack" transparent="1" />
+            <widget name="key_green" position="290,508" size="250,40" zPosition="2" font="Regular;24" valign="center" halign="center" backgroundColor="transpBlack" transparent="1" />
+            <widget name="key_yellow" position="560,508" size="250,40" zPosition="2" font="Regular;24" valign="center" halign="center" backgroundColor="transpBlack" transparent="1" />
+            <widget name="key_blue" position="830,508" size="250,40" zPosition="2" font="Regular;24" valign="center" halign="center" backgroundColor="transpBlack" transparent="1" />
+            <widget name="title_label" position="10,0" size="850,30" zPosition="5" valign="center" font="Regular;22" foregroundColor="#f0b400" transparent="1"/>
+            <widget name="details_label" position="170,40" size="900,228" zPosition="5" font="Regular;19"  transparent="1"/>
+            <widget name="plot_label" position="550,250" size="535,240" zPosition="5" font="Regular;18" transparent="1"/>
+            <widget name="cast_label" position="10,250" size="535,240" zPosition="5" scrollbarMode="showOnDemand" transparent="1"/>
+            <widget name="extra_label" position="10,30" size="1070,470" zPosition="5" font="Regular;18" transparent="1"/>
+            <widget name="rating_label" position="870,56" size="210,25" zPosition="5" halign="center" font="Regular;18" foregroundColor="#f0b400" transparent="1"/>
+            <widget name="login_label" position="870,5" size="210,20" zPosition="5" halign="center" font="Regular;18" foregroundColor="#58bcff" transparent="1"/>
+            <widget name="status_bar" position="10,545" size="1070,20" zPosition="2" font="Regular;16" foregroundColor="#cccccc" transparent="1"/>
+            <widget name="poster" position="20,26" size="140,216" zPosition="5" alphatest="blend" />
+            <widget name="wallpaper" position="870,81" size="210,170" zPosition="0" alphatest="on" />
+            <widget name="menu" position="10,80" size="1070,400" zPosition="5" scrollbarMode="showOnDemand" transparent="1"/>
+            <widget name="stars_bg" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/Filmweb/resource/starsbar_empty.png" position="870,35" zPosition="2" size="210,21" transparent="1" alphatest="on" />
+            <widget name="stars" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/Filmweb/resource/starsbar_filled.png" position="870,35" zPosition="5" size="210,21" transparent="1" />
         </screen>"""
               
     def __init__(self, session, eventName):
@@ -230,15 +287,31 @@ class Filmweb(Screen):
         self.session = session
         self.eventName = eventName
         self.mode = ''
+        self.searchType = MT_MOVIE
+        self.descs = None
+        self.sessionId = None
+        self.userToken = None
+        self.filmId = None
         self.detailDir = 0
         self.resultlist = []  
         self.cast_list = []
         self.loopx = 0      
+        self.initialize = True
+        self.wallpapers = []
+        self.wallpaperidx = 0
                 
         self.createGUI()
         self.initActions()
         self.switchView(to_mode=VT_NONE)
-        self.getData()
+        
+        self.wallpapertimer = eTimer()
+        self.wallpapertimer.callback.append(self.changeWallpaper)
+        self.wallpapertimer.start(10000)
+            
+        if config.plugins.mfilmweb.user.getText() == '':
+            self.getData()
+        else:
+            self.loginPage(self.getData)
     
     event_quoted = property(lambda self: mautils.quote(self.eventName.encode('utf8')))
         
@@ -261,10 +334,12 @@ class Filmweb(Screen):
     # ---- ACTIONS ----  
     def moveLeft(self):
         if self.mode == VT_DETAILS:
-            self.detailDir = 0                
+            self.detailDir = 0
+                            
     def moveRight(self):
         if self.mode == VT_DETAILS:
             self.detailDir = 1
+            
     def pageDown(self):
         if self.mode == VT_MENU:
             self["menu"].instance.moveSelection(self["menu"].instance.moveDown)
@@ -274,7 +349,8 @@ class Filmweb(Screen):
             else:
                 self["plot_label"].pageDown()
         else:
-            self["extra_label"].pageDown()                
+            self["extra_label"].pageDown()
+                            
     def pageUp(self):
         if self.mode == VT_MENU:
             self["menu"].instance.moveSelection(self["menu"].instance.moveUp)
@@ -284,23 +360,43 @@ class Filmweb(Screen):
             else:
                 self["plot_label"].pageUp()
         else:
-            self["extra_label"].pageUp()                    
+            self["extra_label"].pageUp()     
+                           
     def exit(self):
         self.close()
+        
     def showDetails(self):
-        self.switchView(to_mode=VT_DETAILS)  
+        if self.mode == VT_DETAILS or self.mode == VT_NONE:
+            if self.searchType == MT_MOVIE:
+                self.searchType = MT_SERIE
+            else:
+                self.searchType = MT_MOVIE
+            self.switchView(to_mode=VT_NONE)
+            self.getData(False)
+        else:
+            self.switchView(to_mode=VT_DETAILS)
+              
     def showMenu(self):
-        self.switchView(to_mode=VT_MENU)  
+        if self.mode == VT_NONE:
+            return
+        self.switchView(to_mode=VT_MENU)
+          
     def showExtras(self):
-        self.switchView(to_mode=VT_EXTRAS)        
+        if self.mode == VT_DETAILS and self.descs:
+            self.switchView(to_mode=VT_EXTRAS)   
+                 
     def contextMenuPressed(self):
+        lista = []
+        if self.sessionId and self.userToken:
+            lista.append((_("Vote current"), self.voteMovie))
+        lista.append((_("Enter movie title"), self.inputMovieName))
+        lista.append((_("Enter serie title"), self.inputSerieName))
+        lista.append((_("Select from EPG"), self.channelSelection))
+        lista.append((_("Configuration"), self.configData))
         self.session.openWithCallback(
             self.menuCallback,
             ChoiceBox,
-            list = [
-                    (_("Enter movie title"), self.inputMovieName),
-                    (_("Select from EPG"), self.channelSelection),
-            ],
+            list = lista,
         )
 
     def menuCallback(self, ret = None):
@@ -332,78 +428,178 @@ class Filmweb(Screen):
             #print_info("Event name", str(evtname))  
             self.eventName = evt and evt.getEventName()           
             self.resultlist = []
-            self.switchView(to_mode=VT_NONE)
+            self.switchView(to_mode=VT_NONE)            
             self.getData()
             
     def switchView(self, to_mode=VT_MENU):
         print_info("Switching view", "old mode=" + self.mode + ", new mode=" + to_mode)
         if self.mode == to_mode:
             return
-        if to_mode == VT_MENU:
-            size = len(self.resultlist)
-            print_info("The movies list size", str(size))
-            self["title_label"].setText('')
-            if size == 0:
-                self.inputMovieName()
-            if size == 1:
-                to_mode = VT_DETAILS
-                self.loadDetails(self.resultlist[0][1], self.resultlist[0][0])
-        elif to_mode == VT_DETAILS:
-            if self.mode == VT_MENU:
-                if self["menu"].getCurrent():    
-                    idx = self["menu"].getSelectionIndex()        
-                    self.loadDetails(link=self.resultlist[idx][1], title=self.resultlist[idx][0])
+        if self.initialize:
+            to_mode = self.mode
+        else:
+            if to_mode == VT_MENU:
+                size = len(self.resultlist)
+                print_info("The movies list size", str(size))
+                self["title_label"].setText('')
+                if size == 0:
+                    if self.searchType == MT_MOVIE:
+                        self.inputMovieName()
+                    else:
+                        self.inputSerieName()
+                    self.switchGUI(to_mode=VT_NONE)
+                    return
+                if size == 1:
+                    to_mode = VT_DETAILS
+                    self.loadDetails(self.resultlist[0][1], self.resultlist[0][0])
+            elif to_mode == VT_DETAILS:
+                if self.mode == VT_MENU:
+                    if self["menu"].getCurrent():    
+                        idx = self["menu"].getSelectionIndex()        
+                        self.loadDetails(link=self.resultlist[idx][1], title=self.resultlist[idx][0])
+                    else:
+                        to_mode = VT_MENU
+                elif self.mode == VT_EXTRAS:
+                    pass
                 else:
-                    to_mode = VT_MENU
-            elif self.mode == VT_EXTRAS:
-                pass
+                    to_mode = self.mode
+            elif to_mode == VT_EXTRAS:
+                if self.mode == VT_DETAILS:
+                    self.loadDescs()
+                else:
+                    to_mode = self.mode
         self.switchGUI(to_mode)
         
+    def loadDescs(self):
+        if self.descs:
+            print_info("LOAD DESCS", "link: " + self.descs)
+            self["status_bar"].setText(_("Loading descriptions ..."))
+            getPage(self.descs, cookies=COOKIES).addCallback(self.fetchExtraOK).addErrback(self.fetchFailed)
+    
     def loadDetails(self, link, title):
         print_info("LOAD DETAILS", "link: " + link + ", title: " + title)
         self["status_bar"].setText(_("Seraching details for: %s...") % (title))
-        print_info("Filmweb Details Query ", link)
+        print_info("Filmweb Details Query ", link)        
+        self.descs = link + "/descs"
+                        
+        getPage(link, cookies=COOKIES).addCallback(self.fetchDetailsOK, link).addErrback(self.fetchFailed) 
+        
+    def rateEntry(self, rating):
+        try:
+            print_info("rateEntry - user token", str(self.userToken) + ', rating: ' + str(rating))
+            data = '5|0|6|http://2.fwcdn.pl/gwt/newFilmActivity/|CCD826B60450FCB69E9BD856EE06EAB5|filmweb.gwt.filmactivity.client.UserFilmRemoteService|setRate|J|I|1|2|3|4|2|5|6|599540|0|' + str(rating) + '|'
+            headers = {'Content-Type':'text/x-gwt-rpc; charset=UTF-8',
+                       'Host':'www.filmweb.pl',
+                       'Origin':'http://www.filmweb.pl',
+                       'X-GWT-Module-Base':'http://2.fwcdn.pl/gwt/newFilmActivity/',
+                       'X-GWT-Permutation':'7C0EB94ECB5DCB0BABC0AE73531FA849',
+                       'X-Artuser-Token':self.userToken
+                       }
+            getPage('http://www.filmweb.pl/rpc/userFilmRemoteService', method='POST', postdata=data, 
+                    headers=headers,
+                    cookies=COOKIES).addCallback(self.fetchRateRes).addErrback(self.fetchRateRes)
+        except:            
+            import traceback
+            traceback.print_exc() 
                 
-        getPage(link, cookies=COOKIES).addCallback(self.fetchDetailsOK).addErrback(self.fetchFailed) 
-                
+    def loginPage(self, callback=None):
+        try:
+            print_info("LoginPage", "started")
+            self["status_bar"].setText(_('Logging in ...'))
+            self.sessionId = None 
+            if COOKIES.has_key(SESSION_KEY):
+                COOKIES.pop(SESSION_KEY)
+            data = {'j_username': config.plugins.mfilmweb.user.getText(), "j_password" : config.plugins.mfilmweb.password.getText()}
+            data = urllib.urlencode(data)
+            getPage('https://ssl.filmweb.pl/j_login', method='POST', postdata=data, 
+                    headers={'Content-Type':'application/x-www-form-urlencoded'},
+                    cookies=COOKIES).addCallback(self.fetchLoginRes, callback).addErrback(self.fetchLoginRes, callback)
+            print_info("LoginPage data", str(data))
+        except:            
+            import traceback
+            traceback.print_exc() 
+        
+    def fetchRateRes(self, res_):
+        print_info("RESULT COOKIE", str(COOKIES) + ", res: " + str(res_))
+        if res_ and res_.startswith('//OK'):
+            self.session.open(MessageBox,_('Your vote has been registered'), MessageBox.TYPE_INFO)            
+        
+    def fetchLoginRes(self, res_, callback):
+        print_info("RESULT COOKIE", str(COOKIES))
+        if COOKIES.has_key(SESSION_KEY):
+            self.sessionId = COOKIES[SESSION_KEY]            
+        else:
+            self.sessionId = None
+        if COOKIES.has_key(USER_TOKEN):
+            self.userToken = COOKIES[USER_TOKEN]            
+        else:
+            self.userToken = None     
+        self["status_bar"].setText(_('Login done'))   
+        if callback:
+            callback()
+            
     def switchGUI(self, to_mode=VT_MENU):
+        print_info("Switching GUI", "old mode=" + self.mode + ", new mode=" + to_mode)
         self.mode = to_mode
         if self.mode == VT_MENU:
             self["menu"].show()
             self["details_label"].show()            
             
+            self["login_label"].hide()
             self["plot_label"].hide()
             self["stars"].hide()
             self["stars_bg"].hide()
             self["rating_label"].hide()
             self["cast_label"].hide()
             self["poster"].hide()
+            self["wallpaper"].hide()
             self["extra_label"].hide()
             
             self["title"].setText(_("Ambiguous results"))
-            self["details_label"].setText(_("Please select the matching entry"))
+            if len(self.resultlist) > 0:
+                self["details_label"].setText(_("Please select the matching entry"))
+            else:
+                self["details_label"].setText("")
             
             self["key_green"].setText("")
             self["key_yellow"].setText(_("Details"))
             self["key_blue"].setText("")
-        elif self.mode == VT_DETAILS:
+        elif self.mode == VT_DETAILS:            
             self["rating_label"].show()
             self["cast_label"].show()
             self["details_label"].show()
             self["plot_label"].show()
-            self["poster"].show()
+            self["login_label"].show()
+            self["wallpaper"].show()
+            
+            if os.path.exists(POSTER_PATH):
+                self["poster"].show()
+            else:
+                self["poster"].hide()
+            
             self["stars_bg"].show()
             self["stars"].show()
             
             self["menu"].hide()
             self["extra_label"].hide()
-            
-            self["key_green"].setText(_("Title Menu"))
-            self["key_yellow"].setText("")
-            self["key_blue"].setText("")
+
+            if len(self.resultlist) > 1:
+                self["key_green"].setText(_("Title Menu"))
+            else:
+                self["key_green"].setText("")  
+            if self.searchType == MT_MOVIE:          
+                self["key_yellow"].setText(_("Search TV Serie"))
+            else:
+                self["key_yellow"].setText(_("Search Movie"))
+            if self.descs:
+                self["key_blue"].setText(_("Descriptions"))
+            else:
+                self["key_blue"].setText("")
         elif self.mode == VT_EXTRAS:
             self["extra_label"].show()
             
+            self["wallpaper"].hide()            
+            self["login_label"].hide()
             self["details_label"].hide()
             self["plot_label"].hide()
             self["cast_label"].hide()
@@ -412,11 +608,16 @@ class Filmweb(Screen):
             self["stars_bg"].hide()
             self["rating_label"].hide()
             self["menu"].hide()
-            
-            self["key_green"].setText("")
-            self["key_yellow"].setText("")
+                        
+            if len(self.resultlist) > 1:
+                self["key_green"].setText(_("Title Menu"))
+            else:
+                self["key_green"].setText("")  
+            self["key_yellow"].setText(_("Details"))
             self["key_blue"].setText("")
         else:
+            self["title_label"].hide()
+            self["login_label"].hide()
             self["extra_label"].hide()            
             self["details_label"].hide()
             self["plot_label"].hide()
@@ -426,9 +627,19 @@ class Filmweb(Screen):
             self["stars_bg"].hide()
             self["rating_label"].hide()
             self["menu"].hide()
+            self["wallpaper"].hide()
             
+            if self.initialize:
+                self["key_yellow"].setText("")
+                self["title_label"].setText(_("Initializing - please wait ..."))
+                self["title_label"].show()
+            else:
+                if self.searchType == MT_MOVIE:          
+                    self["key_yellow"].setText(_("Search TV Serie"))
+                else:
+                    self["key_yellow"].setText(_("Search Movie"))
+                                    
             self["key_green"].setText('')
-            self["key_yellow"].setText('')
             self["key_blue"].setText('')
 
     def createGUI(self):
@@ -438,12 +649,14 @@ class Filmweb(Screen):
             if len(txt) > TITLE_MAX_SIZE:
                 txt = txt[0:TITLE_MAX_SIZE - 3] + "..."
             Label.setText(self["title_label"], txt)
-        self["title_label"].setText = setLText
-        self["title"] = StaticText('')        
-        self["title"].text = (_("The Filmweb Movie Database"))        
+        self["title_label"].setText = setLText        
+        self["title"] = StaticText(_("The Filmweb Movie Database"))        
         self["poster"] = Pixmap()
         self.picload = ePicLoad()
         self.picload.PictureData.get().append(self.paintPoster)
+        
+        self["wallpaper"] = mautils.PixLoader(self.removeWallData)
+           
         self["stars"] = ProgressBar()        
         
         #self["stars"].instance.setPixmap(LoadPixmap(cached=True, path=mautils.getPluginPath() + '/resource/starsbar_filled.png'))        
@@ -453,6 +666,7 @@ class Filmweb(Screen):
         self["stars_bg"] = Pixmap()      
         #self["stars_bg"].instance.setPixmap(LoadPixmap(cached=True, path=resolveFilename(SCOPE_CURRENT_PLUGIN, 'Filmweb/resource/starsbar_empty.png')))  
         self["details_label"] = Label("")
+        self["login_label"] = Label("")        
         self["plot_label"] = ScrollLabel("")
         self["cast_label"] = ChoiceList(self.cast_list)        
         self["cast_label"].l.setItemHeight(50)
@@ -472,53 +686,138 @@ class Filmweb(Screen):
     def __str__(self):
         return "FILMWEB {Session: " + str(self.session) + ", EventName:" + str(self.eventName) + "}"
                      
-    def getData(self):
-        self.resultlist = []
-        print_info("Getting data for event", str(self.eventName))
-        if not self.eventName or len(self.eventName.strip()) == 0:
-            s = self.session.nav.getCurrentService()
-            print_info("Current Service", str(s))
-            ref = self.session.nav.getCurrentlyPlayingServiceReference()
-            print_info("Current Service ref", str(ref))
+    def getData(self, tryOther=True):
+        try:
+            self.initialize = False
+            if os.path.exists(POSTER_PATH):
+                os.remove(POSTER_PATH)     
+            self.picload.startDecode(POSTER_PATH)
+            self.cast_list = []
+            self.wallpapers = []
+            self.wallpaperidx = 0
+            self.descs = None
+            self.filmId = None
+            self["cast_label"].l.setList(self.cast_list)
+            self.resultlist = []
+            print_info("Getting data for event", str(self.eventName))
+            if not self.eventName or len(self.eventName.strip()) == 0:
+                s = self.session.nav.getCurrentService()
+                print_info("Current Service", str(s))
+                ref = self.session.nav.getCurrentlyPlayingServiceReference()
+                print_info("Current Service ref", str(ref))
+                
+                serviceHandler = eServiceCenter.getInstance()  
+                info = serviceHandler.info(ref)               
+                print_info("Service info", str(info))              
+                evt = info and info.getEvent(ref) 
+                print_info("Event", str(evt))               
+                self.eventName = evt and evt.getEventName()  
+            print_info("Getting data for event with name", str(self.eventName))
+            if self.eventName:
+                idx = self.eventName.find(' -')
+                if idx > 0:
+                    self.eventName = self.eventName[:idx]
+                if tryOther and self.eventName.find('odc.') > 0:
+                    self.searchType = MT_SERIE
+                self["status_bar"].setText(_("Query Filmweb: %s...") % (self.eventName))
+                #localfile = "/tmp/filmweb_query.html"        
+                fetchurl = "http://www.filmweb.pl/search/" + self.searchType + "?q=" + self.event_quoted
+                #print_info("Filmweb Query " + fetchurl + " to ", localfile)
+                print_info("Filmweb Query ", fetchurl)
+                getPage(fetchurl, cookies=COOKIES).addCallback(self.fetchOK, tryOther).addErrback(self.fetchFailed)            
+            else:
+                self["status_bar"].setText(_("Unknown Eventname"))
+                self["title_label"].setText(_("Unknown Eventname"))
+                self.switchView(to_mode='')
+        except:
+            import traceback
+            traceback.print_exc()
             
-            serviceHandler = eServiceCenter.getInstance()  
-            info = serviceHandler.info(ref)               
-            print_info("Service info", str(info))              
-            evt = info and info.getEvent(ref) 
-            print_info("Event", str(evt))               
-            self.eventName = evt and evt.getEventName()  
-        print_info("Getting data for event with name", self.eventName)
-        if self.eventName:
-            self["status_bar"].setText(_("Query Filmweb: %s...") % (self.eventName))
-            #localfile = "/tmp/filmweb_query.html"            
-            fetchurl = "http://www.filmweb.pl/search/film?q=" + self.event_quoted
-            #print_info("Filmweb Query " + fetchurl + " to ", localfile)
-            print_info("Filmweb Query ", fetchurl)
-            getPage(fetchurl, cookies=COOKIES).addCallback(self.fetchOK).addErrback(self.fetchFailed)            
+    def fetchWallpaperOK(self, txt_):
+        try:
+            if not self.filmId:
+                return
+            print_info("fetch wallpaper OK", str(COOKIES))
+            self["status_bar"].setText(_("Wallpaper loading completed"))
+            if txt_ and len(txt_) > 0:
+                walls = mautils.after(txt_, '<ul class=filmWallapersList')
+                elements = walls.split('filmWallapersItem')
+                elcount = len(elements)
+                print_info("Wallpapers count", str(elcount))                
+                if elcount > 0 and self.has_key('wallpaper'):
+                    furl = None
+                    for elem in elements:
+                        #print_info("ELEM", elem)
+                        didx = elem.find('<span class=newLinkLoggedOnly>')
+                        print_info("Wallpaper idx", str(didx))
+                        if didx > -1:                            
+                            furl = mautils.between(elem, '<span class=newLinkLoggedOnly>', '</span>')
+                            print_info("URL", furl)
+                            self.wallpapers.append(furl)
+                    self.changeWallpaper()                       
+        except:
+            import traceback
+            traceback.print_exc()
+    
+    def changeWallpaper(self):
+        print_info("Change wallpaper", str(self.wallpaperidx) + ", filmId: " + str(self.filmId))
+        if self.filmId is None:
+            return
+        localfile = '/tmp/' + self.filmId + '.jpg'
+        if len(self.wallpapers) > 0:               
+            furl = self.wallpapers[self.wallpaperidx]               
+            self.wallpaperidx = self.wallpaperidx + 1
+            if self.wallpaperidx >= len(self.wallpapers):
+                self.wallpaperidx = 0              
+            print_info("Loading wallpaper", 'URL: ' + furl + ', Local File:' + localfile)
+            downloadPage(furl, localfile).addCallback(self.fetchWallDataOK,localfile).addErrback(self.fetchFailed)
+                        
+    def fetchWallDataOK(self, txt_, localfile=None):
+        if self.has_key("wallpaper") and self.filmId and localfile:
+            print_info("Loading image data", str(localfile))
+            self["wallpaper"].updateIcon(localfile)            
+        
+    def removeWallData(self, filename):
+        print_info("removeWallData - filename:", str(filename))
+        if filename:
+            if os.path.exists(filename):
+                os.remove(filename)
+                
+    def fetchExtraOK(self, txt_):
+        print_info("fetch extra OK", str(COOKIES))
+        self["status_bar"].setText(_("Descriptions loading completed"))
+        dhtml = mautils.html2utf8(txt_)
+        if dhtml:
+            self.parseDescriptions(dhtml)
         else:
-            self["status_bar"].setText(_("Unknown Eventname"))
-            self["title_label"].setText(_("Unknown Eventname"))
-            self.switchView(to_mode='')
-
-    def fetchDetailsOK(self, txt_):
+            self["status_bar"].setText(_("Descriptions parsing error"))
+        
+    def fetchDetailsOK(self, txt_, link_=None):
         print_info("fetch details OK", str(COOKIES))
         self["status_bar"].setText(_("Movie details loading completed"))
         self.inhtml = mautils.html2utf8(txt_)   
         if self.inhtml:
-            self.parseTitle()  
-            ls = len(self["title_label"].getText())
-            if ls < TITLE_MAX_SIZE:
-                self.parseOrgTitle() 
-            self.parseRating()
-            self.parsePoster()
-            self.parseCast()
-            self.parsePlot()            
-            
-            self.parseDetails()
+            try:
+                self.parseLogin()
+                self.parseFilmId()
+                self.parseWallpaper(link_)                
+                self.parseTitle()  
+                ls = len(self["title_label"].getText())
+                if ls < TITLE_MAX_SIZE:
+                    self.parseOrgTitle() 
+                self.parseRating()
+                self.parsePoster()
+                self.parseCast()
+                self.parsePlot()            
+                
+                self.parseDetails()
+            except:
+                import traceback
+                traceback.print_exc()
         else:
             self["status_bar"].setText(_("Movie details parsing error"))
         
-    def fetchOK(self, txt_):        
+    def fetchOK(self, txt_, tryOther=True):        
         print_info("Fetch OK", str(COOKIES))                
         self["status_bar"].setText(_("Filmweb Download completed"))
         self.inhtml = mautils.html2utf8(txt_)
@@ -537,25 +836,39 @@ class Filmweb(Screen):
             link = entry[1]
             print_info("LISTA", "caption: " + str(caption) + ", lnk: " + link)
             lista.append(MovieSearchEntryComponent(text = caption))
+        if len(lista) == 0:
+            if tryOther:
+                if self.searchType == MT_SERIE:
+                    self.searchType = MT_MOVIE
+                else:
+                    self.searchType = MT_SERIE
+                self.getData(False)
+                return
+            else:
+                self["title_label"].setText(_("Entry not found in Filmweb.pl database"))
         self["menu"].l.setList(lista)
         #self["menu"].l.setList(self.resultlist)  
         self.switchView(to_mode='MENU')
                 
     def fetchPosterOK(self, data):
         print_info("Fetch Poster OK", str(COOKIES)) 
+        if not self.has_key('status_bar'):
+            return
         self["status_bar"].setText(_("Poster downloading finished"))
-        rpath = path.realpath("/tmp/poster.jpg")
+        rpath = os.path.realpath(POSTER_PATH)
         print_info("Poster local real path", rpath)
-        if path.exists(rpath):
+        if os.path.exists(rpath):
             sc = AVSwitch().getFramebufferScale()
             self.picload.setPara((self["poster"].instance.size().width(), self["poster"].instance.size().height(), sc[0], sc[1], False, 1, "#00000000"))
             self.picload.startDecode(rpath)
     
     def fetchFailed(self, txt_):
         print_info("Fetch failed", str(txt_))
-        self["status_bar"].setText(_("Filmweb Download failed"))
+        if self.has_key('status_bar'):
+            self["status_bar"].setText(_("Filmweb Download failed"))
         
     def paintPoster(self, picInfo=None):
+        print_info("Paint poster", str(picInfo))
         ptr = self.picload.getData()
         if ptr != None:
             self["poster"].instance.setPixmap(ptr.__deref__())
@@ -572,10 +885,26 @@ class Filmweb(Screen):
         if posterUrl != '' and posterUrl.find("jpg") > 0:
             #pname = mautils.before(posterUrl, "jpg")
             self["status_bar"].setText(_("Downloading Movie Poster: %s...") % (posterUrl))
-            localfile = "/tmp/poster.jpg"
+            localfile = POSTER_PATH
             print_info("Downloading poster", posterUrl + " to " + localfile)
             downloadPage(posterUrl, localfile).addCallback(self.fetchPosterOK).addErrback(self.fetchFailed)            
             
+    def parseDescriptions(self, dhtml):
+        print_info("parseDescriptions", "started")
+        descres = ''
+        descs = mautils.between(dhtml, '<ul class=descriptionsList', '</ul>')
+        elements = descs.split('<li class=desc')
+        if elements != '':
+            for element in elements:
+                if element == '':
+                    continue
+                element = mautils.between(element, '<p>', '</p>')
+                element = element.replace('  ', ' ')
+                element = mautils.strip_tags(element)
+                #print_info("DESC", str(element))
+                descres = element + '\n\n'
+        self["extra_label"].setText(descres)
+        
     def parsePlot(self):
         print_info("parsePlot", "started")
         plot = mautils.between(self.inhtml, '<span class=filmDescrBg property="v:summary">', '</span>')
@@ -685,6 +1014,32 @@ class Filmweb(Screen):
             self["rating_label"].setText(_("no user rating yet"))
             self["stars"].setValue(0)
             
+    def parseWallpaper(self, link_=None):
+        idx = self.inhtml.find('<li id="filmMenu-filmWallpapers" class=" caption">tapety</li>')
+        if idx < 0:
+            # only for logged users
+            if link_ and self.sessionId and self.filmId:  
+                getPage(link_ + '/wallpapers', cookies=COOKIES).addCallback(self.fetchWallpaperOK).addErrback(self.fetchFailed)      
+                
+    def parseFilmId(self):
+        print_info("parseFilmId", "started")
+        fid = mautils.between(self.inhtml, '<div id=filmId style="display:none;">', '</div>') 
+        if fid and len(fid) > 0:
+            self.filmId = fid
+        else:
+            self.filmId = None
+        print_info("FILM ID", str(self.filmId))
+        
+    def parseLogin(self):
+        print_info("parseLogin", "started")
+        idx = self.inhtml.find('userName')
+        print_info("Login user idx", str(idx))
+        if idx > -1:
+            lg = mautils.between(self.inhtml, 'userName">', '</a>')            
+            self["login_label"].setText(_("User") + ": " + lg)
+        else:
+            self["login_label"].setText("")
+        
     def parseTitle(self):
         print_info("parseTitle", "started")
         title = mautils.between(self.inhtml, '<title>', '</title>')
@@ -753,7 +1108,52 @@ class Filmweb(Screen):
                                       _("Runtime: ") + str(rtm) + " min.\n"                                           
                                       )                     
 
+    def inputSerieName(self):
+        self.searchType = MT_SERIE
+        dlg = self.session.openWithCallback(self.askForName, InputBox, 
+                                      windowTitle = _("Input the name of serie to search"),
+                                       title=_("Enter serie title to search for"), 
+                                       text=self.eventName + " ", 
+                                       maxSize=55, 
+                                       type=Input.TEXT)
+        dlg["input"].end()
+        
+    def configData(self):
+        print_info("configData", "started")
+        self.session.openWithCallback(self.configSaved, FilmwebConfig)
+        
+    def configSaved(self):
+        print_info("configSaved", "started")
+        self.loginPage()
+    
+    def voteMovie(self, res=None):
+        if self.sessionId is None or self.userToken is None:
+            self.session.open(MessageBox,_('In order to enter vote value you should be logged in'), MessageBox.TYPE_INFO)
+        else:
+            dlg = self.session.openWithCallback(self.rateEntered, InputBox, 
+                                          windowTitle = _("Rating input"),
+                                           title=_("Enter rating value"), 
+                                           text="5 ", 
+                                           maxSize=55, 
+                                           type=Input.NUMBER)
+            dlg["input"].end()
+        
+    def rateEntered(self, val):
+        if val is None:
+            pass 
+        else:
+            voteVal = val.strip()
+            isok = False
+            if len(voteVal) > 0 and voteVal.isdigit():
+                voteNum = int(voteVal) 
+                if voteNum > 0 and voteNum < 11:
+                    isok = True
+                    self.rateEntry(voteNum)
+            if not isok:
+                self.session.openWithCallback(self.voteMovie,MessageBox,_('You have to enter value in range [1, 10]'), MessageBox.TYPE_ERROR)
+                        
     def inputMovieName(self):
+        self.searchType = MT_MOVIE
         dlg = self.session.openWithCallback(self.askForName, InputBox, 
                                       windowTitle = _("Input the name of movie to search"),
                                        title=_("Enter movie title to search for"), 
@@ -767,7 +1167,7 @@ class Filmweb(Screen):
             pass 
         else:
             self.eventName = word.strip()
-            self.getData()
+            self.getData(False)
             #self.session.open(MessageBox,_(word.strip()), MessageBox.TYPE_INFO)
                                
     def search(self):     
@@ -778,13 +1178,17 @@ class Filmweb(Screen):
         #for line in f:
         #    output.write(line.rstrip() + '\n') 
 
-        fidx = self.inhtml.find('Filmy (')
+        if self.searchType == MT_MOVIE:
+            ttx = 'Filmy ('
+        else:
+            ttx = 'Seriale ('
+        fidx = self.inhtml.find(ttx)
         print_info("search idx", str(fidx))  
         if fidx > -1:
-            counts = mautils.between(self.inhtml, 'Filmy (', ')')
+            counts = mautils.between(self.inhtml, ttx, ')')
             #print_info("Movie count string", counts)
             count = mautils.castInt(counts.strip())
-            print_info("Movie count", str(count))
+            print_info("Movie/Serie count", str(count))
             if count > 0:
                 self.inhtml = mautils.between(self.inhtml[fidx:], '<ul id=searchFixCheck>', '</ul>')
             else:

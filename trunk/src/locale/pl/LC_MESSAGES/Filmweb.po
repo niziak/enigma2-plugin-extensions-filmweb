@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Filmweb 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-08-31 09:55+0100\n"
-"PO-Revision-Date: 2012-08-31 09:56+0100\n"
+"POT-Creation-Date: 2012-09-16 00:49+0100\n"
+"PO-Revision-Date: 2012-09-16 01:14+0100\n"
 "Last-Translator: Marcin Słowik <masl@op.pl>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -11,143 +11,248 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Poedit-KeywordsList: _;gettext;gettext_noop\n"
 "X-Poedit-Basepath: /--HomeData--/enigma2-plugins/enigma2-filmweb/src\n"
+"X-Generator: Poedit 1.5.3\n"
 "X-Poedit-SearchPath-0: .\n"
 
-#: Filmweb.py:68
+#: Filmweb.py:151
 msgid "Channel Selection"
 msgstr "Wybór kanału"
 
-#: Filmweb.py:100
+#: Filmweb.py:183
 msgid "Lookup"
 msgstr "Wyszukaj"
 
-#: Filmweb.py:218
-#, fuzzy
-msgid "Enter movie title"
-msgstr "Wprowadź szukany tytuł"
+#: Filmweb.py:235
+msgid "Cancel"
+msgstr "Anuluj"
 
-#: Filmweb.py:219
+#: Filmweb.py:236
+msgid "Save"
+msgstr "Zapisz"
+
+#: Filmweb.py:245
+msgid "User Name"
+msgstr "Email lub nick"
+
+#: Filmweb.py:246
+msgid "Password"
+msgstr "Hasło"
+
+#: Filmweb.py:391
+msgid "Vote current"
+msgstr "Wprowadź ocenę"
+
+#: Filmweb.py:392
+msgid "Enter movie title"
+msgstr "Wprowadź tytuł filmu"
+
+#: Filmweb.py:393
+msgid "Enter serie title"
+msgstr "Wprowadź tytuł serialu"
+
+#: Filmweb.py:394
 msgid "Select from EPG"
 msgstr "Wybierz z EPG"
 
-#: Filmweb.py:267
+#: Filmweb.py:395
+msgid "Configuration"
+msgstr "Konfiguracja"
+
+#: Filmweb.py:476
+msgid "Loading descriptions ..."
+msgstr "Ładowanie opisów ..."
+
+#: Filmweb.py:481
 #, python-format
 msgid "Seraching details for: %s..."
 msgstr "Wyszukiwanie danych dla: %s…"
 
-#: Filmweb.py:286
+#: Filmweb.py:508
+msgid "Logging in ..."
+msgstr "Logoanie do portalu …"
+
+#: Filmweb.py:525
+msgid "Your vote has been registered"
+msgstr "Twoja ocena została zarejestrowana"
+
+#: Filmweb.py:537
+msgid "Login done"
+msgstr "Logowanie zakończone"
+
+#: Filmweb.py:558
 msgid "Ambiguous results"
 msgstr "Wyszukano więcej niż jeden rezultat"
 
-#: Filmweb.py:287
+#: Filmweb.py:560
 msgid "Please select the matching entry"
 msgstr "Wybierz odpowiedni element"
 
-#: Filmweb.py:290 Filmweb.py:334
+#: Filmweb.py:565 Filmweb.py:616
 msgid "Details"
 msgstr "Szczegóły"
 
-#: Filmweb.py:304 Filmweb.py:333
+#: Filmweb.py:587 Filmweb.py:613
 msgid "Title Menu"
 msgstr "Tytuły"
 
-#: Filmweb.py:335
-msgid "Extra"
-msgstr "Inf. dodatkowe"
+#: Filmweb.py:591 Filmweb.py:638
+msgid "Search TV Serie"
+msgstr "Wyszukaj serial"
 
-#: Filmweb.py:346
+#: Filmweb.py:593 Filmweb.py:640
+msgid "Search Movie"
+msgstr "Wyszukaj film"
+
+#: Filmweb.py:595
+msgid "Descriptions"
+msgstr "Opisy"
+
+#: Filmweb.py:634
+msgid "Initializing - please wait ..."
+msgstr "Inicjalizacja - prosze czekać ..."
+
+#: Filmweb.py:653
 msgid "The Filmweb Movie Database"
 msgstr "Baza filmów Filmweb.pl"
 
-#: Filmweb.py:359
+#: Filmweb.py:681
 msgid "Exit"
 msgstr "Wyjście"
 
-#: Filmweb.py:379
+#: Filmweb.py:722
 #, python-format
 msgid "Query Filmweb: %s..."
 msgstr "Przeszukaj Filmweb: %s..."
 
-#: Filmweb.py:386
+#: Filmweb.py:729 Filmweb.py:730
 msgid "Unknown Eventname"
 msgstr "Nieznana nazwa zdarzenia"
 
-#: Filmweb.py:390
+#: Filmweb.py:741
+msgid "Wallpaper loading completed"
+msgstr "Ładowanie tapety zakończone"
+
+#: Filmweb.py:787
+msgid "Descriptions loading completed"
+msgstr "Ładowanie opisów zakończone"
+
+#: Filmweb.py:792
+msgid "Descriptions parsing error"
+msgstr "Błąd ładowania opisów"
+
+#: Filmweb.py:796
 msgid "Movie details loading completed"
 msgstr "Pobieranie danych filmu zakończone"
 
-#: Filmweb.py:404
+#: Filmweb.py:817
 msgid "Movie details parsing error"
 msgstr "Błąd przetwarzania danych filmu"
 
-#: Filmweb.py:408
+#: Filmweb.py:821
 msgid "Filmweb Download completed"
 msgstr "Pobieranie danych z Filmweb zakończone"
 
-#: Filmweb.py:422
+#: Filmweb.py:847
+msgid "Entry not found in Filmweb.pl database"
+msgstr "Pozycja nie została znaleziona w bazie Filmweb.pl"
+
+#: Filmweb.py:856
 msgid "Poster downloading finished"
 msgstr "Pobieranie plakatu zakończone"
 
-#: Filmweb.py:432
+#: Filmweb.py:867
 msgid "Filmweb Download failed"
 msgstr "Pobieranie danych z Filmweb zakończyło się niepowodzeniem"
 
-#: Filmweb.py:450
+#: Filmweb.py:886
 #, python-format
 msgid "Downloading Movie Poster: %s..."
 msgstr "Pobieranie plakatu: %s..."
 
-#: Filmweb.py:484
+#: Filmweb.py:953
 msgid " as "
 msgstr " jako "
 
-#: Filmweb.py:489
-msgid "Cast: "
-msgstr "Obsada: "
-
-#: Filmweb.py:538
+#: Filmweb.py:1009
 msgid "User Rating"
 msgstr "Ocena"
 
-#: Filmweb.py:542
+#: Filmweb.py:1013
 msgid "no user rating yet"
 msgstr "brak oceny społeczności"
 
-#: Filmweb.py:603
+#: Filmweb.py:1038
+msgid "User"
+msgstr "Login"
+
+#: Filmweb.py:1102
 msgid "Genre: "
 msgstr "Gatunek: "
 
-#: Filmweb.py:604
+#: Filmweb.py:1103
 msgid "Country: "
 msgstr "Produkcja: "
 
-#: Filmweb.py:605
+#: Filmweb.py:1104
 msgid "Director: "
 msgstr "Reżyseria: "
 
-#: Filmweb.py:606
+#: Filmweb.py:1105
 msgid "Writer: "
 msgstr "Scenariusz: "
 
-#: Filmweb.py:607
+#: Filmweb.py:1106
 msgid "Year: "
 msgstr "Rok: "
 
-#: Filmweb.py:608
+#: Filmweb.py:1107
 msgid "Runtime: "
 msgstr "Czas trwania:"
 
-#: Filmweb.py:613
+#: Filmweb.py:1113
+msgid "Input the name of serie to search"
+msgstr "Wprowadź nazwę serialu do przeszukania"
+
+#: Filmweb.py:1114
+msgid "Enter serie title to search for"
+msgstr "Wprowadź tytuł serialu do wyszukania"
+
+#: Filmweb.py:1130
+msgid "In order to enter vote value you should be logged in"
+msgstr "Wprowadzanie ocen możliwe tylko po zalogowaniu"
+
+#: Filmweb.py:1133
+msgid "Rating input"
+msgstr "Wprowadzanie własnej oceny"
+
+#: Filmweb.py:1134
+msgid "Enter rating value"
+msgstr "Wprowadź swoją ocenę"
+
+#: Filmweb.py:1152
+msgid "You have to enter value in range [1, 10]"
+msgstr "Musisz wprowadzić wartość z przedziału [1, 10]"
+
+#: Filmweb.py:1158
 msgid "Input the name of movie to search"
 msgstr "Wprowadź nazwę filmu do wyszukania"
 
-#: Filmweb.py:614
+#: Filmweb.py:1159
 msgid "Enter movie title to search for"
 msgstr "Wprowadź szukany tytuł"
 
 #: plugin.py:65 plugin.py:70
 msgid "Query details from the Filmweb.pl Database"
 msgstr "Pobierz dane z bazy Filmweb.pl"
+
+#~ msgid "Logged User"
+#~ msgstr "Zalogowany"
+
+#~ msgid "Extra"
+#~ msgstr "Inf. dodatkowe"
+
+#~ msgid "Cast: "
+#~ msgstr "Obsada: "
 
 #~ msgid "Plot: "
 #~ msgstr "Opis: "

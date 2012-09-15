@@ -6,6 +6,6 @@ License: GNU GPL v3
 Section: base
 Architecture: mipsel
 Priority: optional
-Homepage: http://https://code.google.com/p/enigma2-plugin-extensions-filmweb/
-Depends: enigma2, python-html, python-twisted-web
+Homepage: http://code.google.com/p/enigma2-plugin-extensions-filmweb/wiki/Welcome
+Depends: enigma2, python-html, python-twisted-web, openssl, python-pyopenssl
 Source: https://code.google.com/p/enigma2-plugin-extensions-filmweb/source/browse/#svn%2Ftrunk
