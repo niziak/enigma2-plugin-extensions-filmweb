@@ -5,7 +5,7 @@ This plugin will do a query on Filmweb.pl for movies from EPG and will show the 
 = Installation =
 ----
   * SSH onto the dreambox
-  * install libs: python-html, python-twisted-web
+  * install libs: python-html, python-twisted-web, openssl, python-pyopenssl
   * copy IPK file to /tmp folder
   * use manual IPK package installation option from Dreambox plugin menu
 
