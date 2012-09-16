@@ -299,6 +299,8 @@ class Filmweb(Screen):
         self.initialize = True
         self.wallpapers = []
         self.wallpaperidx = -1
+        self.myvote = -1
+        self.detailslink = None
                 
         self.createGUI()
         self.initActions()
@@ -481,23 +483,26 @@ class Filmweb(Screen):
         self["status_bar"].setText(_("Seraching details for: %s...") % (title))
         print_info("Filmweb Details Query ", link)        
         self.descs = link + "/descs"
+        self.detailslink = link
                         
-        getPage(link, cookies=COOKIES).addCallback(self.fetchDetailsOK, link).addErrback(self.fetchFailed) 
+        getPage(link, cookies=COOKIES).addCallback(self.fetchDetailsOK).addErrback(self.fetchFailed) 
         
     def rateEntry(self, rating):
         try:
-            print_info("rateEntry - user token", str(self.userToken) + ', rating: ' + str(rating))
-            data = '5|0|6|http://2.fwcdn.pl/gwt/newFilmActivity/|CCD826B60450FCB69E9BD856EE06EAB5|filmweb.gwt.filmactivity.client.UserFilmRemoteService|setRate|J|I|1|2|3|4|2|5|6|599540|0|' + str(rating) + '|'
-            headers = {'Content-Type':'text/x-gwt-rpc; charset=UTF-8',
-                       'Host':'www.filmweb.pl',
-                       'Origin':'http://www.filmweb.pl',
-                       'X-GWT-Module-Base':'http://2.fwcdn.pl/gwt/newFilmActivity/',
-                       'X-GWT-Permutation':'7C0EB94ECB5DCB0BABC0AE73531FA849',
-                       'X-Artuser-Token':self.userToken
-                       }
-            getPage('http://www.filmweb.pl/rpc/userFilmRemoteService', method='POST', postdata=data, 
-                    headers=headers,
-                    cookies=COOKIES).addCallback(self.fetchRateRes).addErrback(self.fetchRateRes)
+            if rating and self.filmId:
+                print_info("rateEntry - user token", str(self.userToken) + ', rating: ' + str(rating))
+                data = '5|0|6|http://2.fwcdn.pl/gwt/newFilmActivity/|CCD826B60450FCB69E9BD856EE06EAB5|filmweb.gwt.filmactivity.client.UserFilmRemoteService|setRate|J|I|1|2|3|4|2|5|6|' + str(self.filmId) + '|0|' + str(rating) + '|'
+                print_info("POST DATA", data)
+                headers = {'Content-Type':'text/x-gwt-rpc; charset=UTF-8',
+                           'Host':'www.filmweb.pl',
+                           'Origin':'http://www.filmweb.pl',
+                           'X-GWT-Module-Base':'http://2.fwcdn.pl/gwt/newFilmActivity/',
+                           'X-GWT-Permutation':'7C0EB94ECB5DCB0BABC0AE73531FA849',
+                           'X-Artuser-Token':self.userToken
+                           }
+                getPage('http://www.filmweb.pl/rpc/userFilmRemoteService', method='POST', postdata=data, 
+                        headers=headers,
+                        cookies=COOKIES).addCallback(self.fetchRateRes).addErrback(self.fetchRateRes)
         except:            
             import traceback
             traceback.print_exc() 
@@ -522,7 +527,9 @@ class Filmweb(Screen):
     def fetchRateRes(self, res_):
         print_info("RESULT COOKIE", str(COOKIES) + ", res: " + str(res_))
         if res_ and res_.startswith('//OK'):
-            self.session.open(MessageBox,_('Your vote has been registered'), MessageBox.TYPE_INFO)            
+            #self.session.open(MessageBox,_('Your vote has been registered'), MessageBox.TYPE_INFO)
+            if self.mode == VT_DETAILS:
+                self.loadDetails(self.detailslink, self["title_label"].getText())          
         
     def fetchLoginRes(self, res_, callback):
         print_info("RESULT COOKIE", str(COOKIES))
@@ -698,8 +705,10 @@ class Filmweb(Screen):
             self.cast_list = []
             self.wallpapers = []
             self.wallpaperidx = -1
+            self.myvote = -1
             self.descs = None
             self.filmId = None
+            self.detailslink = None
             self["cast_label"].l.setList(self.cast_list)
             self.resultlist = []
             print_info("Getting data for event", str(self.eventName))
@@ -807,7 +816,7 @@ class Filmweb(Screen):
         else:
             self["status_bar"].setText(_("Descriptions parsing error"))
         
-    def fetchDetailsOK(self, txt_, link_=None):
+    def fetchDetailsOK(self, txt_):
         print_info("fetch details OK", str(COOKIES))
         self["status_bar"].setText(_("Movie details loading completed"))
         self.inhtml = mautils.html2utf8(txt_)   
@@ -815,7 +824,7 @@ class Filmweb(Screen):
             try:
                 self.parseLogin()
                 self.parseFilmId()
-                self.parseWallpaper(link_)                
+                self.parseWallpaper(self.detailslink)                
                 self.parseTitle()  
                 ls = len(self["title_label"].getText())
                 if ls < TITLE_MAX_SIZE:
@@ -1077,6 +1086,18 @@ class Filmweb(Screen):
         if title != '':
             self["title_label"].setText(self["title_label"].getText() + " (" + title + ")")
     
+    def parseMyVote(self):
+        print_info("parseMyVote", "started")
+        idx = self.inhtml.find('gwt-currentVoteLabel')
+        if idx > 0:
+            txt = mautils.between(self.inhtml, 'gwt-currentVoteLabel>', '</span>')
+            print_info("My VOTE", txt)
+            num = mautils.between(txt, '(',')')
+            if len(num) > 0 and num.isdigit():
+                self.myvote = int(num)
+            return txt 
+        return ''
+    
     def parseRuntime(self):
         print_info("parseRuntime", "started")
         if mautils.between(self.inhtml, '<title>', '</title>').find('Serial TV') > -1: 
@@ -1118,13 +1139,16 @@ class Filmweb(Screen):
         print_info("Movie Year", str(year))
         rtm = self.parseRuntime()   
         print_info("Movie Runtime", str(rtm))
+        vote = self.parseMyVote()
+        print_info("My Vote", str(vote))
         
         self["details_label"].setText(_("Genre: ") + genere + "\n" + 
                                       _("Country: ") +  country + "\n" + 
                                       _("Director: ") + director + "\n" + 
                                       _("Writer: ") + writer + "\n" +
                                       _("Year: ") + year + "\n" + 
-                                      _("Runtime: ") + str(rtm) + " min.\n"                                           
+                                      _("Runtime: ") + str(rtm) + " min.\n" +
+                                      _("My Vote: ") + str(vote) + "\n"                                         
                                       )                     
 
     def inputSerieName(self):
@@ -1149,10 +1173,13 @@ class Filmweb(Screen):
         if self.sessionId is None or self.userToken is None:
             self.session.open(MessageBox,_('In order to enter vote value you should be logged in'), MessageBox.TYPE_INFO)
         else:
+            defa = '5 '
+            if self.myvote > 0:
+                defa = str(self.myvote) + ' '
             dlg = self.session.openWithCallback(self.rateEntered, InputBox, 
                                           windowTitle = _("Rating input"),
                                            title=_("Enter rating value"), 
-                                           text="5 ", 
+                                           text=defa, 
                                            maxSize=55, 
                                            type=Input.NUMBER)
             dlg["input"].end()
