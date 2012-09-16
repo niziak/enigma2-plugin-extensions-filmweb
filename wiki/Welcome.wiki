@@ -21,11 +21,12 @@ I've assigned function from Extension Manager on the YELLOW key button using Mul
 ----
 === ver. 1.0.9 ===
   * Series data fetching added
-  * New entry added to context menu in main window
+  * New entry for searching TV Series added to context menu in main window
   * Configuration entry added to the context menu 
-  * Login to portal functionality implemented based on the configuration data
+  * Login to portal based on the configuration data implemented 
   * Added voting function entry to the context menu 
   * Wallpapers fetching added
+  * Some improvements and fixes
 === ver. 1.0.8 ===
   * Switching to version UNK and MIPSEL
 === ver. 1.0.7 ===
