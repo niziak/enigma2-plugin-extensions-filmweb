@@ -298,7 +298,7 @@ class Filmweb(Screen):
         self.loopx = 0      
         self.initialize = True
         self.wallpapers = []
-        self.wallpaperidx = 0
+        self.wallpaperidx = -1
                 
         self.createGUI()
         self.initActions()
@@ -306,7 +306,7 @@ class Filmweb(Screen):
         
         self.wallpapertimer = eTimer()
         self.wallpapertimer.callback.append(self.changeWallpaper)
-        self.wallpapertimer.start(10000)
+        self.wallpapertimer.start(15000)
             
         if config.plugins.mfilmweb.user.getText() == '':
             self.getData()
@@ -545,6 +545,7 @@ class Filmweb(Screen):
             self["menu"].show()
             self["details_label"].show()            
             
+            self["title_label"].hide()
             self["login_label"].hide()
             self["plot_label"].hide()
             self["stars"].hide()
@@ -571,6 +572,7 @@ class Filmweb(Screen):
             self["plot_label"].show()
             self["login_label"].show()
             self["wallpaper"].show()
+            self["title_label"].show()
             
             if os.path.exists(POSTER_PATH):
                 self["poster"].show()
@@ -597,6 +599,7 @@ class Filmweb(Screen):
                 self["key_blue"].setText("")
         elif self.mode == VT_EXTRAS:
             self["extra_label"].show()
+            self["title_label"].show()
             
             self["wallpaper"].hide()            
             self["login_label"].hide()
@@ -694,7 +697,7 @@ class Filmweb(Screen):
             self.picload.startDecode(POSTER_PATH)
             self.cast_list = []
             self.wallpapers = []
-            self.wallpaperidx = 0
+            self.wallpaperidx = -1
             self.descs = None
             self.filmId = None
             self["cast_label"].l.setList(self.cast_list)
@@ -737,6 +740,7 @@ class Filmweb(Screen):
         try:
             if not self.filmId:
                 return
+            self["wallpaper"].hide()
             print_info("fetch wallpaper OK", str(COOKIES))
             self["status_bar"].setText(_("Wallpaper loading completed"))
             if txt_ and len(txt_) > 0:
@@ -760,22 +764,33 @@ class Filmweb(Screen):
             traceback.print_exc()
     
     def changeWallpaper(self):
+        if self.mode != VT_DETAILS:
+            return;
         print_info("Change wallpaper", str(self.wallpaperidx) + ", filmId: " + str(self.filmId))
         if self.filmId is None:
             return
         localfile = '/tmp/' + self.filmId + '.jpg'
-        if len(self.wallpapers) > 0:               
-            furl = self.wallpapers[self.wallpaperidx]               
+        if len(self.wallpapers) > 0:    
+            indx = self.wallpaperidx            
+            if self.wallpaperidx < 0:
+                self.wallpaperidx = 0
+            furl = self.wallpapers[self.wallpaperidx]                          
             self.wallpaperidx = self.wallpaperidx + 1
             if self.wallpaperidx >= len(self.wallpapers):
-                self.wallpaperidx = 0              
+                self.wallpaperidx = 0   
+            if indx == self.wallpaperidx:
+                return           
             print_info("Loading wallpaper", 'URL: ' + furl + ', Local File:' + localfile)
             downloadPage(furl, localfile).addCallback(self.fetchWallDataOK,localfile).addErrback(self.fetchFailed)
+        else:
+            self["wallpaper"].hide()
                         
     def fetchWallDataOK(self, txt_, localfile=None):
         if self.has_key("wallpaper") and self.filmId and localfile:
             print_info("Loading image data", str(localfile))
-            self["wallpaper"].updateIcon(localfile)            
+            self["wallpaper"].updateIcon(localfile)
+            if self.mode == VT_DETAILS:  
+                self["wallpaper"].show()          
         
     def removeWallData(self, filename):
         print_info("removeWallData - filename:", str(filename))
@@ -861,6 +876,8 @@ class Filmweb(Screen):
             sc = AVSwitch().getFramebufferScale()
             self.picload.setPara((self["poster"].instance.size().width(), self["poster"].instance.size().height(), sc[0], sc[1], False, 1, "#00000000"))
             self.picload.startDecode(rpath)
+            if self.mode == VT_DETAILS:
+                self["poster"].show()
     
     def fetchFailed(self, txt_):
         print_info("Fetch failed", str(txt_))
@@ -875,6 +892,7 @@ class Filmweb(Screen):
             self["poster"].show()
             
     def parsePoster(self):
+        self["poster"].hide()
         print_info("parsePoster", "started")   
         if self.inhtml.find('<div class=posterLightbox>') > -1:
             posterUrl = mautils.between(self.inhtml, '<div class=posterLightbox>', '</div>')
@@ -892,8 +910,9 @@ class Filmweb(Screen):
     def parseDescriptions(self, dhtml):
         print_info("parseDescriptions", "started")
         descres = ''
-        descs = mautils.between(dhtml, '<ul class=descriptionsList', '</ul>')
-        elements = descs.split('<li class=desc')
+        descs = mautils.between(dhtml, '<ul class=descriptionsList', '<script type=')
+        #print_info("DESCS", str(descs))
+        elements = descs.split('<li class=')
         if elements != '':
             for element in elements:
                 if element == '':
@@ -902,7 +921,7 @@ class Filmweb(Screen):
                 element = element.replace('  ', ' ')
                 element = mautils.strip_tags(element)
                 #print_info("DESC", str(element))
-                descres = element + '\n\n'
+                descres = descres + element + '\n\n'
         self["extra_label"].setText(descres)
         
     def parsePlot(self):
