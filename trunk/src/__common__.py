@@ -19,8 +19,31 @@
 # GNU General Public License, version 3 or later
 ######################################################################
 
+from Tools.Directories import resolveFilename, SCOPE_PLUGINS
+from Components.Language import language
+import os
+import gettext
 
-    
+def _(txt):
+    t = gettext.dgettext("Filmweb", txt)
+    if t == txt:
+        t = gettext.gettext(txt)
+    return t
 
+def localeInit():
+    lang = language.getLanguage()[:2] 
+    os.environ["LANGUAGE"] = lang 
+    print "Language: " + lang
+    gettext.bindtextdomain("Filmweb", resolveFilename(SCOPE_PLUGINS, "Extensions/Filmweb/locale"))
 
+def __print_info(prefix, nfo, data):
+    txt = "[" + prefix + "] " + nfo
+    if data is not None:
+        txt = txt + ": " + data
+    print txt
 
+def print_info(nfo, data=None):
+    __print_info("FILMWEB", nfo, data)
+
+localeInit()
+language.addCallback(localeInit)

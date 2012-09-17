@@ -19,29 +19,17 @@
 # GNU General Public License, version 3 or later
 ######################################################################
 
-from __future__ import print_function
 from Plugins.Plugin import PluginDescriptor
-from Tools.Directories import resolveFilename, SCOPE_PLUGINS
-from Components.Language import language
-from os import environ as os_environ
-import gettext
+from __common__ import print_info, _
+import mselection
 import Filmweb
+import FilmwebConfig
 import mautils
     
-def localeInit():
-    lang = language.getLanguage()[:2] 
-    os_environ["LANGUAGE"] = lang 
-    Filmweb.print_info("Language", lang)
-    gettext.bindtextdomain("Filmweb", resolveFilename(SCOPE_PLUGINS, "Extensions/Filmweb/locale"))
-
-def _(txt):
-    return Filmweb._(txt)
-
-localeInit()
-language.addCallback(localeInit)
-
 def main(session, eventName="", **kwargs):    
     reload(mautils)
+    reload(mselection)
+    reload(FilmwebConfig)
     reload(Filmweb)
     try:
         session.open(Filmweb.Filmweb, eventName)
@@ -51,11 +39,13 @@ def main(session, eventName="", **kwargs):
         
 def eventinfo(session, servicelist, **kwargs):
     reload(mautils)
+    reload(mselection)
+    reload(FilmwebConfig)
     reload(Filmweb)    
     try:
         ref = session.nav.getCurrentlyPlayingServiceReference()
-        Filmweb.print_info("Current Service ref", str(ref))
-        session.open(Filmweb.FilmwebEPGSelection, ref)
+        print_info("Current Service ref", str(ref))
+        session.open(mselection.FilmwebEPGSelection, ref, Filmweb.Filmweb)
     except:
         import traceback
         traceback.print_exc()      

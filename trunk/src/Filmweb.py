@@ -22,14 +22,16 @@
 ######################################################################
 
 from twisted.web.client import downloadPage, getPage
-from enigma import gFont, eTimer, ePicLoad, eServiceReference, eServiceCenter, eServiceEvent, eListboxPythonMultiContent, RT_HALIGN_LEFT
+from enigma import gFont, eTimer, ePicLoad, eServiceCenter, eListboxPythonMultiContent, RT_HALIGN_LEFT
+from FilmwebConfig import FilmwebConfig
+from mselection import FilmwebChannelSelection
+from __common__ import print_info, _
 import mautils
-import gettext
 import os
 import urllib
 #import re
     
-from ServiceReference import ServiceReference
+#from ServiceReference import ServiceReference
 from Tools.BoundFunction import boundFunction
 #from Tools.LoadPixmap import LoadPixmap
 #from Tools.Directories import resolveFilename, SCOPE_CURRENT_PLUGIN
@@ -38,9 +40,6 @@ from Screens.Screen import Screen
 from Screens.InputBox import InputBox
 from Screens.ChoiceBox import ChoiceBox
 from Screens.MessageBox import MessageBox
-from Screens.EpgSelection import EPGSelection
-#from Screens.InfoBarGenerics import InfoBarEPG
-from Screens.ChannelSelection import SimpleChannelSelection
 
 from Components.MultiContent import MultiContentEntryText #, MultiContentEntryProgress, MultiContentTemplateColor
 from Components.ChoiceList import ChoiceList
@@ -54,8 +53,7 @@ from Components.Pixmap import Pixmap
 from Components.ScrollLabel import ScrollLabel
 from Components.Button import Button
 from Components.ActionMap import ActionMap
-from Components.ConfigList import ConfigListScreen
-from Components.config import config, configfile, getConfigListEntry, ConfigPassword, ConfigText, ConfigSubsection
+from Components.config import config
 
 USER_TOKEN = '_artuser_token'
 SESSION_KEY = '_artuser_sessionId'
@@ -70,23 +68,10 @@ VT_MENU = 'MENU'
 VT_DETAILS = 'DETAILS'
 VT_EXTRAS = 'EXTRAS'
 
-COOKIES = {}
+COOKIES = {} 
 
-config.plugins.mfilmweb = ConfigSubsection()
-config.plugins.mfilmweb.user = ConfigText(default = "", fixed_size = False)
-config.plugins.mfilmweb.password = ConfigPassword(default="",visible_width = 50,fixed_size = False)
-
-
-def print_info(nfo, data):
-    mautils.print_info("FILMWEB", nfo, data)    
-
-def _(txt):
-    t = gettext.dgettext("Filmweb", txt)
-    if t == txt:
-        t = gettext.gettext(txt)
-    return t
-        
 actorPicload = {}
+
 
 def MovieSearchEntryComponent(text = ["--"]):
     res = [ text ]
@@ -146,115 +131,7 @@ def ActorEntryComponent(inst, img_url = "", text = ["--"], index=0):
     #inst["cast_label"].l.setList(inst.cast_list)
     return res
 
-class FilmwebChannelSelection(SimpleChannelSelection):
-    def __init__(self, session):
-        SimpleChannelSelection.__init__(self, session, _("Channel Selection"))
-        self.skinName = "SimpleChannelSelection"
-
-        self["ChannelSelectEPGActions"] = ActionMap(["ChannelSelectEPGActions"],
-            { "showEPGList": self.processSelected }
-        )
-
-    def processSelected(self):
-        ref = self.getCurrentSelection()
-        print_info("Channel selected", str(ref) + ", flags: " + str(ref.flags))
-        # flagDirectory = isDirectory|mustDescent|canDescent
-        if (ref.flags & eServiceReference.flagDirectory) == eServiceReference.flagDirectory:
-            # when directory go to descent
-            self.enterPath(ref)
-        elif not (ref.flags & eServiceReference.isMarker):
-            # open the event selection screen and handle on close event
-            self.session.openWithCallback(
-                self.onClosed,
-                FilmwebEPGSelection,
-                ref,
-                openPlugin = False
-            )
-
-    def onClosed(self, ret = None):
-        print_info("EPG Closed", str(ret)) 
-        if ret:
-            self.close(ret)
-    
-class FilmwebEPGSelection(EPGSelection):
-    def __init__(self, session, ref, openPlugin = True):
-        EPGSelection.__init__(self, session, ref)
-        self.skinName = "EPGSelection"
-        self["key_red"].setText(_("Lookup"))
-        self.openPlugin = openPlugin
-
-    def infoKeyPressed(self):
-        print_info("Info Key pressed", "")
-        self.lookup()
-        
-    def zapTo(self):
-        self.lookup()
-        
-    #def onSelectionChanged(self):
-    #    cur = self["list"].getCurrent()
-    #    evt = cur[0]
-    #    print_info("Selection Changed Event", str(evt))        
-    
-    def lookup(self):
-        cur = self["list"].getCurrent()
-        evt = cur[0]
-        sref = cur[1]        
-        print_info("Lookup EVT", str(evt))
-        print_info("Lookup SREF", str(sref)) 
-        if not evt: 
-            return
-        
-        # when openPlugin is TRUE - open filmweb data window
-        # otherwise only return the selected event name           
-        if self.openPlugin:
-            print_info("EVT short desc", str(evt.getShortDescription()))
-            print_info("EVT ext desc", str(evt.getExtendedDescription()))
-            print_info("EVT ptr", str(evt.getPtrString()))
-            self.session.open(Filmweb, evt.getEventName())
-        else:
-            self.close(evt.getEventName())              
-        
-class FilmwebConfig(Screen, ConfigListScreen):
-    skin = """<screen position="center,center" size="700,340" title="Filmweb Plugin Configuration">
-        <widget name="config" position="10,30" size="680,230" scrollbarMode="showOnDemand" transparent="1"/>
-        
-        <ePixmap pixmap="skin_default/buttons/red.png" position="140,270" size="140,40" alphatest="on" />
-        <ePixmap pixmap="skin_default/buttons/green.png" position="420,270" size="140,40"  alphatest="on" zPosition="1" />
-        
-        <widget name="key_red" position="140,270" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="red" transparent="1" />        
-        <widget name="key_green" position="420,270" zPosition="2" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="green" transparent="1" />
-    </screen>"""
-    
-    def __init__(self, session):
-        self.skin = FilmwebConfig.skin
-        self.session = session
-        Screen.__init__(self, session)
-        
-        self.list = []
-        ConfigListScreen.__init__(self, self.list)
-        self["key_red"] = Label(_("Cancel"))
-        self["key_green"] = Label(_("Save"))
-        
-        self["actions"] = ActionMap(["WizardActions", "ColorActions"],
-        {
-            "red": self.keyCancel,
-            "back": self.keyCancel,
-            "green": self.keySave,
-        }, -2)
-        self.list = []
-        self.list.append(getConfigListEntry(_("User Name"), config.plugins.mfilmweb.user))
-        self.list.append(getConfigListEntry(_("Password"), config.plugins.mfilmweb.password))
-        self["config"].list = self.list
-        self["config"].l.setList(self.list)     
-        
-    def keySave(self):            
-        config.plugins.mfilmweb.save()
-        configfile.save()
-        self.close()
-
-    def keyCancel(self):        
-        self.close()
-                
+                        
 class Filmweb(Screen):
     skin = """<screen name="FilmwebData" position="90,105" size="1100,560" title="Filmweb.pl" >
             <ePixmap pixmap="/usr/share/enigma2/skin_default/buttons/red25.png" position="20,505" size="250,40" alphatest="on" />
@@ -287,21 +164,15 @@ class Filmweb(Screen):
         self.session = session
         self.eventName = eventName
         self.mode = ''
-        self.searchType = MT_MOVIE
-        self.descs = None
-        self.sessionId = None
-        self.userToken = None
-        self.filmId = None
+        self.searchType = MT_MOVIE        
         self.detailDir = 0
-        self.resultlist = []  
-        self.cast_list = []
+        self.resultlist = []          
         self.loopx = 0      
         self.initialize = True
-        self.wallpapers = []
-        self.wallpaperidx = -1
-        self.myvote = -1
-        self.detailslink = None
-                
+        self.sessionId = None
+        self.userToken = None
+        
+        self.initVars()
         self.createGUI()
         self.initActions()
         self.switchView(to_mode=VT_NONE)
@@ -309,7 +180,7 @@ class Filmweb(Screen):
         self.wallpapertimer = eTimer()
         self.wallpapertimer.callback.append(self.changeWallpaper)
         self.wallpapertimer.start(15000)
-            
+                        
         if config.plugins.mfilmweb.user.getText() == '':
             self.getData()
         else:
@@ -317,8 +188,17 @@ class Filmweb(Screen):
     
     event_quoted = property(lambda self: mautils.quote(self.eventName.encode('utf8')))
         
+    def initVars(self):
+        self.descs = None
+        self.filmId = None
+        self.cast_list = []
+        self.wallpapers = []
+        self.wallpaperidx = -1
+        self.myvote = -1
+        self.detailslink = None
+            
     def initActions(self):
-        self["actions"] = ActionMap(["OkCancelActions", "ColorActions", "MovieSelectionActions", "DirectionActions"], {
+        self["actions"] = ActionMap(["OkCancelActions", "ColorActions", "InfobarMovieListActions", "MovieSelectionActions", "DirectionActions"], {
             "ok": self.showDetails,
             "cancel": self.exit,
             "down": self.pageDown,
@@ -330,10 +210,31 @@ class Filmweb(Screen):
             "yellow": self.showDetails,
             "blue": self.showExtras,
             "contextMenu": self.contextMenuPressed,
-            "showEventInfo": self.showDetails
+            "showEventInfo": self.showDetails,
+            "movieList": self.showEPGList
         }, -1)
         
     # ---- ACTIONS ----  
+    def showEPGList(self):
+        from enigma import  eEPGCache, eServiceReference
+        from Screens.ChannelSelection import service_types_tv
+        idbouquet = '%s ORDER BY name'%(service_types_tv)
+        epgcache = eEPGCache.getInstance()
+        serviceHandler = eServiceCenter.getInstance()
+        services = serviceHandler.list(eServiceReference(idbouquet))
+        print_info('-- EPG --', 'services: ' + str(services))
+        channels = services and services.getContent("SN", True)
+        for channel in channels:
+            print_info('-- EPG --', 'channel: ' + str(channel))
+            if not int(channel[0].split(":")[1]) & 64:
+                chan = {}
+                chan['ref'] = channel[0]
+                chan['name'] = channel[1]
+                print_info('-- EPG --', 'chan: ' + str(chan))
+                nowevent = epgcache.lookupEvent(['TBDCIX', (channel[0], 0, -1)])
+                print_info('-- EPG --', 'now evt: ' + str(nowevent))
+                
+    
     def moveLeft(self):
         if self.mode == VT_DETAILS:
             self.detailDir = 0
@@ -389,7 +290,7 @@ class Filmweb(Screen):
                  
     def contextMenuPressed(self):
         lista = []
-        if self.sessionId and self.userToken:
+        if self.sessionId is not None and self.userToken is not None:
             lista.append((_("Vote current"), self.voteMovie))
         lista.append((_("Enter movie title"), self.inputMovieName))
         lista.append((_("Enter serie title"), self.inputSerieName))
@@ -408,7 +309,7 @@ class Filmweb(Screen):
         
         
     def channelSelection(self):      
-        print_info("Channel selection", "exec")  
+        print_info("Channel selection")  
         self.session.openWithCallback(
             self.serachSelectedChannel,
             FilmwebChannelSelection
@@ -417,7 +318,7 @@ class Filmweb(Screen):
     def serachSelectedChannel(self, ret = None):
         print_info("Serach Selected Channel", str(ret)) 
         if ret:
-            sr = ServiceReference(ret)            
+            #sr = ServiceReference(ret)            
             #self.switchView(to_mode=VT_MENU)  
             serviceHandler = eServiceCenter.getInstance()  
             info = serviceHandler.info(ret)               
@@ -512,8 +413,11 @@ class Filmweb(Screen):
             print_info("LoginPage", "started")
             self["status_bar"].setText(_('Logging in ...'))
             self.sessionId = None 
+            self.userToken = None
             if COOKIES.has_key(SESSION_KEY):
                 COOKIES.pop(SESSION_KEY)
+            if COOKIES.has_key(USER_TOKEN):
+                COOKIES.pop(USER_TOKEN)  
             data = {'j_username': config.plugins.mfilmweb.user.getText(), "j_password" : config.plugins.mfilmweb.password.getText()}
             data = urllib.urlencode(data)
             getPage('https://ssl.filmweb.pl/j_login', method='POST', postdata=data, 
@@ -542,6 +446,7 @@ class Filmweb(Screen):
         else:
             self.userToken = None     
         self["status_bar"].setText(_('Login done'))   
+        print_info('Login data', str(self.userToken) + ', SID: ' + str(self.sessionId))
         if callback:
             callback()
             
@@ -702,13 +607,7 @@ class Filmweb(Screen):
             if os.path.exists(POSTER_PATH):
                 os.remove(POSTER_PATH)     
             self.picload.startDecode(POSTER_PATH)
-            self.cast_list = []
-            self.wallpapers = []
-            self.wallpaperidx = -1
-            self.myvote = -1
-            self.descs = None
-            self.filmId = None
-            self.detailslink = None
+            self.initVars()
             self["cast_label"].l.setList(self.cast_list)
             self.resultlist = []
             print_info("Getting data for event", str(self.eventName))
@@ -746,6 +645,7 @@ class Filmweb(Screen):
             traceback.print_exc()
             
     def fetchWallpaperOK(self, txt_):
+        print_info("fetchWallpaperOK ...")
         try:
             if not self.filmId:
                 return
@@ -1043,9 +943,12 @@ class Filmweb(Screen):
             self["stars"].setValue(0)
             
     def parseWallpaper(self, link_=None):
+        print_info("parseWallpaper", "started")
         idx = self.inhtml.find('<li id="filmMenu-filmWallpapers" class=" caption">tapety</li>')
+        print_info('Wallpaper idx', str(idx))
         if idx < 0:
             # only for logged users
+            print_info("Parse wallpapers for link_" + str(link_) + ', SID: ' + str(self.sessionId) + ', FID: ' + str(self.filmId))
             if link_ and self.sessionId and self.filmId:  
                 getPage(link_ + '/wallpapers', cookies=COOKIES).addCallback(self.fetchWallpaperOK).addErrback(self.fetchFailed)      
                 
@@ -1095,7 +998,7 @@ class Filmweb(Screen):
             num = mautils.between(txt, '(',')')
             if len(num) > 0 and num.isdigit():
                 self.myvote = int(num)
-            return txt 
+                return txt 
         return ''
     
     def parseRuntime(self):
@@ -1165,9 +1068,10 @@ class Filmweb(Screen):
         print_info("configData", "started")
         self.session.openWithCallback(self.configSaved, FilmwebConfig)
         
-    def configSaved(self):
-        print_info("configSaved", "started")
-        self.loginPage()
+    def configSaved(self, val=False):
+        print_info("configSaved", str(val))
+        if val:
+            self.loginPage()
     
     def voteMovie(self, res=None):
         if self.sessionId is None or self.userToken is None:
