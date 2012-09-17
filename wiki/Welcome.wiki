@@ -4,6 +4,8 @@ Plugin has been prepared in the PYTHON dev-language and works in the Enigma2 env
 
 The plugin is prepared based on the resources from the BlackGlass-HD skin (default skin for BlackHole image), so if you want to use it in the other skin you should copy proper resources to the proper location - you should look at skin definition in the sources.
 
+
+
 = Installation =
 ----
   * SSH onto the dreambox
@@ -12,8 +14,11 @@ The plugin is prepared based on the resources from the BlackGlass-HD skin (defau
   * use manual IPK package installation option from Dreambox plugin menu
 
 {{{
-ipkg install /tmp/enigma2-plugin-extensions-filmweb-1.0.9-mipsel.ipk
+ipkg install /tmp/enigma2-plugin-extensions-filmweb_1.0.9_mipsel.ipk
 }}}
+
+
+
 = Usage =
 ----
 You could run plugin from two places:
