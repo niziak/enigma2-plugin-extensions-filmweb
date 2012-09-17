@@ -11,6 +11,9 @@ The plugin is prepared based on the resources from the BlackGlass-HD skin (defau
   * copy IPK file to /tmp folder
   * use manual IPK package installation option from Dreambox plugin menu
 
+{{{
+ipkg install /tmp/enigma2-plugin-extensions-filmweb-1.0.9-mipsel.ipk
+}}}
 = Usage =
 ----
 You could run plugin from two places:
