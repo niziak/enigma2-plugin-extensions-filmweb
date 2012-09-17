@@ -11,6 +11,7 @@ The plugin is prepared based on the resources from the BlackGlass-HD skin (defau
   * SSH onto the dreambox
   * install libs: python-html, python-twisted-web, openssl, python-pyopenssl
 {{{
+ipkg update
 ipkg install python-html
 ipkg install python-twisted-web
 ipkg install openssl
