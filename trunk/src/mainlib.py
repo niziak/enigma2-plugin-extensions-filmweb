@@ -23,18 +23,19 @@
 
 from twisted.web.client import downloadPage, getPage
 from enigma import gFont, eTimer, ePicLoad, eServiceCenter, eListboxPythonMultiContent, RT_HALIGN_LEFT
-from FilmwebConfig import FilmwebConfig
-from mselection import FilmwebChannelSelection
+from config import FilmwebConfig
+from mselection import FilmwebChannelSelection, FilmwebRateChannelSelection
 from __common__ import print_info, _
 import mautils
 import os
+import sys
 import urllib
 #import re
     
 #from ServiceReference import ServiceReference
 from Tools.BoundFunction import boundFunction
-#from Tools.LoadPixmap import LoadPixmap
-#from Tools.Directories import resolveFilename, SCOPE_CURRENT_PLUGIN
+from Tools.LoadPixmap import LoadPixmap
+from Tools.Directories import resolveFilename, SCOPE_CURRENT_SKIN
 
 from Screens.Screen import Screen
 from Screens.InputBox import InputBox
@@ -58,7 +59,9 @@ from Components.config import config
 USER_TOKEN = '_artuser_token'
 SESSION_KEY = '_artuser_sessionId'
 POSTER_PATH = "/tmp/poster.jpg"
+ACTOR_IMG_PREFIX = "/tmp/actor_img_"
 TITLE_MAX_SIZE = 67
+WALLPAPER_REFRESH_TIME=15000
 
 MT_MOVIE = 'film'
 MT_SERIE = 'serial'
@@ -108,7 +111,7 @@ def ActorEntryComponent(inst, img_url = "", text = ["--"], index=0):
     
     def fetchImgOK(data, idx):
         print_info("fetchImgOK", str(idx))
-        rpath = os.path.realpath("/tmp/actor_img_" + str(idx) + ".jpg")
+        rpath = os.path.realpath(ACTOR_IMG_PREFIX + str(idx) + ".jpg")
         if os.path.exists(rpath):
             sc = AVSwitch().getFramebufferScale()
             actorPicload[idx].setPara((40, 45, sc[0], sc[1], False, 1, "#00000000"))
@@ -124,7 +127,7 @@ def ActorEntryComponent(inst, img_url = "", text = ["--"], index=0):
         actorPicload[index] = ePicLoad()
         actorPicload[index].PictureData.get().append(boundFunction(paintImage, index)) 
         res.append((eListboxPythonMultiContent.TYPE_TEXT, 45, 0, 750, 45, 0, RT_HALIGN_LEFT, text[0]))        
-        localfile = "/tmp/actor_img_" + str(index) + ".jpg"
+        localfile = ACTOR_IMG_PREFIX + str(index) + ".jpg"
         print_info("Downloading actor img", img_url + " to " + localfile)
         downloadPage(img_url, localfile).addCallback(fetchImgOK, index).addErrback(fetchImgFailed, index)
     #inst.cast_list.append(res)
@@ -133,31 +136,19 @@ def ActorEntryComponent(inst, img_url = "", text = ["--"], index=0):
 
                         
 class Filmweb(Screen):
-    skin = """<screen name="FilmwebData" position="90,105" size="1100,560" title="Filmweb.pl" >
-            <ePixmap pixmap="/usr/share/enigma2/skin_default/buttons/red25.png" position="20,505" size="250,40" alphatest="on" />
-            <ePixmap pixmap="/usr/share/enigma2/skin_default/buttons/green25.png" position="290,505" size="250,40" alphatest="on" />
-            <ePixmap pixmap="/usr/share/enigma2/skin_default/buttons/yellow25.png" position="560,505" size="250,40"  alphatest="on" />
-            <ePixmap pixmap="/usr/share/enigma2/skin_default/buttons/blue25.png" position="830,505" size="250,40"  alphatest="on" />
-            <widget name="key_red" position="20,508" size="250,40" zPosition="2" font="Regular;24" valign="center" halign="center" backgroundColor="transpBlack" transparent="1" />
-            <widget name="key_green" position="290,508" size="250,40" zPosition="2" font="Regular;24" valign="center" halign="center" backgroundColor="transpBlack" transparent="1" />
-            <widget name="key_yellow" position="560,508" size="250,40" zPosition="2" font="Regular;24" valign="center" halign="center" backgroundColor="transpBlack" transparent="1" />
-            <widget name="key_blue" position="830,508" size="250,40" zPosition="2" font="Regular;24" valign="center" halign="center" backgroundColor="transpBlack" transparent="1" />
-            <widget name="title_label" position="10,0" size="850,30" zPosition="5" valign="center" font="Regular;22" foregroundColor="#f0b400" transparent="1"/>
-            <widget name="details_label" position="170,40" size="900,228" zPosition="5" font="Regular;19"  transparent="1"/>
-            <widget name="plot_label" position="550,250" size="535,240" zPosition="5" font="Regular;18" transparent="1"/>
-            <widget name="cast_label" position="10,250" size="535,240" zPosition="5" scrollbarMode="showOnDemand" transparent="1"/>
-            <widget name="extra_label" position="10,30" size="1070,470" zPosition="5" font="Regular;18" transparent="1"/>
-            <widget name="rating_label" position="870,56" size="210,25" zPosition="5" halign="center" font="Regular;18" foregroundColor="#f0b400" transparent="1"/>
-            <widget name="login_label" position="870,5" size="210,20" zPosition="5" halign="center" font="Regular;18" foregroundColor="#58bcff" transparent="1"/>
-            <widget name="status_bar" position="10,545" size="1070,20" zPosition="2" font="Regular;16" foregroundColor="#cccccc" transparent="1"/>
-            <widget name="poster" position="20,26" size="140,216" zPosition="5" alphatest="blend" />
-            <widget name="wallpaper" position="870,81" size="210,170" zPosition="0" alphatest="on" />
-            <widget name="menu" position="10,80" size="1070,400" zPosition="5" scrollbarMode="showOnDemand" transparent="1"/>
-            <widget name="stars_bg" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/Filmweb/resource/starsbar_empty.png" position="870,35" zPosition="2" size="210,21" transparent="1" alphatest="on" />
-            <widget name="stars" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/Filmweb/resource/starsbar_filled.png" position="870,35" zPosition="5" size="210,21" transparent="1" />
-        </screen>"""
-              
     def __init__(self, session, eventName):
+        mf = sys.modules[__name__].__file__
+        self.ppath = os.path.dirname(mf)
+        print_info('Plugin path', self.ppath)
+        fn = resolveFilename(SCOPE_CURRENT_SKIN, 'skin_default/buttons/red25.png')
+        if (os.path.exists(fn)):
+            skin = "%s/resource/filmweb_skin_bh.xml" % (self.ppath)
+        else:
+            skin = "%s/resource/filmweb_skin_df.xml" % (self.ppath)
+        f = open(skin, "r")
+        self.skin = f.read()
+        f.close()
+        
         Screen.__init__(self, session)
         print_info("Filmweb Screen - event", eventName)
 
@@ -179,7 +170,7 @@ class Filmweb(Screen):
         
         self.wallpapertimer = eTimer()
         self.wallpapertimer.callback.append(self.changeWallpaper)
-        self.wallpapertimer.start(15000)
+        self.wallpapertimer.start(WALLPAPER_REFRESH_TIME)
                         
         if config.plugins.mfilmweb.user.getText() == '':
             self.getData()
@@ -215,24 +206,52 @@ class Filmweb(Screen):
         }, -1)
         
     # ---- ACTIONS ----  
+    def showEPGListCallback(self, res=None):
+        print_info('showEPGListCallback', str(res))
+        
     def showEPGList(self):
+        self.session.openWithCallback(self.showEPGListCallback, FilmwebRateChannelSelection) 
+              
+        '''
         from enigma import  eEPGCache, eServiceReference
         from Screens.ChannelSelection import service_types_tv
-        idbouquet = '%s ORDER BY name'%(service_types_tv)
-        epgcache = eEPGCache.getInstance()
-        serviceHandler = eServiceCenter.getInstance()
-        services = serviceHandler.list(eServiceReference(idbouquet))
-        print_info('-- EPG --', 'services: ' + str(services))
-        channels = services and services.getContent("SN", True)
-        for channel in channels:
-            print_info('-- EPG --', 'channel: ' + str(channel))
-            if not int(channel[0].split(":")[1]) & 64:
-                chan = {}
-                chan['ref'] = channel[0]
-                chan['name'] = channel[1]
-                print_info('-- EPG --', 'chan: ' + str(chan))
-                nowevent = epgcache.lookupEvent(['TBDCIX', (channel[0], 0, -1)])
-                print_info('-- EPG --', 'now evt: ' + str(nowevent))
+        from Components.Sources.ServiceList import ServiceList
+        
+        bouquetlist = ServiceList(eServiceReference(service_types_tv + ' FROM BOUQUET "bouquets.tv" ORDER BY bouquet'), validate_commands=False).getServicesAsList()
+        for bouquetitem in bouquetlist:
+            print_info('-- EPG --', 'bouquet: ' + str(bouquetitem))
+            serviceHandler = eServiceCenter.getInstance()
+            list = serviceHandler.list(eServiceReference(str(bouquetitem[0])))
+            services = list and list.getContent('S')
+            print_info('-- EPG --', 'SERV: ' + str(services))
+            channels = list and list.getContent("SN", True)
+            print_info('-- EPG --', 'CHNLS: ' + str(channels))
+            
+            search = ['IBDCTSERNX']
+            if services: # It's a Bouquet
+                search.extend([(service, 0, -1) for service in services])
+            
+            print_info('-- EPG --', 'SEARCH: ' + str(search))
+            events = eEPGCache.getInstance().lookupEvent(search)
+            for eventinfo in events:
+                #0 eventID | 4 eventname | 5 short descr | 6 long descr | 7 serviceref | 8 channelname
+                print_info('-- EPG --', 'evt: ' + str(eventinfo))
+        '''    
+        #idbouquet = '%s ORDER BY name'%(service_types_tv)
+        #epgcache = eEPGCache.getInstance()
+        #serviceHandler = eServiceCenter.getInstance()
+        #services = serviceHandler.list(eServiceReference(idbouquet))
+        #print_info('-- EPG --', 'services: ' + str(services))
+        #channels = services and services.getContent("SN", True)
+        #for channel in channels:
+            #print_info('-- EPG --', 'channel: ' + str(channel))
+            #if not int(channel[0].split(":")[1]) & 64:
+                #chan = {}
+                #chan['ref'] = channel[0]
+                #chan['name'] = channel[1]
+                #print_info('-- EPG --', 'chan: ' + str(chan))
+                #nowevent = epgcache.lookupEvent(['TBDCIX', (channel[0], 0, -1)])
+                #print_info('-- EPG --', 'now evt: ' + str(nowevent))
                 
     
     def moveLeft(self):
@@ -572,14 +591,13 @@ class Filmweb(Screen):
         
         self["wallpaper"] = mautils.PixLoader(self.removeWallData)
            
-        self["stars"] = ProgressBar()        
-        
-        #self["stars"].instance.setPixmap(LoadPixmap(cached=True, path=mautils.getPluginPath() + '/resource/starsbar_filled.png'))        
-        #path=resolveFilename(SCOPE_CURRENT_PLUGIN, 'Filmweb/resource/starsbar_filled.png')
-        #print_info("Current Path", str(path))
-        
+        self["stars"] = ProgressBar()                
+        pixmap_path = "%s/resource/starsbar_filled.png" % (self.ppath)
+        self["stars"].instance.setPixmap(LoadPixmap(cached=True, path=pixmap_path))                
         self["stars_bg"] = Pixmap()      
-        #self["stars_bg"].instance.setPixmap(LoadPixmap(cached=True, path=resolveFilename(SCOPE_CURRENT_PLUGIN, 'Filmweb/resource/starsbar_empty.png')))  
+        pixmap_path = "%s/resource/starsbar_empty.png" % (self.ppath)
+        self["stars_bg"].instance.setPixmap(LoadPixmap(cached=True, path=pixmap_path))
+          
         self["details_label"] = Label("")
         self["login_label"] = Label("")        
         self["plot_label"] = ScrollLabel("")
