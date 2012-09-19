@@ -36,6 +36,11 @@ I've assigned function registered in the Extension Manager on the YELLOW key but
 
 = Change log =
 ----
+=== TO-DO ===
+  * support for showing recommendations information
+  * skin handling fix
+  * 'want to see' support
+  * support for showing ratings for movies from EPG for selected channels in one list (recommendation for choice of what to see in the near future)
 === ver. 1.0.9 ===
   * Series data fetching added
   * New entry for searching TV Series added to context menu in main window
