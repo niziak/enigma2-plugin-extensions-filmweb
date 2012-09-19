@@ -22,13 +22,36 @@
 from __common__ import print_info, _
 from enigma import eServiceReference
 
+#from Tools.LoadPixmap import LoadPixmap
+#from Tools.Directories import resolveFilename, SCOPE_CURRENT_SKIN
+
 from Screens.EpgSelection import EPGSelection
 #from Screens.InfoBarGenerics import InfoBarEPG
 from Screens.ChannelSelection import SimpleChannelSelection
 
 from Components.ActionMap import ActionMap
 
-
+class FilmwebRateChannelSelection(SimpleChannelSelection):
+    def __init__(self, session):
+        SimpleChannelSelection.__init__(self, session, _("Channel Selection"))
+        self.skinName = "SimpleChannelSelection"
+        
+    def channelSelected(self):
+        ref = self.getCurrentSelection()
+        print_info("Channel selected", str(ref) + ", flags: " + str(ref.flags))
+        if (ref.flags & eServiceReference.flagDirectory) == eServiceReference.flagDirectory:
+            self.enterPath(ref)
+        # when service is not directory and is not marker that means playable service
+        elif not (ref.flags & eServiceReference.isMarker):
+            refx = self.servicelist.getCurrent()
+            if self.servicelist.isMarked(refx):
+                self.servicelist.removeMarked(refx)
+            else:
+                self.servicelist.addMarked(refx)
+                
+    def setModeRadio(self):
+        pass
+    
 class FilmwebChannelSelection(SimpleChannelSelection):
     def __init__(self, session):
         SimpleChannelSelection.__init__(self, session, _("Channel Selection"))
@@ -43,10 +66,8 @@ class FilmwebChannelSelection(SimpleChannelSelection):
         print_info("Channel selected", str(ref) + ", flags: " + str(ref.flags))
         # flagDirectory = isDirectory|mustDescent|canDescent
         if (ref.flags & eServiceReference.flagDirectory) == eServiceReference.flagDirectory:
-            # when directory go to descent
             self.enterPath(ref)
         elif not (ref.flags & eServiceReference.isMarker):
-            # open the event selection screen and handle on close event
             self.session.openWithCallback(
                 self.onClosed,
                 FilmwebEPGSelection,
@@ -54,7 +75,7 @@ class FilmwebChannelSelection(SimpleChannelSelection):
             )
 
     def onClosed(self, ret = None):
-        print_info("EPG Closed", str(ret)) 
+        print_info("Closed", str(ret)) 
         if ret:
             self.close(ret)
     

@@ -22,17 +22,17 @@
 from Plugins.Plugin import PluginDescriptor
 from __common__ import print_info, _
 import mselection
-import Filmweb
-import FilmwebConfig
+import mainlib
+import config
 import mautils
     
 def main(session, eventName="", **kwargs):    
     reload(mautils)
     reload(mselection)
-    reload(FilmwebConfig)
-    reload(Filmweb)
+    reload(config)
+    reload(mainlib)
     try:
-        session.open(Filmweb.Filmweb, eventName)
+        session.open(mainlib.Filmweb, eventName)
     except:
         import traceback
         traceback.print_exc()
@@ -40,12 +40,12 @@ def main(session, eventName="", **kwargs):
 def eventinfo(session, servicelist, **kwargs):
     reload(mautils)
     reload(mselection)
-    reload(FilmwebConfig)
-    reload(Filmweb)    
+    reload(config)
+    reload(mainlib)    
     try:
         ref = session.nav.getCurrentlyPlayingServiceReference()
         print_info("Current Service ref", str(ref))
-        session.open(mselection.FilmwebEPGSelection, ref, Filmweb.Filmweb)
+        session.open(mselection.FilmwebEPGSelection, ref, mainlib.Filmweb)
     except:
         import traceback
         traceback.print_exc()      
