@@ -163,6 +163,8 @@ class Filmweb(Screen):
         self.sessionId = None
         self.userToken = None
         
+        self.onLayoutFinish.append(self.__layoutFinished)
+        
         self.initVars()
         self.createGUI()
         self.initActions()
@@ -179,6 +181,19 @@ class Filmweb(Screen):
     
     event_quoted = property(lambda self: mautils.quote(self.eventName.encode('utf8')))
         
+    def __layoutFinished(self):
+        try:
+            pixmap_path = "%s/resource/starsbar_filled.png" % (self.ppath)
+            print_info('STARS instance', str(self["stars"].instance))
+            self["stars"].instance.setPixmap(LoadPixmap(cached=True, path=pixmap_path))                
+                  
+            pixmap_path = "%s/resource/starsbar_empty.png" % (self.ppath)
+            print_info('STARS BG instance', str(self["stars_bg"].instance))
+            self["stars_bg"].instance.setPixmap(LoadPixmap(cached=True, path=pixmap_path))
+        except:            
+            import traceback
+            traceback.print_exc() 
+            
     def initVars(self):
         self.descs = None
         self.filmId = None
@@ -482,6 +497,8 @@ class Filmweb(Screen):
             self["stars"].hide()
             self["stars_bg"].hide()
             self["rating_label"].hide()
+            if self.has_key('cast_scroll'):
+                self["cast_scroll"].hide()
             self["cast_label"].hide()
             self["poster"].hide()
             self["wallpaper"].hide()
@@ -498,6 +515,8 @@ class Filmweb(Screen):
             self["key_blue"].setText("")
         elif self.mode == VT_DETAILS:            
             self["rating_label"].show()
+            if self.has_key('cast_scroll'):
+                self["cast_scroll"].show()
             self["cast_label"].show()
             self["details_label"].show()
             self["plot_label"].show()
@@ -536,6 +555,8 @@ class Filmweb(Screen):
             self["login_label"].hide()
             self["details_label"].hide()
             self["plot_label"].hide()
+            if self.has_key('cast_scroll'):
+                self["cast_scroll"].hide()
             self["cast_label"].hide()
             self["poster"].hide()
             self["stars"].hide()
@@ -555,6 +576,8 @@ class Filmweb(Screen):
             self["extra_label"].hide()            
             self["details_label"].hide()
             self["plot_label"].hide()
+            if self.has_key('cast_scroll'):
+                self["cast_scroll"].hide()
             self["cast_label"].hide()
             self["poster"].hide()
             self["stars"].hide()
@@ -592,11 +615,7 @@ class Filmweb(Screen):
         self["wallpaper"] = mautils.PixLoader(self.removeWallData)
            
         self["stars"] = ProgressBar()                
-        pixmap_path = "%s/resource/starsbar_filled.png" % (self.ppath)
-        self["stars"].instance.setPixmap(LoadPixmap(cached=True, path=pixmap_path))                
         self["stars_bg"] = Pixmap()      
-        pixmap_path = "%s/resource/starsbar_empty.png" % (self.ppath)
-        self["stars_bg"].instance.setPixmap(LoadPixmap(cached=True, path=pixmap_path))
           
         self["details_label"] = Label("")
         self["login_label"] = Label("")        
@@ -1007,6 +1026,15 @@ class Filmweb(Screen):
         if title != '':
             self["title_label"].setText(self["title_label"].getText() + " (" + title + ")")
     
+    def parsePromoWidget(self):
+        print_info("parsePromoWidget", "started")
+        if self.sessionId is not None:
+            idx = self.inhtml.find('<div id="svdRec" style="display:none">')
+            if idx > 0:
+                txt = mautils.between(self.inhtml, '<div id="svdRec" style="display:none">', '</div>')
+                return txt
+        return None
+        
     def parseMyVote(self):
         print_info("parseMyVote", "started")
         idx = self.inhtml.find('gwt-currentVoteLabel')
@@ -1062,15 +1090,20 @@ class Filmweb(Screen):
         print_info("Movie Runtime", str(rtm))
         vote = self.parseMyVote()
         print_info("My Vote", str(vote))
+        promo = self.parsePromoWidget()
         
-        self["details_label"].setText(_("Genre: ") + genere + "\n" + 
-                                      _("Country: ") +  country + "\n" + 
-                                      _("Director: ") + director + "\n" + 
-                                      _("Writer: ") + writer + "\n" +
-                                      _("Year: ") + year + "\n" + 
-                                      _("Runtime: ") + str(rtm) + " min.\n" +
-                                      _("My Vote: ") + str(vote) + "\n"                                         
-                                      )                     
+        textdsp = _("Genre: ") + genere + "\n" + \
+        _("Country: ") +  country + "\n" + \
+        _("Director: ") + director + "\n" + \
+        _("Writer: ") + writer + "\n" + \
+        _("Year: ") + year + "\n" + \
+        _("Runtime: ") + str(rtm) + " min.\n" + \
+        _("My Vote: ") + str(vote) + "\n"
+        
+        if promo is not None:
+            textdsp = textdsp + promo + '% ' + _('to your taste') + ' \n'
+            
+        self["details_label"].setText(textdsp)                     
 
     def inputSerieName(self):
         self.searchType = MT_SERIE
@@ -1095,7 +1128,7 @@ class Filmweb(Screen):
         if self.sessionId is None or self.userToken is None:
             self.session.open(MessageBox,_('In order to enter vote value you should be logged in'), MessageBox.TYPE_INFO)
         else:
-            defa = '5 '
+            defa = '0 '
             if self.myvote > 0:
                 defa = str(self.myvote) + ' '
             dlg = self.session.openWithCallback(self.rateEntered, InputBox, 
@@ -1114,11 +1147,11 @@ class Filmweb(Screen):
             isok = False
             if len(voteVal) > 0 and voteVal.isdigit():
                 voteNum = int(voteVal) 
-                if voteNum > 0 and voteNum < 11:
+                if voteNum >= 0 and voteNum < 11:
                     isok = True
                     self.rateEntry(voteNum)
             if not isok:
-                self.session.openWithCallback(self.voteMovie,MessageBox,_('You have to enter value in range [1, 10]'), MessageBox.TYPE_ERROR)
+                self.session.openWithCallback(self.voteMovie,MessageBox,_('You have to enter value in range [0, 10]'), MessageBox.TYPE_ERROR)
                         
     def inputMovieName(self):
         self.searchType = MT_MOVIE

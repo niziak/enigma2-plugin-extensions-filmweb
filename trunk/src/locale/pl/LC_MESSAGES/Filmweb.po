@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Filmweb 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-09-19 09:20+0100\n"
-"PO-Revision-Date: 2012-09-19 09:21+0100\n"
+"POT-Creation-Date: 2012-09-19 17:30+0100\n"
+"PO-Revision-Date: 2012-09-19 17:31+0100\n"
 "Last-Translator: Marcin Słowik <masl@op.pl>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -177,63 +177,67 @@ msgstr "brak oceny społeczności"
 msgid "User"
 msgstr "Login"
 
-#: mainlib.py:1066
+#: mainlib.py:1076
 msgid "Genre: "
 msgstr "Gatunek: "
 
-#: mainlib.py:1067
+#: mainlib.py:1077
 msgid "Country: "
 msgstr "Produkcja: "
 
-#: mainlib.py:1068
+#: mainlib.py:1078
 msgid "Director: "
 msgstr "Reżyseria: "
 
-#: mainlib.py:1069
+#: mainlib.py:1079
 msgid "Writer: "
 msgstr "Scenariusz: "
 
-#: mainlib.py:1070
+#: mainlib.py:1080
 msgid "Year: "
 msgstr "Rok: "
 
-#: mainlib.py:1071
+#: mainlib.py:1081
 msgid "Runtime: "
 msgstr "Czas trwania:"
 
-#: mainlib.py:1072
+#: mainlib.py:1082
 msgid "My Vote: "
 msgstr "Moja ocena:"
 
-#: mainlib.py:1078
+#: mainlib.py:1085
+msgid "to your taste"
+msgstr "w Twoim guście"
+
+#: mainlib.py:1092
 msgid "Input the name of serie to search"
 msgstr "Wprowadź nazwę serialu do przeszukania"
 
-#: mainlib.py:1079
+#: mainlib.py:1093
 msgid "Enter serie title to search for"
 msgstr "Wprowadź tytuł serialu do wyszukania"
 
-#: mainlib.py:1096
+#: mainlib.py:1110
 msgid "In order to enter vote value you should be logged in"
 msgstr "Wprowadzanie ocen możliwe tylko po zalogowaniu"
 
-#: mainlib.py:1102
+#: mainlib.py:1116
 msgid "Rating input"
 msgstr "Wprowadzanie własnej oceny"
 
-#: mainlib.py:1103
+#: mainlib.py:1117
 msgid "Enter rating value"
 msgstr "Wprowadź swoją ocenę"
 
-#: mainlib.py:1121
+#: mainlib.py:1135
 msgid "You have to enter value in range [1, 10]"
 msgstr "Musisz wprowadzić wartość z przedziału [1, 10]"
 
-#: mainlib.py:1126
+#: mainlib.py:1140
 msgid "Input the name of movie to search"
 msgstr "Wprowadź nazwę filmu do wyszukania"
 
-#: mainlib.py:1127
+#: mainlib.py:1141
 msgid "Enter movie title to search for"
 msgstr "Wprowadź szukany tytuł"
 
