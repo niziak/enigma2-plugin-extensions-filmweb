@@ -20,7 +20,7 @@
 ######################################################################
 
 from __common__ import print_info, _
-from enigma import eServiceReference
+from enigma import eServiceReference, gRGB, eListboxServiceContent
 
 #from Tools.LoadPixmap import LoadPixmap
 #from Tools.Directories import resolveFilename, SCOPE_CURRENT_SKIN
@@ -36,6 +36,8 @@ class FilmwebRateChannelSelection(SimpleChannelSelection):
         SimpleChannelSelection.__init__(self, session, _("Channel Selection"))
         self.skinName = "SimpleChannelSelection"
         
+        self.onLayoutFinish.append(self.__layoutFinished)
+        
     def channelSelected(self):
         ref = self.getCurrentSelection()
         print_info("Channel selected", str(ref) + ", flags: " + str(ref.flags))
@@ -49,6 +51,15 @@ class FilmwebRateChannelSelection(SimpleChannelSelection):
             else:
                 self.servicelist.addMarked(refx)
                 
+    def __layoutFinished(self):    
+        try:
+            self.servicelist.l.setColor(eListboxServiceContent.markedForeground, gRGB(0x58BCFF))
+            self.servicelist.l.setColor(eListboxServiceContent.markedForegroundSelected, gRGB(0xF0B400))
+            #self.servicelist.instance.setForegroundColorSelected(gRGB(0xF0B400))
+        except:
+            import traceback
+            traceback.print_exc()         
+        
     def setModeRadio(self):
         pass
     
