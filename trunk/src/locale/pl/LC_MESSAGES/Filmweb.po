@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Filmweb 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-09-19 17:30+0100\n"
-"PO-Revision-Date: 2012-09-19 17:31+0100\n"
+"POT-Creation-Date: 2012-09-23 16:22+0100\n"
+"PO-Revision-Date: 2012-09-23 16:22+0100\n"
 "Last-Translator: Marcin Słowik <masl@op.pl>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -34,218 +34,218 @@ msgstr "Email lub nick"
 msgid "Password"
 msgstr "Hasło"
 
-#: mainlib.py:313
+#: mainlib.py:350
 msgid "Vote current"
 msgstr "Wprowadź ocenę"
 
-#: mainlib.py:314
+#: mainlib.py:351
 msgid "Enter movie title"
 msgstr "Wprowadź tytuł filmu"
 
-#: mainlib.py:315
+#: mainlib.py:352
 msgid "Enter serie title"
 msgstr "Wprowadź tytuł serialu"
 
-#: mainlib.py:316
+#: mainlib.py:353
 msgid "Select from EPG"
 msgstr "Wybierz z EPG"
 
-#: mainlib.py:317
+#: mainlib.py:354
 msgid "Configuration"
 msgstr "Konfiguracja"
 
-#: mainlib.py:398
+#: mainlib.py:435
 msgid "Loading descriptions ..."
 msgstr "Ładowanie opisów ..."
 
-#: mainlib.py:403
+#: mainlib.py:440
 #, python-format
 msgid "Seraching details for: %s..."
 msgstr "Wyszukiwanie danych dla: %s…"
 
-#: mainlib.py:433
+#: mainlib.py:470
 msgid "Logging in ..."
 msgstr "Logoanie do portalu …"
 
-#: mainlib.py:467
+#: mainlib.py:504
 msgid "Login done"
 msgstr "Logowanie zakończone"
 
-#: mainlib.py:490
+#: mainlib.py:529
 msgid "Ambiguous results"
 msgstr "Wyszukano więcej niż jeden rezultat"
 
-#: mainlib.py:492
+#: mainlib.py:531
 msgid "Please select the matching entry"
 msgstr "Wybierz odpowiedni element"
 
-#: mainlib.py:497 mainlib.py:550
+#: mainlib.py:536 mainlib.py:593
 msgid "Details"
 msgstr "Szczegóły"
 
-#: mainlib.py:520 mainlib.py:547
+#: mainlib.py:561 mainlib.py:590
 msgid "Title Menu"
 msgstr "Tytuły"
 
-#: mainlib.py:524 mainlib.py:572
+#: mainlib.py:565 mainlib.py:617
 msgid "Search TV Serie"
 msgstr "Wyszukaj serial"
 
-#: mainlib.py:526 mainlib.py:574
+#: mainlib.py:567 mainlib.py:619
 msgid "Search Movie"
 msgstr "Wyszukaj film"
 
-#: mainlib.py:528
+#: mainlib.py:569
 msgid "Descriptions"
 msgstr "Opisy"
 
-#: mainlib.py:568
+#: mainlib.py:613
 msgid "Initializing - please wait ..."
 msgstr "Inicjalizacja - prosze czekać ..."
 
-#: mainlib.py:587
+#: mainlib.py:632
 msgid "The Filmweb Movie Database"
 msgstr "Baza filmów Filmweb.pl"
 
-#: mainlib.py:614
+#: mainlib.py:655
 msgid "Exit"
 msgstr "Wyjście"
 
-#: mainlib.py:651
+#: mainlib.py:692
 #, python-format
 msgid "Query Filmweb: %s..."
 msgstr "Przeszukaj Filmweb: %s..."
 
-#: mainlib.py:658 mainlib.py:659
+#: mainlib.py:699 mainlib.py:700
 msgid "Unknown Eventname"
 msgstr "Nieznana nazwa zdarzenia"
 
-#: mainlib.py:672
+#: mainlib.py:713
 msgid "Wallpaper loading completed"
 msgstr "Ładowanie tapety zakończone"
 
-#: mainlib.py:730
+#: mainlib.py:771
 msgid "Descriptions loading completed"
 msgstr "Ładowanie opisów zakończone"
 
-#: mainlib.py:735
+#: mainlib.py:776
 msgid "Descriptions parsing error"
 msgstr "Błąd ładowania opisów"
 
-#: mainlib.py:739
+#: mainlib.py:780
 msgid "Movie details loading completed"
 msgstr "Pobieranie danych filmu zakończone"
 
-#: mainlib.py:760
+#: mainlib.py:801
 msgid "Movie details parsing error"
 msgstr "Błąd przetwarzania danych filmu"
 
-#: mainlib.py:764
+#: mainlib.py:805
 msgid "Filmweb Download completed"
 msgstr "Pobieranie danych z Filmweb zakończone"
 
-#: mainlib.py:790
+#: mainlib.py:831
 msgid "Entry not found in Filmweb.pl database"
 msgstr "Pozycja nie została znaleziona w bazie Filmweb.pl"
 
-#: mainlib.py:799
+#: mainlib.py:840
 msgid "Poster downloading finished"
 msgstr "Pobieranie plakatu zakończone"
 
-#: mainlib.py:812
+#: mainlib.py:853
 msgid "Filmweb Download failed"
 msgstr "Pobieranie danych z Filmweb zakończyło się niepowodzeniem"
 
-#: mainlib.py:832
+#: mainlib.py:873
 #, python-format
 msgid "Downloading Movie Poster: %s..."
 msgstr "Pobieranie plakatu: %s..."
 
-#: mainlib.py:900
+#: mainlib.py:941
 msgid " as "
 msgstr " jako "
 
-#: mainlib.py:956
+#: mainlib.py:997
 msgid "User Rating"
 msgstr "Ocena"
 
-#: mainlib.py:960
+#: mainlib.py:1001
 msgid "no user rating yet"
 msgstr "brak oceny społeczności"
 
-#: mainlib.py:988
+#: mainlib.py:1029
 msgid "User"
 msgstr "Login"
 
-#: mainlib.py:1076
+#: mainlib.py:1117
 msgid "Genre: "
 msgstr "Gatunek: "
 
-#: mainlib.py:1077
+#: mainlib.py:1118
 msgid "Country: "
 msgstr "Produkcja: "
 
-#: mainlib.py:1078
+#: mainlib.py:1119
 msgid "Director: "
 msgstr "Reżyseria: "
 
-#: mainlib.py:1079
+#: mainlib.py:1120
 msgid "Writer: "
 msgstr "Scenariusz: "
 
-#: mainlib.py:1080
+#: mainlib.py:1121
 msgid "Year: "
 msgstr "Rok: "
 
-#: mainlib.py:1081
+#: mainlib.py:1122
 msgid "Runtime: "
 msgstr "Czas trwania:"
 
-#: mainlib.py:1082
+#: mainlib.py:1123
 msgid "My Vote: "
 msgstr "Moja ocena:"
 
-#: mainlib.py:1085
+#: mainlib.py:1126
 msgid "to your taste"
 msgstr "w Twoim guście"
 
-#: mainlib.py:1092
+#: mainlib.py:1133
 msgid "Input the name of serie to search"
 msgstr "Wprowadź nazwę serialu do przeszukania"
 
-#: mainlib.py:1093
+#: mainlib.py:1134
 msgid "Enter serie title to search for"
 msgstr "Wprowadź tytuł serialu do wyszukania"
 
-#: mainlib.py:1110
+#: mainlib.py:1151
 msgid "In order to enter vote value you should be logged in"
 msgstr "Wprowadzanie ocen możliwe tylko po zalogowaniu"
 
-#: mainlib.py:1116
+#: mainlib.py:1157
 msgid "Rating input"
 msgstr "Wprowadzanie własnej oceny"
 
-#: mainlib.py:1117
+#: mainlib.py:1158
 msgid "Enter rating value"
 msgstr "Wprowadź swoją ocenę"
 
-#: mainlib.py:1135
-msgid "You have to enter value in range [1, 10]"
-msgstr "Musisz wprowadzić wartość z przedziału [1, 10]"
+#: mainlib.py:1176
+msgid "You have to enter value in range [0, 10]"
+msgstr "Musisz wprowadzić wartość z przedziału [0, 10]"
 
-#: mainlib.py:1140
+#: mainlib.py:1181
 msgid "Input the name of movie to search"
 msgstr "Wprowadź nazwę filmu do wyszukania"
 
-#: mainlib.py:1141
+#: mainlib.py:1182
 msgid "Enter movie title to search for"
 msgstr "Wprowadź szukany tytuł"
 
-#: mselection.py:36 mselection.py:57
+#: mselection.py:36 mselection.py:68
 msgid "Channel Selection"
 msgstr "Wybór kanału"
 
-#: mselection.py:86
+#: mselection.py:97
 msgid "Lookup"
 msgstr "Wyszukaj"
 
