@@ -225,6 +225,28 @@ class Filmweb(Screen):
         print_info('showEPGListCallback', str(res))
         
     def showEPGList(self):
+        try:
+            from enigma import  eEPGCache, eServiceReference
+            from Screens.ChannelSelection import service_types_tv
+            center = eServiceCenter.getInstance()
+            print_info('center', str(center))
+            ref = eServiceReference(service_types_tv + ' FROM BOUQUET "bouquets.tv" ORDER BY bouquet')
+            srv = center.list(ref)
+            res = srv.compareLessEqual(ref, ref)
+            xx = srv.startEdit()
+            print_info('service list', str(srv) + ', res: ' + str(res) + ', mut: ' + str(xx))
+            srv = center.play(ref)
+            print_info('service play', str(srv))
+            srv = center.record(ref)            
+            print_info('service rec', str(srv))
+            srv = center.info(ref)
+            print_info('service info', str(srv))
+            srv = center.offlineOperations(ref)
+            print_info('service offOper', str(srv))
+        except:
+            import traceback
+            traceback.print_exc()    
+        
         self.session.openWithCallback(self.showEPGListCallback, FilmwebRateChannelSelection) 
               
         '''
