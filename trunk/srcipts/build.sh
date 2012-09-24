@@ -48,5 +48,5 @@ cd ../../tmp
 cp ../srcipts/debian-binary ./
 ar -r ../${pkg}_${version}_${arch}.ipk ./debian-binary ./data.tar.gz ./control.tar.gz
 cd ..
-# rm -rf tmp
+rm -rf tmp
 
