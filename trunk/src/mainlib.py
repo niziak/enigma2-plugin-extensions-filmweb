@@ -22,10 +22,11 @@
 ######################################################################
 
 from twisted.web.client import downloadPage, getPage
-from enigma import gFont, eTimer, ePicLoad, eServiceCenter, eListboxPythonMultiContent, RT_HALIGN_LEFT
+from enigma import eTimer, ePicLoad, eServiceCenter
 from config import FilmwebConfig
 from mselection import FilmwebChannelSelection, FilmwebRateChannelSelection
 from __common__ import print_info, _
+from comps import ActorChoiceList, ScrollLabelExt, MenuChoiceList, StarsComp
 import mautils
 import os
 import sys
@@ -33,7 +34,6 @@ import urllib
 #import re
     
 #from ServiceReference import ServiceReference
-from Tools.BoundFunction import boundFunction
 from Tools.LoadPixmap import LoadPixmap
 from Tools.Directories import resolveFilename, SCOPE_CURRENT_SKIN
 
@@ -42,8 +42,6 @@ from Screens.InputBox import InputBox
 from Screens.ChoiceBox import ChoiceBox
 from Screens.MessageBox import MessageBox
 
-from Components.MultiContent import MultiContentEntryText #, MultiContentEntryProgress, MultiContentTemplateColor
-from Components.ChoiceList import ChoiceList
 from Components.Input import Input
 from Components.AVSwitch import AVSwitch
 from Components.Sources.StaticText import StaticText
@@ -51,7 +49,6 @@ from Components.Sources.StaticText import StaticText
 from Components.ProgressBar import ProgressBar
 from Components.Label import Label
 from Components.Pixmap import Pixmap
-from Components.ScrollLabel import ScrollLabel
 from Components.Button import Button
 from Components.ActionMap import ActionMap
 from Components.config import config
@@ -59,7 +56,6 @@ from Components.config import config
 USER_TOKEN = '_artuser_token'
 SESSION_KEY = '_artuser_sessionId'
 POSTER_PATH = "/tmp/poster.jpg"
-ACTOR_IMG_PREFIX = "/tmp/actor_img_"
 TITLE_MAX_SIZE = 67
 WALLPAPER_REFRESH_TIME=15000
 
@@ -72,68 +68,6 @@ VT_DETAILS = 'DETAILS'
 VT_EXTRAS = 'EXTRAS'
 
 COOKIES = {} 
-
-actorPicload = {}
-
-
-def MovieSearchEntryComponent(text = ["--"]):
-    res = [ text ]
-
-    if text[0] == "--":
-        res.append((eListboxPythonMultiContent.TYPE_TEXT, 0, 0, 800, 65, 0, RT_HALIGN_LEFT, "-"*200))
-    else:
-        offset = 0
-        for x in text.splitlines():
-            if offset == 0:            
-                color=0x00F0B400
-                font=1
-            else:
-                color=0x00FFFFFF
-                font=0                
-            res.append(MultiContentEntryText(pos=(0, offset), size=(800, 25), font=font, 
-                                             flags=RT_HALIGN_LEFT, text=x, 
-                                             color=color, color_sel=color))
-            offset = offset + 25        
-    return res      
-    
-def ActorEntryComponent(inst, img_url = "", text = ["--"], index=0):
-    res = [ text ]
-    
-    def paintImage(idx=None, picInfo=None):
-        print_info("Paint Actor Image", str(idx))
-        ptr = actorPicload[idx].getData()
-        if ptr != None:
-            #png = ptr.__deref__()
-            print_info("RES append", str(res) + " - img: " + str(ptr))
-            res.append((eListboxPythonMultiContent.TYPE_PIXMAP_ALPHATEST, 5, 0, 40, 45, ptr))
-            inst.l.invalidate()
-        del actorPicload[idx]        
-    
-    def fetchImgOK(data, idx):
-        print_info("fetchImgOK", str(idx))
-        rpath = os.path.realpath(ACTOR_IMG_PREFIX + str(idx) + ".jpg")
-        if os.path.exists(rpath):
-            sc = AVSwitch().getFramebufferScale()
-            actorPicload[idx].setPara((40, 45, sc[0], sc[1], False, 1, "#00000000"))
-            print_info("Decode Image", rpath)
-            actorPicload[idx].startDecode(rpath)
-    
-    def fetchImgFailed(data,idx):
-        pass
-    
-    if text[0] == "--" or img_url == '' or img_url.find("jpg") < 0:
-        res.append((eListboxPythonMultiContent.TYPE_TEXT, 0, 0, 800, 45, 0, RT_HALIGN_LEFT, "-"*200))
-    else:
-        actorPicload[index] = ePicLoad()
-        actorPicload[index].PictureData.get().append(boundFunction(paintImage, index)) 
-        res.append((eListboxPythonMultiContent.TYPE_TEXT, 45, 0, 750, 45, 0, RT_HALIGN_LEFT, text[0]))        
-        localfile = ACTOR_IMG_PREFIX + str(index) + ".jpg"
-        print_info("Downloading actor img", img_url + " to " + localfile)
-        downloadPage(img_url, localfile).addCallback(fetchImgOK, index).addErrback(fetchImgFailed, index)
-    #inst.cast_list.append(res)
-    #inst["cast_label"].l.setList(inst.cast_list)
-    return res
-
                         
 class Filmweb(Screen):
     def __init__(self, session, eventName):
@@ -189,7 +123,7 @@ class Filmweb(Screen):
                   
             pixmap_path = "%s/resource/starsbar_empty.png" % (self.ppath)
             print_info('STARS BG instance', str(self["stars_bg"].instance))
-            self["stars_bg"].instance.setPixmap(LoadPixmap(cached=True, path=pixmap_path))
+            self["stars_bg"].instance.setPixmap(LoadPixmap(cached=True, path=pixmap_path))            
         except:            
             import traceback
             traceback.print_exc() 
@@ -245,51 +179,8 @@ class Filmweb(Screen):
             print_info('service offOper', str(srv))
         except:
             import traceback
-            traceback.print_exc()    
-        
-        self.session.openWithCallback(self.showEPGListCallback, FilmwebRateChannelSelection) 
-              
-        '''
-        from enigma import  eEPGCache, eServiceReference
-        from Screens.ChannelSelection import service_types_tv
-        from Components.Sources.ServiceList import ServiceList
-        
-        bouquetlist = ServiceList(eServiceReference(service_types_tv + ' FROM BOUQUET "bouquets.tv" ORDER BY bouquet'), validate_commands=False).getServicesAsList()
-        for bouquetitem in bouquetlist:
-            print_info('-- EPG --', 'bouquet: ' + str(bouquetitem))
-            serviceHandler = eServiceCenter.getInstance()
-            list = serviceHandler.list(eServiceReference(str(bouquetitem[0])))
-            services = list and list.getContent('S')
-            print_info('-- EPG --', 'SERV: ' + str(services))
-            channels = list and list.getContent("SN", True)
-            print_info('-- EPG --', 'CHNLS: ' + str(channels))
-            
-            search = ['IBDCTSERNX']
-            if services: # It's a Bouquet
-                search.extend([(service, 0, -1) for service in services])
-            
-            print_info('-- EPG --', 'SEARCH: ' + str(search))
-            events = eEPGCache.getInstance().lookupEvent(search)
-            for eventinfo in events:
-                #0 eventID | 4 eventname | 5 short descr | 6 long descr | 7 serviceref | 8 channelname
-                print_info('-- EPG --', 'evt: ' + str(eventinfo))
-        '''    
-        #idbouquet = '%s ORDER BY name'%(service_types_tv)
-        #epgcache = eEPGCache.getInstance()
-        #serviceHandler = eServiceCenter.getInstance()
-        #services = serviceHandler.list(eServiceReference(idbouquet))
-        #print_info('-- EPG --', 'services: ' + str(services))
-        #channels = services and services.getContent("SN", True)
-        #for channel in channels:
-            #print_info('-- EPG --', 'channel: ' + str(channel))
-            #if not int(channel[0].split(":")[1]) & 64:
-                #chan = {}
-                #chan['ref'] = channel[0]
-                #chan['name'] = channel[1]
-                #print_info('-- EPG --', 'chan: ' + str(chan))
-                #nowevent = epgcache.lookupEvent(['TBDCIX', (channel[0], 0, -1)])
-                #print_info('-- EPG --', 'now evt: ' + str(nowevent))
-                
+            traceback.print_exc()            
+        self.session.openWithCallback(self.showEPGListCallback, FilmwebRateChannelSelection)               
     
     def moveLeft(self):
         if self.mode == VT_DETAILS:
@@ -516,11 +407,8 @@ class Filmweb(Screen):
             self["title_label"].hide()
             self["login_label"].hide()
             self["plot_label"].hide()
-            self["stars"].hide()
-            self["stars_bg"].hide()
-            self["rating_label"].hide()
-            if self.has_key('cast_scroll'):
-                self["cast_scroll"].hide()
+            self["nstars"].hide()            
+            self["rating_label"].hide()            
             self["cast_label"].hide()
             self["poster"].hide()
             self["wallpaper"].hide()
@@ -536,9 +424,7 @@ class Filmweb(Screen):
             self["key_yellow"].setText(_("Details"))
             self["key_blue"].setText("")
         elif self.mode == VT_DETAILS:            
-            self["rating_label"].show()
-            if self.has_key('cast_scroll'):
-                self["cast_scroll"].show()
+            self["rating_label"].show()            
             self["cast_label"].show()
             self["details_label"].show()
             self["plot_label"].show()
@@ -551,8 +437,7 @@ class Filmweb(Screen):
             else:
                 self["poster"].hide()
             
-            self["stars_bg"].show()
-            self["stars"].show()
+            self["nstars"].show()
             
             self["menu"].hide()
             self["extra_label"].hide()
@@ -576,13 +461,10 @@ class Filmweb(Screen):
             self["wallpaper"].hide()            
             self["login_label"].hide()
             self["details_label"].hide()
-            self["plot_label"].hide()
-            if self.has_key('cast_scroll'):
-                self["cast_scroll"].hide()
+            self["plot_label"].hide()            
             self["cast_label"].hide()
             self["poster"].hide()
-            self["stars"].hide()
-            self["stars_bg"].hide()
+            self["nstars"].hide()
             self["rating_label"].hide()
             self["menu"].hide()
                         
@@ -597,13 +479,10 @@ class Filmweb(Screen):
             self["login_label"].hide()
             self["extra_label"].hide()            
             self["details_label"].hide()
-            self["plot_label"].hide()
-            if self.has_key('cast_scroll'):
-                self["cast_scroll"].hide()
+            self["plot_label"].hide()            
             self["cast_label"].hide()
             self["poster"].hide()
-            self["stars"].hide()
-            self["stars_bg"].hide()
+            self["nstars"].hide()
             self["rating_label"].hide()
             self["menu"].hide()
             self["wallpaper"].hide()
@@ -636,21 +515,19 @@ class Filmweb(Screen):
         
         self["wallpaper"] = mautils.PixLoader(self.removeWallData)
            
+        self["nstars"] = StarsComp()
         self["stars"] = ProgressBar()                
-        self["stars_bg"] = Pixmap()      
+        self["stars_bg"] = Pixmap()   
           
         self["details_label"] = Label("")
         self["login_label"] = Label("")        
-        self["plot_label"] = ScrollLabel("")
-        self["cast_label"] = ChoiceList(self.cast_list)        
-        self["cast_label"].l.setItemHeight(50)
-        self["extra_label"] = ScrollLabel("")
+        self["plot_label"] = ScrollLabelExt("")
+        self["cast_label"] = ActorChoiceList(self.cast_list)        
+        
+        self["extra_label"] = ScrollLabelExt("")
         self["status_bar"] = Label("")
         self["rating_label"] = Label("")        
-        self["menu"] = ChoiceList(self.resultlist)
-        self["menu"].l.setItemHeight(70)
-        self["menu"].l.setFont(0, gFont("Regular", 16))
-        self["menu"].l.setFont(1, gFont("Regular", 20))        
+        self["menu"] = MenuChoiceList(self.resultlist)            
         
         self["key_red"] = Button(_("Exit"))
         self["key_green"] = Button()
@@ -659,7 +536,7 @@ class Filmweb(Screen):
         
     def __str__(self):
         return "FILMWEB {Session: " + str(self.session) + ", EventName:" + str(self.eventName) + "}"
-                     
+        
     def getData(self, tryOther=True):
         try:
             self.initialize = False
@@ -818,7 +695,7 @@ class Filmweb(Screen):
             caption = entry[0]
             link = entry[1]
             print_info("LISTA", "caption: " + str(caption) + ", lnk: " + link)
-            lista.append(MovieSearchEntryComponent(text = caption))
+            lista.append(self["menu"].createEntry(caption))
         if len(lista) == 0:
             if tryOther:
                 if self.searchType == MT_SERIE:
@@ -943,7 +820,7 @@ class Filmweb(Screen):
                     stre = stre.replace('   ', '')
                     stre = stre.replace('  ', ' ')
                     print_info("Actor data", "IMG=" + imge + ", DATA=" + stre)  
-                    self.cast_list.append(ActorEntryComponent(self["cast_label"], img_url = imge, text = [stre], index=cidx))
+                    self.cast_list.append(self["cast_label"].createEntry(imge, stre, cidx))                    
                     cidx += 1            
             self["cast_label"].l.setList(self.cast_list)
                     
@@ -996,10 +873,10 @@ class Filmweb(Screen):
             print_info("RATING", str(rate))
             self["rating_label"].setText(_("User Rating") + ": " + str(rate) + " / 10")
             ratingstars = int(10*round(rate,1))
-            self["stars"].setValue(ratingstars)
+            self["nstars"].setValue(ratingstars)
         else:
             self["rating_label"].setText(_("no user rating yet"))
-            self["stars"].setValue(0)
+            self["nstars"].setValue(0)
             
     def parseWallpaper(self, link_=None):
         print_info("parseWallpaper", "started")
