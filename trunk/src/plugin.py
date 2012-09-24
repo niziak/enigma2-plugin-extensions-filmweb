@@ -25,11 +25,13 @@ import mselection
 import mainlib
 import config
 import mautils
+import comps
     
 def main(session, eventName="", **kwargs):    
     reload(mautils)
+    reload(comps)
     reload(mselection)
-    reload(config)
+    reload(config)    
     reload(mainlib)
     try:
         session.open(mainlib.Filmweb, eventName)
@@ -39,6 +41,7 @@ def main(session, eventName="", **kwargs):
         
 def eventinfo(session, servicelist, **kwargs):
     reload(mautils)
+    reload(comps)
     reload(mselection)
     reload(config)
     reload(mainlib)    
