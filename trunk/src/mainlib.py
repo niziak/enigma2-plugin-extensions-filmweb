@@ -21,7 +21,7 @@
 # GNU General Public License, version 3 or later
 ######################################################################
 
-from enigma import eTimer, ePicLoad, eServiceCenter
+from enigma import eTimer, ePicLoad, eServiceCenter, eServiceReference, eEPGCache
 from config import FilmwebConfig
 from filmweb import FilmwebEngine,MT_MOVIE, MT_SERIE, POSTER_PATH
 from mselection import FilmwebChannelSelection, FilmwebRateChannelSelection
@@ -31,10 +31,6 @@ import mautils
 import os
 import sys
 
-#import re
-    
-#from ServiceReference import ServiceReference
-#from Tools.LoadPixmap import LoadPixmap
 from Tools.Directories import resolveFilename, SCOPE_CURRENT_SKIN
 
 from Screens.Screen import Screen
@@ -45,8 +41,6 @@ from Screens.MessageBox import MessageBox
 from Components.Input import Input
 from Components.AVSwitch import AVSwitch
 from Components.Sources.StaticText import StaticText
-#from Components.MenuList import MenuList
-#from Components.ProgressBar import ProgressBar
 from Components.Label import Label
 from Components.Pixmap import Pixmap
 from Components.Button import Button
@@ -103,8 +97,6 @@ class Filmweb(Screen):
         else:
             self.loginPage(self.getData)
     
-    event_quoted = property(lambda self: mautils.quote(self.eventName.encode('utf8')))
-                
     def initVars(self):
         self.filmId = None
         self.cast_list = []
@@ -131,33 +123,30 @@ class Filmweb(Screen):
         }, -1)
         
     # ---- ACTIONS ----  
-    def showEPGListCallback(self, res=None):
-        print_info('showEPGListCallback', str(res))
-        
     def showEPGList(self):
-        try:
-            from enigma import  eEPGCache, eServiceReference
-            from Screens.ChannelSelection import service_types_tv
-            center = eServiceCenter.getInstance()
-            print_info('center', str(center))
-            ref = eServiceReference(service_types_tv + ' FROM BOUQUET "bouquets.tv" ORDER BY bouquet')
-            srv = center.list(ref)
-            res = srv.compareLessEqual(ref, ref)
-            xx = srv.startEdit()
-            print_info('service list', str(srv) + ', res: ' + str(res) + ', mut: ' + str(xx))
-            srv = center.play(ref)
-            print_info('service play', str(srv))
-            srv = center.record(ref)            
-            print_info('service rec', str(srv))
-            srv = center.info(ref)
-            print_info('service info', str(srv))
-            srv = center.offlineOperations(ref)
-            print_info('service offOper', str(srv))
+        self.session.openWithCallback(self.searchMoviesInfo, FilmwebRateChannelSelection)   
+        
+    def searchMoviesInfo(self, res=None):
+        try: 
+            #serviceHandler = eServiceCenter.getInstance()
+            epg = eEPGCache.getInstance()
+            txt = config.plugins.mfilmweb.selserv.getText()
+            if txt:
+                entries = txt.split('|')
+                for x in entries:
+                    ref = eServiceReference(x)
+                    print_info('--> SERV', str(x))
+                    if epg.startTimeQuery(ref) != -1:
+                        evt = epg.getNextTimeEntry()
+                        if evt:
+                            ename = evt and evt.getEventName()
+                            edesc = evt and evt.getShortDescription()
+                            eext = evt and evt.getExtendedDescription()
+                            print_info('----> EVENT', 'name: ' + str(ename) + ', \ndesc: ' + str(edesc) + ', \nextra: ' + str(eext))
         except:
             import traceback
-            traceback.print_exc()            
-        self.session.openWithCallback(self.showEPGListCallback, FilmwebRateChannelSelection)               
-    
+            traceback.print_exc()  
+                           
     def moveLeft(self):
         if self.mode == VT_DETAILS:
             self.detailDir = 0
@@ -592,7 +581,7 @@ class Filmweb(Screen):
                 if tryOther and self.eventName.find('odc.') > 0:
                     self.searchType = MT_SERIE
                 self["status_bar"].setText(_("Query Filmweb: %s...") % (self.eventName))
-                self.engine.query(self.searchType, self.event_quoted, tryOther, self.queryCallback)
+                self.engine.query(self.searchType, self.eventName, None, tryOther, self.queryCallback)
             else:
                 self["status_bar"].setText(_("Unknown Eventname"))
                 self["title_label"].setText(_("Unknown Eventname"))

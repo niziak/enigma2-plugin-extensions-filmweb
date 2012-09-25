@@ -67,8 +67,10 @@ class FilmwebEngine(object):
     def queryDetails(self, link, callback=None):
         getPage(link, cookies=COOKIES).addCallback(self.__fetchDetailsOK, link, callback).addErrback(self.__fetchFailed) 
         
-    def query(self, type, text, tryOther=False, callback=None):
-        fetchurl = SEARCH_QUERY_URL + type + "?q=" + text
+    def query(self, type, title, year=None, tryOther=False, callback=None):
+        fetchurl = SEARCH_QUERY_URL + type + "?q=" + mautils.quote(title.encode('utf8'))
+        if year:
+            fetchurl += '&startYear=' + year + '&endYear=' + year
         print_info("Filmweb Query", fetchurl)
         self.__fetchEntries(fetchurl, type, callback, tryOther)
 
@@ -322,7 +324,8 @@ class FilmwebEngine(object):
                     if year:
                         element += ' (' + year.strip() + ')'
                     if country:
-                        element += ' - ' + country.strip()                    
+                        element += ' - ' + country.strip()    
+                    basic_data = element                
                     #element = mautils.convert_entities(element)
                     element = mautils.strip_tags(element)
                     if rating:
@@ -331,7 +334,7 @@ class FilmwebEngine(object):
                         element += '\n' + cast.strip()
                     print_info("The movie serach title", element)
                     #self.titles.append(element)
-                    self.resultlist.append((element, PAGE_URL + link))
+                    self.resultlist.append((element, PAGE_URL + link, basic_data, title, rating, year, country))
         
     def parsePlot(self):
         print_info("parsePlot", "started")
