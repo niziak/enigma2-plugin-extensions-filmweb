@@ -24,8 +24,6 @@ from Components.Language import language
 import os
 import gettext
 
-DEVMODE = True
-
 def _(txt):
     t = gettext.dgettext("Filmweb", txt)
     if t == txt:
@@ -45,8 +43,7 @@ def __print_info(prefix, nfo, data):
     print txt
 
 def print_info(nfo, data=None):
-    if DEVMODE:
-        __print_info("FILMWEB", nfo, data)
+    __print_info("FILMWEB", nfo, data)
 
 localeInit()
 language.addCallback(localeInit)
