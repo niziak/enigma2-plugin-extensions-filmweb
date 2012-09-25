@@ -37,16 +37,18 @@ POSTER_PATH = "/tmp/poster.jpg"
 COOKIES = {} 
 
 class FilmwebEngine(object):
-    def __init__(self, failureHandler=None):
+    def __init__(self, failureHandler=None, statusComponent=None):
         self.inhtml = None
         self.loopx = 0  
         self.resultlist = []       
         self.detailsData = {} 
         self.failureHandler = failureHandler
+        self.statusComponent = statusComponent
     
     def login(self, username, password, callback=None, data=None):
         print_info("LoginPage", "started")
-        #self["status_bar"].setText(_('Logging in ...'))
+        if self.statusComponent:
+            self.statusComponent.setText(_('Logging in ...'))
         if COOKIES.has_key(SESSION_KEY):
             COOKIES.pop(SESSION_KEY)
         if COOKIES.has_key(USER_TOKEN):
@@ -55,11 +57,11 @@ class FilmwebEngine(object):
         data = urllib.urlencode(data)
         getPage('https://ssl.filmweb.pl/j_login', method='POST', postdata=data, 
                 headers={'Content-Type':'application/x-www-form-urlencoded'},
-                cookies=COOKIES).addCallback(self.fetchLoginRes, callback, data).addErrback(self.fetchLoginRes, callback, data)
+                cookies=COOKIES).addCallback(self.__fetchLoginRes, callback, data).addErrback(self.__fetchLoginRes, callback, data)
         print_info("LoginPage data", str(data))
 
     def queryDetails(self, link, callback=None):
-        getPage(link, cookies=COOKIES).addCallback(self.fetchDetailsOK, link, callback).addErrback(self.fetchFailed) 
+        getPage(link, cookies=COOKIES).addCallback(self.__fetchDetailsOK, link, callback).addErrback(self.__fetchFailed) 
         
     def query(self, type, text, callback=None):
         fetchurl = "http://www.filmweb.pl/search/" + type + "?q=" + text
@@ -68,20 +70,20 @@ class FilmwebEngine(object):
 
     def searchWallpapers(self, link_, callback):
         if link_:  
-            getPage(link_, cookies=COOKIES).addCallback(self.fetchWallpaperOK, callback).addErrback(self.fetchFailed)      
+            getPage(link_, cookies=COOKIES).addCallback(self.__fetchWallpaperOK, callback).addErrback(self.__fetchFailed)      
         
     def loadPoster(self, posterUrl, callback):
         if posterUrl:                    
             localfile = POSTER_PATH
             print_info("Downloading poster", posterUrl + " to " + localfile)
-            downloadPage(posterUrl, localfile).addCallback(self.fetchPosterOK, callback).addErrback(self.fetchFailed)
+            downloadPage(posterUrl, localfile).addCallback(self.__fetchPosterOK, callback).addErrback(self.__fetchFailed)
                         
     def loadWallpaper(self, furl, localfile, callback):
         print_info("Loading wallpaper", 'URL: ' + furl + ', Local File:' + localfile)
-        downloadPage(furl, localfile).addCallback(callback,localfile).addErrback(self.fetchFailed)
+        downloadPage(furl, localfile).addCallback(callback,localfile).addErrback(self.__fetchFailed)
 
     def loadDescriptions(self, furl, callback):                    
-        getPage(furl, cookies=COOKIES).addCallback(self.fetchExtraOK, callback).addErrback(self.fetchFailed)
+        getPage(furl, cookies=COOKIES).addCallback(self.__fetchExtraOK, callback).addErrback(self.__fetchFailed)
 
     def applyRating(self, rating, filmId, userToken, callback):
         if rating and filmId:
@@ -100,25 +102,31 @@ class FilmwebEngine(object):
                     cookies=COOKIES).addCallback(callback).addErrback(callback)    
         
 
+############################################# LOCAL METHODS ###############################
 
 
-
-    def fetchExtraOK(self, txt_, callback):
-        print_info("fetch extra OK", str(COOKIES))
-        #self["status_bar"].setText(_("Descriptions loading completed"))
-        dhtml = mautils.html2utf8(txt_)
-        data = None
-        if dhtml:
-            data = self.parseDescriptions(dhtml)
-        if callback:
-            callback(data)
+    def __fetchExtraOK(self, txt_, callback):
+        try:
+            print_info("fetch extra OK", str(COOKIES))
+            if self.statusComponent:
+                self.statusComponent.setText(_("Descriptions loading completed"))
+            dhtml = mautils.html2utf8(txt_)
+            data = None
+            if dhtml:
+                data = self.parseDescriptions(dhtml)
+            if callback:
+                callback(data)
+        except:
+            import traceback
+            traceback.print_exc()            
             
-    def fetchWallpaperOK(self, txt_, callback):
+    def __fetchWallpaperOK(self, txt_, callback):
         print_info("fetchWallpaperOK ...")
         try:
             wallpapers = []
             print_info("fetch wallpaper OK", str(COOKIES))
-            #self["status_bar"].setText(_("Wallpaper loading completed"))
+            if self.statusComponent:
+                self.statusComponent.setText(_("Wallpaper loading completed"))
             if txt_ and len(txt_) > 0:
                 walls = mautils.after(txt_, '<ul class=filmWallapersList')
                 elements = walls.split('filmWallapersItem')
@@ -139,34 +147,45 @@ class FilmwebEngine(object):
             import traceback
             traceback.print_exc()
                     
-    def fetchPosterOK(self, data, callback):
-        print_info("Fetch Poster OK", str(COOKIES)) 
-        #if not self.has_key('status_bar'):
-        #    return
-        #self["status_bar"].setText(_("Poster downloading finished"))
-        rpath = os.path.realpath(POSTER_PATH)
-        print_info("Poster local real path", rpath)
-        if callback and os.path.exists(rpath):
-            callback(rpath)
+    def __fetchPosterOK(self, data, callback):
+        try:
+            print_info("Fetch Poster OK", str(COOKIES)) 
+            #if not self.has_key('status_bar'):
+            #    return
+            if self.statusComponent:
+                self.statusComponent.setText(_("Poster downloading finished"))
+            rpath = os.path.realpath(POSTER_PATH)
+            print_info("Poster local real path", rpath)
+            if callback and os.path.exists(rpath):
+                callback(rpath)
+        except:
+            import traceback
+            traceback.print_exc()
                 
-    def fetchLoginRes(self, res_, callback, data):
-        print_info("RESULT COOKIE", str(COOKIES))
-        if COOKIES.has_key(SESSION_KEY):
-            sessionId = COOKIES[SESSION_KEY]            
-        else:
-            sessionId = None
-        if COOKIES.has_key(USER_TOKEN):
-            userToken = COOKIES[USER_TOKEN]            
-        else:
-            userToken = None     
-        #self["status_bar"].setText(_('Login done'))   
-        print_info('Login data', str(userToken) + ', SID: ' + str(sessionId))
-        if callback:
-            callback(userToken, sessionId, data)
+    def __fetchLoginRes(self, res_, callback, data):
+        try:
+            print_info("RESULT COOKIE", str(COOKIES))
+            if COOKIES.has_key(SESSION_KEY):
+                sessionId = COOKIES[SESSION_KEY]            
+            else:
+                sessionId = None
+            if COOKIES.has_key(USER_TOKEN):
+                userToken = COOKIES[USER_TOKEN]            
+            else:
+                userToken = None     
+            if self.statusComponent:
+                self.statusComponent.setText(_('Login done'))   
+            print_info('Login data', str(userToken) + ', SID: ' + str(sessionId))
+            if callback:
+                callback(userToken, sessionId, data)
+        except:
+            import traceback
+            traceback.print_exc()             
             
-    def fetchDetailsOK(self, txt_, link, callback):
+    def __fetchDetailsOK(self, txt_, link, callback):
         print_info("fetch details OK", str(COOKIES))
-        #self["status_bar"].setText(_("Movie details loading completed"))
+        if self.statusComponent:
+            self.statusComponent.setText(_("Movie details loading completed"))
         self.inhtml = mautils.html2utf8(txt_)   
         self.detailsData = {}
         if self.inhtml:
@@ -198,11 +217,12 @@ class FilmwebEngine(object):
             
     def __fetchEntries(self, fetchurl, type, callback, tryOther=True):
         self.resultlist = []
-        getPage(fetchurl, cookies=COOKIES).addCallback(self.fetchOK, callback, tryOther, fetchurl, type).addErrback(self.fetchFailed) 
+        getPage(fetchurl, cookies=COOKIES).addCallback(self.__fetchOK, callback, tryOther, fetchurl, type).addErrback(self.__fetchFailed) 
         
-    def fetchOK(self, txt_, callback, tryOther, fetchurl, type):        
+    def __fetchOK(self, txt_, callback, tryOther, fetchurl, type):        
         print_info("Fetch OK", str(COOKIES))                
-        #self["status_bar"].setText(_("Filmweb Download completed"))
+        if self.statusComponent:
+            self.statusComponent.setText(_("Filmweb Download completed"))
         self.inhtml = mautils.html2utf8(txt_)
         if self.inhtml:
             if self.inhtml.find('Automatyczne przekierowanie') > -1:
@@ -224,7 +244,7 @@ class FilmwebEngine(object):
         if callback:
             callback(self.resultlist, type)
         
-    def fetchFailed(self, txt_):
+    def __fetchFailed(self, txt_):
         print_info("Fetch failed", str(txt_))
         if self.failureHandler:
             self.failureHandler(txt_)
@@ -480,7 +500,8 @@ class FilmwebEngine(object):
             posterUrl = ''
         print_info("Poster URL", posterUrl)  
         if posterUrl != '' and posterUrl.find("jpg") > 0:
-            #self["status_bar"].setText(_("Downloading Movie Poster: %s...") % (posterUrl))
+            if self.statusComponent:
+                self.statusComponent.setText(_("Downloading Movie Poster: %s...") % (posterUrl))
             self.detailsData['poster_url'] = posterUrl
         
     def parseWallpaper(self, link_=None):

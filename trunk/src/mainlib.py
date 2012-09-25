@@ -81,7 +81,7 @@ class Filmweb(Screen):
         self.session = session
         self.eventName = eventName
         self.mode = ''
-        self.engine = FilmwebEngine(self.failureHandler)
+        self.engine = FilmwebEngine(self.failureHandler, self["status_bar"])
         self.searchType = MT_MOVIE        
         self.detailDir = 0
         self.resultlist = []             
