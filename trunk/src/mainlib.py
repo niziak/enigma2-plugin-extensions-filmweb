@@ -97,8 +97,6 @@ class Filmweb(Screen):
         self.sessionId = None
         self.userToken = None
         
-        self.onLayoutFinish.append(self.__layoutFinished)
-        
         self.initVars()
         self.createGUI()
         self.initActions()
@@ -114,19 +112,6 @@ class Filmweb(Screen):
             self.loginPage(self.getData)
     
     event_quoted = property(lambda self: mautils.quote(self.eventName.encode('utf8')))
-        
-    def __layoutFinished(self):
-        try:
-            pixmap_path = "%s/resource/starsbar_filled.png" % (self.ppath)
-            print_info('STARS instance', str(self["stars"].instance))
-            self["stars"].instance.setPixmap(LoadPixmap(cached=True, path=pixmap_path))                
-                  
-            pixmap_path = "%s/resource/starsbar_empty.png" % (self.ppath)
-            print_info('STARS BG instance', str(self["stars_bg"].instance))
-            self["stars_bg"].instance.setPixmap(LoadPixmap(cached=True, path=pixmap_path))            
-        except:            
-            import traceback
-            traceback.print_exc() 
             
     def initVars(self):
         self.descs = None
@@ -515,9 +500,7 @@ class Filmweb(Screen):
         
         self["wallpaper"] = mautils.PixLoader(self.removeWallData)
            
-        self["nstars"] = StarsComp()
-        self["stars"] = ProgressBar()                
-        self["stars_bg"] = Pixmap()   
+        self["nstars"] = StarsComp()  
           
         self["details_label"] = Label("")
         self["login_label"] = Label("")        

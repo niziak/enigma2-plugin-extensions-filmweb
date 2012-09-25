@@ -26,7 +26,5 @@
   <widget name="poster" position="20,26" size="140,216" zPosition="5" alphatest="blend" />
   <widget name="wallpaper" position="870,81" size="210,170" zPosition="0" alphatest="on" />
   <widget name="menu" position="10,80" size="1070,400" zPosition="5" scrollbarMode="showOnDemand" transparent="1" />
-  <widget name="stars_bg"  position="870,35" zPosition="2" size="210,21" transparent="1" alphatest="on" />
-  <widget name="stars"  position="870,35" zPosition="5" size="210,21" transparent="1" />
-  <widget name="nstars" pixmap="/resource/starsbar_filled.png" pixmap_bg="/resource/starsbar_empty.png" position="620,35" zPosition="5" size="210,21" transparent="1" />
+  <widget name="nstars" pixmap="/resource/starsbar_filled.png" pixmap_bg="/resource/starsbar_empty.png" position="870,35" zPosition="5" size="210,21" transparent="1" />
 </screen>
