@@ -33,7 +33,7 @@ from Components.config import config, configfile, getConfigListEntry, ConfigPass
 config.plugins.mfilmweb = ConfigSubsection()
 config.plugins.mfilmweb.user = ConfigText(default = "", fixed_size = False)
 config.plugins.mfilmweb.password = ConfigPassword(default="",visible_width = 50,fixed_size = False)
-
+config.plugins.mfilmweb.selserv = ConfigText(default = "", fixed_size = False)
 
 class FilmwebConfig(Screen, ConfigListScreen):
     def __init__(self, session):

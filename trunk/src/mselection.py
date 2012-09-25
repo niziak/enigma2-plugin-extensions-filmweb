@@ -21,7 +21,7 @@
 
 from __common__ import print_info, _
 from enigma import eServiceReference, gRGB, eListboxServiceContent
-
+from Components.config import config, configfile
 #from Tools.LoadPixmap import LoadPixmap
 #from Tools.Directories import resolveFilename, SCOPE_CURRENT_SKIN
 
@@ -37,6 +37,7 @@ class FilmwebRateChannelSelection(SimpleChannelSelection):
         self.skinName = "SimpleChannelSelection"
         
         self.onLayoutFinish.append(self.__layoutFinished)
+        self.onClose.append(self.__onClose)
         
     def channelSelected(self):
         ref = self.getCurrentSelection()
@@ -53,6 +54,7 @@ class FilmwebRateChannelSelection(SimpleChannelSelection):
                 
     def __layoutFinished(self):    
         try:
+            self.__load()
             self.servicelist.l.setColor(eListboxServiceContent.markedForeground, gRGB(0x58BCFF))
             self.servicelist.l.setColor(eListboxServiceContent.markedForegroundSelected, gRGB(0xF0B400))
             #self.servicelist.instance.setForegroundColorSelected(gRGB(0xF0B400))
@@ -62,6 +64,25 @@ class FilmwebRateChannelSelection(SimpleChannelSelection):
         
     def setModeRadio(self):
         pass
+    
+    def __load(self):
+        txt = config.plugins.mfilmweb.selserv.getText()
+        print_info("config", str(txt))
+        if txt:
+            entries = txt.split('|')
+            for x in entries:
+                self.servicelist.addMarked(eServiceReference(x))
+        
+    def __onClose(self):
+        marked = self.servicelist.getMarked()
+        txt = ''
+        for x in marked:
+            print_info("marked", str(x)) 
+            txt += str(x) + '|'   
+        txt = txt.strip('|')
+        config.plugins.mfilmweb.selserv.setValue(txt)
+        config.plugins.mfilmweb.save()
+        configfile.save()
     
 class FilmwebChannelSelection(SimpleChannelSelection):
     def __init__(self, session):
