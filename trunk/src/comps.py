@@ -118,24 +118,27 @@ class Scroller(object):
             self.scroller.GUIdelete()
             
     def applyScroller(self, desktop, parent):
+        attrmap = {}
+        for (attrib, value) in self.skinAttributes:
+            print_info('ATTRIB', attrib + ": " + value)
+            attrmap[attrib] = value
+            
         if self.scroller:
-            name = self.skinAttributes['name']            
             self.scroller.skinAttributes = []
-            self.scroller.skinAttributes.append(('name', name + '_scroll'))            
+            
             self.scroller.skinAttributes.append(('pixmap', self.pixpath))
             self.scroller.skinAttributes.append(('alphatest', 'blend'))
             self.scroller.skinAttributes.append(('transparent', '1'))            
-            zp = self.skinAttributes['zPosition']
+            zp = attrmap['zPosition']
             if zp:
                 zpn = int(zp) + 1
                 self.scroller.skinAttributes.append(('zPosition', str(zpn)))  
             self.scroller.applySkin(desktop, parent)
             
             px,py = self.getPosition()
-            pw = self.getWidth()
-            ph = self.getHeight()            
-            self.scroller.setPosition(px + pw - 22,py-2)
-            self.scroller.resize(22,ph+2)
+            pt = self.instance.size()         
+            self.scroller.setPosition(px + pt.width() - 22,py-2)
+            self.scroller.resize(22,pt.height() + 2)
 
 class ChoiceListExt(ChoiceList, Scroller):
     def __init__(self, lista):
@@ -229,26 +232,43 @@ class StarsComp(ProgressBar):
         self.bg.destroy()
         ProgressBar.destroy(self)        
         
-    def applySkin(self, desktop, parent):        
-        name = self.skinAttributes['name']            
-        self.bg.skinAttributes = []
-        self.bg.skinAttributes.append(('name', name + '_bg'))        
-        pixmap_path = "%s%s" % (self.ppath, self.skinAttributes['pixmap_bg'])          
-        self.bg.skinAttributes.append(('pixmap', pixmap_path))
-        self.bg.skinAttributes.append(('transparent', self.skinAttributes['transparent']))
-        self.bg.skinAttributes.append(('position', self.skinAttributes['position']))
-        self.bg.skinAttributes.append(('size', self.skinAttributes['size']))
+    def applySkin(self, desktop, parent):   
+        attrmap = {}
+        idx = 0
+        pixmap_path = None
+        for (attrib, value) in self.skinAttributes:
+            print_info('ATTRIB - stars', attrib + ": " + value)
+            attrmap[attrib] = value
+            if attrib == 'pixmap_bg':
+                pixmap_path = "%s%s" % (self.ppath, value)
+                self.skinAttributes.pop(idx)
+            idx += 1
+                 
+        self.bg.skinAttributes = []    
+        if pixmap_path:              
+            self.bg.skinAttributes.append(('pixmap', pixmap_path))
+        if attrmap.has_key('transparent'):
+            self.bg.skinAttributes.append(('transparent', attrmap['transparent']))
+        self.bg.skinAttributes.append(('position', attrmap['position']))
+        self.bg.skinAttributes.append(('size', attrmap['size']))
         self.bg.skinAttributes.append(('alphatest', 'on'))
-        zp = self.skinAttributes['zPosition']
-        if zp:
+        
+        if attrmap.has_key('zPosition'):
+            zp = attrmap['zPosition']
             zpn = int(zp) - 1
             self.bg.skinAttributes.append(('zPosition', str(zpn)))          
         self.bg.applySkin(desktop, parent)            
 
-        if self.skinAttributes.has_key('pixmap'):
-            pxm = self.skinAttributes['pixmap']
+        if attrmap.has_key('pixmap'):
+            pxm = attrmap['pixmap']
             pixmap_path = "%s%s" % (self.ppath, pxm)
-            self.skinAttributes['pixmap'] = pixmap_path            
+            idx = 0;
+            for (attrib, value) in self.skinAttributes:
+                if attrib == 'pixmap':
+                    self.skinAttributes.pop(idx)                    
+                    break;
+                idx += 1;            
+            self.skinAttributes.append(('pixmap', pixmap_path))            
         ProgressBar.applySkin(self, desktop, parent)
         
     def GUIcreate(self, parent):
