@@ -20,7 +20,7 @@
 ######################################################################
 
 from Plugins.Plugin import PluginDescriptor
-from __common__ import print_info, _, DEVMODE
+from __common__ import print_info, _
 import mselection
 import mainlib
 import config
@@ -29,13 +29,12 @@ import comps
 import filmweb
     
 def main(session, eventName="", **kwargs):
-    if DEVMODE:    
-        reload(mautils)    
-        reload(comps)
-        reload(config)
-        reload(filmweb)
-        reload(mselection)        
-        reload(mainlib)
+    reload(mautils)    
+    reload(comps)
+    reload(config)
+    reload(filmweb)
+    reload(mselection)        
+    reload(mainlib)
     try:
         session.open(mainlib.Filmweb, eventName)
     except:
@@ -43,13 +42,12 @@ def main(session, eventName="", **kwargs):
         traceback.print_exc()
         
 def eventinfo(session, servicelist, **kwargs):
-    if DEVMODE:   
-        reload(mautils)    
-        reload(comps)
-        reload(config)
-        reload(filmweb)
-        reload(mselection)        
-        reload(mainlib)  
+    reload(mautils)    
+    reload(comps)
+    reload(config)
+    reload(filmweb)
+    reload(mselection)        
+    reload(mainlib)  
     try:
         ref = session.nav.getCurrentlyPlayingServiceReference()
         print_info("Current Service ref", str(ref))

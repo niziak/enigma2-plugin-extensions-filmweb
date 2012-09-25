@@ -59,42 +59,44 @@ class FilmwebEngine(object):
             COOKIES.pop(USER_TOKEN)  
         data = {'j_username': username, "j_password" : password}
         data = urllib.urlencode(data)
-        getPage(LOGIN_QUERY_URL, method='POST', postdata=data, 
-                headers={'Content-Type':'application/x-www-form-urlencoded'},
-                cookies=COOKIES).addCallback(self.__fetchLoginRes, callback, resdata).addErrback(self.__fetchLoginRes, callback, resdata)
         print_info("LoginPage data", str(data))
+        return getPage(LOGIN_QUERY_URL, method='POST', postdata=data, 
+                headers={'Content-Type':'application/x-www-form-urlencoded'},
+                cookies=COOKIES).addCallback(self.__fetchLoginRes, callback, resdata).addErrback(self.__fetchLoginRes, callback, resdata)        
 
-    def queryDetails(self, link, callback=None):
-        getPage(link, cookies=COOKIES).addCallback(self.__fetchDetailsOK, link, callback).addErrback(self.__fetchFailed) 
+    def queryDetails(self, link, callback=None, sessionId=None):
+        return getPage(link, cookies=COOKIES).addCallback(self.__fetchDetailsOK, link, callback, sessionId).addErrback(self.__fetchFailed) 
         
     def query(self, type, title, year=None, tryOther=False, callback=None):
         fetchurl = SEARCH_QUERY_URL + type + "?q=" + mautils.quote(title.encode('utf8'))
         if year:
             fetchurl += '&startYear=' + year + '&endYear=' + year
         print_info("Filmweb Query", fetchurl)
-        self.__fetchEntries(fetchurl, type, callback, tryOther)
+        return self.__fetchEntries(fetchurl, type, callback, tryOther)
 
     def searchWallpapers(self, link_, callback):
         if link_:  
-            getPage(link_, cookies=COOKIES).addCallback(self.__fetchWallpaperOK, callback).addErrback(self.__fetchFailed)      
+            return getPage(link_, cookies=COOKIES).addCallback(self.__fetchWallpaperOK, callback).addErrback(self.__fetchFailed)
+        return None      
         
     def loadPoster(self, posterUrl, callback):
         if posterUrl:                    
             localfile = POSTER_PATH
             print_info("Downloading poster", posterUrl + " to " + localfile)
-            downloadPage(posterUrl, localfile).addCallback(self.__fetchPosterOK, callback).addErrback(self.__fetchFailed)
+            return downloadPage(posterUrl, localfile).addCallback(self.__fetchPosterOK, callback).addErrback(self.__fetchFailed)
+        return None
                         
     def loadWallpaper(self, furl, localfile, callback):
         if not furl or not localfile:
-            return
+            return None
         print_info("Loading wallpaper", 'URL: ' + furl + ', Local File:' + localfile)
-        downloadPage(furl, localfile).addCallback(callback,localfile).addErrback(self.__fetchFailed)
+        return downloadPage(furl, localfile).addCallback(callback,localfile).addErrback(self.__fetchFailed)
 
     def loadDescriptions(self, furl, callback):  
         if not furl:
-            return
+            return None
         print_info("LOAD DESCS - link", furl + "/descs")                  
-        getPage(furl + "/descs", cookies=COOKIES).addCallback(self.__fetchExtraOK, callback).addErrback(self.__fetchFailed)
+        return getPage(furl + "/descs", cookies=COOKIES).addCallback(self.__fetchExtraOK, callback).addErrback(self.__fetchFailed)
 
     def applyRating(self, rating, filmId, userToken, callback):
         if rating and filmId:
@@ -108,9 +110,10 @@ class FilmwebEngine(object):
                        'X-GWT-Permutation':'7C0EB94ECB5DCB0BABC0AE73531FA849',
                        'X-Artuser-Token': userToken
                        }
-            getPage(PAGE_URL + '/rpc/userFilmRemoteService', method='POST', postdata=data, 
+            return getPage(PAGE_URL + '/rpc/userFilmRemoteService', method='POST', postdata=data, 
                     headers=headers,
-                    cookies=COOKIES).addCallback(callback).addErrback(callback)    
+                    cookies=COOKIES).addCallback(callback).addErrback(callback)  
+        return None  
         
 
 ############################################# LOCAL METHODS ###############################
@@ -193,7 +196,7 @@ class FilmwebEngine(object):
             import traceback
             traceback.print_exc()             
             
-    def __fetchDetailsOK(self, txt_, link, callback):
+    def __fetchDetailsOK(self, txt_, link, callback, sessionId):
         print_info("fetch details OK", str(COOKIES))
         if self.statusComponent:
             self.statusComponent.setText(_("Movie details loading completed"))
@@ -215,7 +218,7 @@ class FilmwebEngine(object):
                 self.parseYear()
                 self.parseRuntime()   
                 self.parseMyVote()
-                self.parsePromoWidget()                
+                self.parsePromoWidget(sessionId)                
                 self.parseWallpaper(link)                      
                 self.parseCast()
             except:
@@ -228,7 +231,7 @@ class FilmwebEngine(object):
             
     def __fetchEntries(self, fetchurl, type, callback, tryOther=True):
         self.resultlist = []
-        getPage(fetchurl, cookies=COOKIES).addCallback(self.__fetchOK, callback, tryOther, fetchurl, type).addErrback(self.__fetchFailed) 
+        return getPage(fetchurl, cookies=COOKIES).addCallback(self.__fetchOK, callback, tryOther, fetchurl, type).addErrback(self.__fetchFailed) 
         
     def __fetchOK(self, txt_, callback, tryOther, fetchurl, type):        
         print_info("Fetch OK", str(COOKIES))                
@@ -237,32 +240,33 @@ class FilmwebEngine(object):
         self.inhtml = mautils.html2utf8(txt_)
         if self.inhtml:
             if self.inhtml.find('Automatyczne przekierowanie') > -1:
+                df = None
                 if self.loopx == 0:
                     self.loopx = 1
-                    self.__fetchEntries(fetchurl, type, callback)
+                    df = self.__fetchEntries(fetchurl, type, callback)
                 else:
                     self.loopx = 0
-                return;
-            self.__parseEntries()
+                return df
+            self.__parseEntries(type)
         if len(self.resultlist) == 0:
             if tryOther:
                 if type == MT_SERIE:
                     type = MT_MOVIE
                 else:
                     type = MT_SERIE
-                self.self.__fetchEntries(fetchurl, type, callback, False)
-                return
+                return self.__fetchEntries(fetchurl, type, callback, False)
         if callback:
-            callback(self.resultlist, type)
+            callback(self.resultlist, type)            
+        return None
         
     def __fetchFailed(self, txt_):
         print_info("Fetch failed", str(txt_))
         if self.failureHandler:
             self.failureHandler(txt_)
 
-    def __parseEntries(self):     
+    def __parseEntries(self, type):     
         print_info("__parseEntries", "started")   
-        if self.searchType == MT_MOVIE:
+        if type == MT_MOVIE:
             ttx = 'Filmy ('
         else:
             ttx = 'Seriale ('
@@ -450,9 +454,9 @@ class FilmwebEngine(object):
         print_info("org title first", title)          
         self.detailsData['org_title'] = title
     
-    def parsePromoWidget(self):
+    def parsePromoWidget(self, sessionId):
         print_info("parsePromoWidget", "started")
-        if self.sessionId is not None:
+        if sessionId is not None:
             idx = self.inhtml.find('<div id="svdRec" style="display:none">')
             if idx > 0:
                 txt = mautils.between(self.inhtml, '<div id="svdRec" style="display:none">', '</div>')
@@ -475,13 +479,9 @@ class FilmwebEngine(object):
     
     def parseRuntime(self):
         print_info("parseRuntime", "started")
-        if mautils.between(self.inhtml, '<title>', '</title>').find('Serial TV') > -1: 
-            runtime = mautils.between(self.inhtml, "czas trwania:", '</strong>')
-            runtime = mautils.after(runtime, '<strong>')
-        else:  
-            runtime = mautils.between(self.inhtml, 'var filmTime="', '";')
-            #runtime = mautils.after(runtime, '<td>')
-            #runtime = mautils.before(runtime, '</td>')
+        #if mautils.between(self.inhtml, '<title>', '</title>').find('Serial TV') > -1: 
+        runtime = mautils.between(self.inhtml, 'filmTime="', '";')
+        print_info('Runtime data', str(runtime))
         runtime = runtime.replace(' ', '')        
         if not runtime:
             self.detailsData['runtime'] = ''

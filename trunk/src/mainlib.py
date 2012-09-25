@@ -22,6 +22,7 @@
 ######################################################################
 
 from enigma import eTimer, ePicLoad, eServiceCenter, eServiceReference, eEPGCache
+from time import localtime, strftime
 from config import FilmwebConfig
 from filmweb import FilmwebEngine,MT_MOVIE, MT_SERIE, POSTER_PATH
 from mselection import FilmwebChannelSelection, FilmwebRateChannelSelection
@@ -74,8 +75,7 @@ class Filmweb(Screen):
 
         self.session = session
         self.eventName = eventName
-        self.mode = ''
-        self.engine = FilmwebEngine(self.failureHandler, self["status_bar"])
+        self.mode = ''        
         self.searchType = MT_MOVIE        
         self.detailDir = 0
         self.resultlist = []             
@@ -85,6 +85,9 @@ class Filmweb(Screen):
         
         self.initVars()
         self.createGUI()
+        
+        self.engine = FilmwebEngine(self.failureHandler, self["status_bar"])
+        
         self.initActions()
         self.switchView(to_mode=VT_NONE)
         
@@ -138,15 +141,23 @@ class Filmweb(Screen):
                     print_info('--> SERV', str(x))
                     if epg.startTimeQuery(ref) != -1:
                         evt = epg.getNextTimeEntry()
-                        if evt:
+                        while evt:
                             ename = evt and evt.getEventName()
                             edesc = evt and evt.getShortDescription()
                             eext = evt and evt.getExtendedDescription()
-                            print_info('----> EVENT', 'name: ' + str(ename) + ', \ndesc: ' + str(edesc) + ', \nextra: ' + str(eext))
+                            ebgn = evt and evt.getBeginTimeString()
+                            edur = evt and evt.getDuration()
+                            ebgnt = evt and evt.getBeginTime()
+                            print_info('----> EVENT', 'name: ' + str(ename) + ', from: ' + strftime("%Y-%m-%d %H:%M", (localtime(ebgnt))) + ' to: ' + strftime("%H:%M",(localtime(ebgnt + edur))))
+                            evt = epg.getNextTimeEntry()
+                            #self.engine.query(MT_MOVIE, ename, None, False, self.searchMoviesCallback)
         except:
             import traceback
             traceback.print_exc()  
                            
+    def searchMoviesCallback(self):
+        pass
+    
     def moveLeft(self):
         if self.mode == VT_DETAILS:
             self.detailDir = 0
@@ -435,7 +446,7 @@ class Filmweb(Screen):
         self.detailslink = link
         self["poster"].hide()
         self.cast_list = []
-        self.engine.queryDetails(link, self.queryDetailsCallback)
+        self.engine.queryDetails(link, self.queryDetailsCallback, self.sessionId)
                 
     def loadDescsCallback(self, descres):
         if descres:
@@ -469,9 +480,9 @@ class Filmweb(Screen):
             self["cast_label"].l.setList(self.cast_list)
             
             self.wallpapers = []
-            if self.sessionId and self.filmId and self.detailsData['wallpapers_link']:
-                print_info("Parse wallpapers for link_" + str(self.detailsData['wallpapers_link']) + ', SID: ' + str(self.sessionId) + ', FID: ' + str(self.filmId))
-                self.engine.searchWallpapers(self.detailsData['wallpapers_link'], self.searchWallpapersCallback)
+            if self.sessionId and self.filmId and detailsData['wallpapers_link']:
+                print_info("Parse wallpapers for link_" + str(detailsData['wallpapers_link']) + ', SID: ' + str(self.sessionId) + ', FID: ' + str(self.filmId))
+                self.engine.searchWallpapers(detailsData['wallpapers_link'], self.searchWallpapersCallback)
             
             self["title_label"].setText(detailsData['title'])            
             title = detailsData['org_title']
