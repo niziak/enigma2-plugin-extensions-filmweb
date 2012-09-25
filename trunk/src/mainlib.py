@@ -106,7 +106,6 @@ class Filmweb(Screen):
     event_quoted = property(lambda self: mautils.quote(self.eventName.encode('utf8')))
                 
     def initVars(self):
-        self.descs = None
         self.filmId = None
         self.cast_list = []
         self.wallpapers = []
@@ -209,7 +208,7 @@ class Filmweb(Screen):
         self.switchView(to_mode=VT_MENU)
           
     def showExtras(self):
-        if self.mode == VT_DETAILS and self.descs:
+        if self.mode == VT_DETAILS and self.detailslink:
             self.switchView(to_mode=VT_EXTRAS)   
                  
     def contextMenuPressed(self):
@@ -311,7 +310,7 @@ class Filmweb(Screen):
                 self["key_yellow"].setText(_("Search TV Serie"))
             else:
                 self["key_yellow"].setText(_("Search Movie"))
-            if self.descs:
+            if self.detailslink:
                 self["key_blue"].setText(_("Descriptions"))
             else:
                 self["key_blue"].setText("")
@@ -436,16 +435,14 @@ class Filmweb(Screen):
         self.switchGUI(to_mode)
         
     def loadDescs(self):
-        if self.descs:
-            print_info("LOAD DESCS", "link: " + self.descs)
+        if self.detailslink:            
             self["status_bar"].setText(_("Loading descriptions ..."))
-            self.engine.loadDescriptions(self.descs, self.loadDescsCallback)
+            self.engine.loadDescriptions(self.detailslink, self.loadDescsCallback)
     
     def loadDetails(self, link, title):
         print_info("LOAD DETAILS", "link: " + link + ", title: " + title)
         self["status_bar"].setText(_("Seraching details for: %s...") % (title))
         print_info("Filmweb Details Query ", link)        
-        self.descs = link + "/descs"
         self.detailslink = link
         self["poster"].hide()
         self.cast_list = []
@@ -595,7 +592,7 @@ class Filmweb(Screen):
                 if tryOther and self.eventName.find('odc.') > 0:
                     self.searchType = MT_SERIE
                 self["status_bar"].setText(_("Query Filmweb: %s...") % (self.eventName))
-                self.engine.query(self.searchType, self.event_quoted, self.queryCallback)
+                self.engine.query(self.searchType, self.event_quoted, tryOther, self.queryCallback)
             else:
                 self["status_bar"].setText(_("Unknown Eventname"))
                 self["title_label"].setText(_("Unknown Eventname"))

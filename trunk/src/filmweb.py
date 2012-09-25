@@ -34,6 +34,10 @@ USER_TOKEN = '_artuser_token'
 SESSION_KEY = '_artuser_sessionId'
 POSTER_PATH = "/tmp/poster.jpg"
 
+PAGE_URL = 'http://www.filmweb.pl'
+SEARCH_QUERY_URL = PAGE_URL + "/search/"
+LOGIN_QUERY_URL = 'https://ssl.filmweb.pl/j_login'
+
 COOKIES = {} 
 
 class FilmwebEngine(object):
@@ -45,7 +49,7 @@ class FilmwebEngine(object):
         self.failureHandler = failureHandler
         self.statusComponent = statusComponent
     
-    def login(self, username, password, callback=None, data=None):
+    def login(self, username, password, callback=None, resdata=None):
         print_info("LoginPage", "started")
         if self.statusComponent:
             self.statusComponent.setText(_('Logging in ...'))
@@ -55,18 +59,18 @@ class FilmwebEngine(object):
             COOKIES.pop(USER_TOKEN)  
         data = {'j_username': username, "j_password" : password}
         data = urllib.urlencode(data)
-        getPage('https://ssl.filmweb.pl/j_login', method='POST', postdata=data, 
+        getPage(LOGIN_QUERY_URL, method='POST', postdata=data, 
                 headers={'Content-Type':'application/x-www-form-urlencoded'},
-                cookies=COOKIES).addCallback(self.__fetchLoginRes, callback, data).addErrback(self.__fetchLoginRes, callback, data)
+                cookies=COOKIES).addCallback(self.__fetchLoginRes, callback, resdata).addErrback(self.__fetchLoginRes, callback, resdata)
         print_info("LoginPage data", str(data))
 
     def queryDetails(self, link, callback=None):
         getPage(link, cookies=COOKIES).addCallback(self.__fetchDetailsOK, link, callback).addErrback(self.__fetchFailed) 
         
-    def query(self, type, text, callback=None):
-        fetchurl = "http://www.filmweb.pl/search/" + type + "?q=" + text
-        print_info("Filmweb Query ", fetchurl)
-        self.__fetchEntries(fetchurl, type, callback)
+    def query(self, type, text, tryOther=False, callback=None):
+        fetchurl = SEARCH_QUERY_URL + type + "?q=" + text
+        print_info("Filmweb Query", fetchurl)
+        self.__fetchEntries(fetchurl, type, callback, tryOther)
 
     def searchWallpapers(self, link_, callback):
         if link_:  
@@ -79,11 +83,16 @@ class FilmwebEngine(object):
             downloadPage(posterUrl, localfile).addCallback(self.__fetchPosterOK, callback).addErrback(self.__fetchFailed)
                         
     def loadWallpaper(self, furl, localfile, callback):
+        if not furl or not localfile:
+            return
         print_info("Loading wallpaper", 'URL: ' + furl + ', Local File:' + localfile)
         downloadPage(furl, localfile).addCallback(callback,localfile).addErrback(self.__fetchFailed)
 
-    def loadDescriptions(self, furl, callback):                    
-        getPage(furl, cookies=COOKIES).addCallback(self.__fetchExtraOK, callback).addErrback(self.__fetchFailed)
+    def loadDescriptions(self, furl, callback):  
+        if not furl:
+            return
+        print_info("LOAD DESCS - link", furl + "/descs")                  
+        getPage(furl + "/descs", cookies=COOKIES).addCallback(self.__fetchExtraOK, callback).addErrback(self.__fetchFailed)
 
     def applyRating(self, rating, filmId, userToken, callback):
         if rating and filmId:
@@ -97,7 +106,7 @@ class FilmwebEngine(object):
                        'X-GWT-Permutation':'7C0EB94ECB5DCB0BABC0AE73531FA849',
                        'X-Artuser-Token': userToken
                        }
-            getPage('http://www.filmweb.pl/rpc/userFilmRemoteService', method='POST', postdata=data, 
+            getPage(PAGE_URL + '/rpc/userFilmRemoteService', method='POST', postdata=data, 
                     headers=headers,
                     cookies=COOKIES).addCallback(callback).addErrback(callback)    
         
@@ -322,7 +331,7 @@ class FilmwebEngine(object):
                         element += '\n' + cast.strip()
                     print_info("The movie serach title", element)
                     #self.titles.append(element)
-                    self.resultlist.append((element,'http://www.filmweb.pl' + link))
+                    self.resultlist.append((element, PAGE_URL + link))
         
     def parsePlot(self):
         print_info("parsePlot", "started")
