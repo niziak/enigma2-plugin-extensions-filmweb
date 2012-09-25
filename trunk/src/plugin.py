@@ -26,12 +26,14 @@ import mainlib
 import config
 import mautils
 import comps
+import filmweb
     
 def main(session, eventName="", **kwargs):    
-    reload(mautils)
+    reload(mautils)    
     reload(comps)
-    reload(mselection)
-    reload(config)    
+    reload(config)
+    reload(filmweb)
+    reload(mselection)        
     reload(mainlib)
     try:
         session.open(mainlib.Filmweb, eventName)
@@ -40,11 +42,12 @@ def main(session, eventName="", **kwargs):
         traceback.print_exc()
         
 def eventinfo(session, servicelist, **kwargs):
-    reload(mautils)
+    reload(mautils)    
     reload(comps)
-    reload(mselection)
     reload(config)
-    reload(mainlib)    
+    reload(filmweb)
+    reload(mselection)        
+    reload(mainlib)  
     try:
         ref = session.nav.getCurrentlyPlayingServiceReference()
         print_info("Current Service ref", str(ref))
@@ -54,12 +57,12 @@ def eventinfo(session, servicelist, **kwargs):
         traceback.print_exc()      
         
 def Plugins(path, **kwargs):
-    p = [PluginDescriptor(name="Filmweb Details",
+    p = [PluginDescriptor(name=_("Filmweb Details"),
                            description=_("Query details from the Filmweb.pl Database"),
                            where=PluginDescriptor.WHERE_PLUGINMENU,
                            needsRestart=False,
                            fnc=main),
-         PluginDescriptor(name="Filmweb Details",
+         PluginDescriptor(name=_("Filmweb Details"),
             description=_("Query details from the Filmweb.pl Database"),
             where=PluginDescriptor.WHERE_EVENTINFO,
             fnc=eventinfo,
