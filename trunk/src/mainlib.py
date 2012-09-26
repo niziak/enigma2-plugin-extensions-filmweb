@@ -21,20 +21,16 @@
 # GNU General Public License, version 3 or later
 ######################################################################
 
-from enigma import eTimer, ePicLoad, eServiceCenter, eServiceReference, eEPGCache
-from time import localtime, strftime
+from enigma import eTimer, ePicLoad, eServiceCenter
 from config import FilmwebConfig
-from filmweb import FilmwebEngine,MT_MOVIE, MT_SERIE, POSTER_PATH
-from mselection import FilmwebChannelSelection, FilmwebRateChannelSelection
-from __common__ import print_info, _
+from engine import FilmwebEngine,MT_MOVIE, MT_SERIE, POSTER_PATH
+from mselection import FilmwebChannelSelection
+from movieguide import MovieGuide
+from __common__ import print_info, _, DefaultScreen
 from comps import ActorChoiceList, ScrollLabelExt, MenuChoiceList, StarsComp
 import mautils
 import os
-import sys
 
-from Tools.Directories import resolveFilename, SCOPE_CURRENT_SKIN
-
-from Screens.Screen import Screen
 from Screens.InputBox import InputBox
 from Screens.ChoiceBox import ChoiceBox
 from Screens.MessageBox import MessageBox
@@ -56,21 +52,9 @@ VT_MENU = 'MENU'
 VT_DETAILS = 'DETAILS'
 VT_EXTRAS = 'EXTRAS'
             
-class Filmweb(Screen):
+class Filmweb(DefaultScreen):
     def __init__(self, session, eventName):
-        mf = sys.modules[__name__].__file__
-        self.ppath = os.path.dirname(mf)
-        print_info('Plugin path', self.ppath)
-        fn = resolveFilename(SCOPE_CURRENT_SKIN, 'skin_default/buttons/red25.png')
-        if (os.path.exists(fn)):
-            skin = "%s/resource/filmweb_skin_bh.xml" % (self.ppath)
-        else:
-            skin = "%s/resource/filmweb_skin_df.xml" % (self.ppath)
-        f = open(skin, "r")
-        self.skin = f.read()
-        f.close()
-        
-        Screen.__init__(self, session)
+        DefaultScreen.__init__(self, session, "filmweb")
         print_info("Filmweb Screen - event", eventName)
 
         self.session = session
@@ -127,37 +111,8 @@ class Filmweb(Screen):
         
     # ---- ACTIONS ----  
     def showEPGList(self):
-        self.session.openWithCallback(self.searchMoviesInfo, FilmwebRateChannelSelection)   
+        self.session.open(MovieGuide)   
         
-    def searchMoviesInfo(self, res=None):
-        try: 
-            #serviceHandler = eServiceCenter.getInstance()
-            epg = eEPGCache.getInstance()
-            txt = config.plugins.mfilmweb.selserv.getText()
-            if txt:
-                entries = txt.split('|')
-                for x in entries:
-                    ref = eServiceReference(x)
-                    print_info('--> SERV', str(x))
-                    if epg.startTimeQuery(ref) != -1:
-                        evt = epg.getNextTimeEntry()
-                        while evt:
-                            ename = evt and evt.getEventName()
-                            edesc = evt and evt.getShortDescription()
-                            eext = evt and evt.getExtendedDescription()
-                            ebgn = evt and evt.getBeginTimeString()
-                            edur = evt and evt.getDuration()
-                            ebgnt = evt and evt.getBeginTime()
-                            print_info('----> EVENT', 'name: ' + str(ename) + ', from: ' + strftime("%Y-%m-%d %H:%M", (localtime(ebgnt))) + ' to: ' + strftime("%H:%M",(localtime(ebgnt + edur))))
-                            evt = epg.getNextTimeEntry()
-                            #self.engine.query(MT_MOVIE, ename, None, False, self.searchMoviesCallback)
-        except:
-            import traceback
-            traceback.print_exc()  
-                           
-    def searchMoviesCallback(self):
-        pass
-    
     def moveLeft(self):
         if self.mode == VT_DETAILS:
             self.detailDir = 0
