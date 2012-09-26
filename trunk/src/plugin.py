@@ -26,15 +26,17 @@ import mainlib
 import config
 import mautils
 import comps
-import filmweb
+import engine
+import movieguide
     
 def main(session, eventName="", **kwargs):
     reload(mautils)    
     reload(comps)
     reload(config)
-    reload(filmweb)
-    reload(mselection)        
-    reload(mainlib)
+    reload(engine)
+    reload(mselection)  
+    reload(movieguide)      
+    reload(mainlib)    
     try:
         session.open(mainlib.Filmweb, eventName)
     except:
@@ -45,8 +47,9 @@ def eventinfo(session, servicelist, **kwargs):
     reload(mautils)    
     reload(comps)
     reload(config)
-    reload(filmweb)
-    reload(mselection)        
+    reload(engine)
+    reload(mselection)   
+    reload(movieguide)     
     reload(mainlib)  
     try:
         ref = session.nav.getCurrentlyPlayingServiceReference()
