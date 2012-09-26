@@ -21,8 +21,9 @@
 
 from enigma import eEPGCache, eServiceReference
 from time import localtime, strftime
-from __common__ import print_info, _, DefaultScreen
+from __common__ import print_info, _
 from mselection import FilmwebRateChannelSelection
+from comps import DefaultScreen
 
 from Components.config import config
 from Components.ActionMap import ActionMap
