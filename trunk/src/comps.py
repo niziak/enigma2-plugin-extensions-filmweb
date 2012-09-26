@@ -25,6 +25,8 @@ from twisted.web.client import downloadPage
 from __common__ import print_info
 import os
 import sys
+
+from Screens.Screen import Screen
 from Tools.BoundFunction import boundFunction
 from Tools.Directories import resolveFilename, SCOPE_CURRENT_SKIN
 from Components.AVSwitch import AVSwitch
@@ -35,10 +37,29 @@ from Components.ChoiceList import ChoiceList
 from Components.MultiContent import MultiContentEntryText
 from Components.ProgressBar import ProgressBar
 
+
 ACTOR_IMG_PREFIX = "/tmp/actor_img_"
 
 actorPicload = {}
 
+class DefaultScreen(Screen):
+    def __init__(self, session, temat):
+        mf = sys.modules[__name__].__file__
+        self.ppath = os.path.dirname(mf)
+        print_info('Plugin path', self.ppath)
+        fn = resolveFilename(SCOPE_CURRENT_SKIN, 'skin_default/menu/BlackHoleEpgBackup.png')
+        if (os.path.exists(fn)):
+            skin = "%s/resource/%s_skin_bh.xml" % (self.ppath, temat)
+        else:
+            skin = "%s/resource/%s_skin_df.xml" % (self.ppath, temat)
+        f = open(skin, "r")
+        self.skin = f.read()
+        f.close()
+        
+        Screen.__init__(self, session)
+        print_info("Screen init")
+        
+    
 def MovieSearchEntryComponent(text = ["--"]):
     res = [ text ]
 

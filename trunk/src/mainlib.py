@@ -26,8 +26,8 @@ from config import FilmwebConfig
 from engine import FilmwebEngine,MT_MOVIE, MT_SERIE, POSTER_PATH
 from mselection import FilmwebChannelSelection
 from movieguide import MovieGuide
-from __common__ import print_info, _, DefaultScreen
-from comps import ActorChoiceList, ScrollLabelExt, MenuChoiceList, StarsComp
+from __common__ import print_info, _
+from comps import ActorChoiceList, ScrollLabelExt, MenuChoiceList, StarsComp, DefaultScreen
 import mautils
 import os
 
