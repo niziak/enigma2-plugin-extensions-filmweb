@@ -57,7 +57,7 @@ class MovieGuide(DefaultScreen):
     def createGUI(self):
         self["list"] = List(self.list)
         self["key_red"] = StaticText(_("Config"))
-        self["key_green"] = StaticText("")
+        self["key_green"] = StaticText(_("Refresh"))
         self["key_yellow"] = StaticText("")
         self["key_blue"] = StaticText("")
     
@@ -85,6 +85,7 @@ class MovieGuide(DefaultScreen):
     
     def greenAction(self):
         print_info("GREEN action")
+        self.refreshList()
     
     def yellowAction(self):
         print_info("YELLOW action")
@@ -115,7 +116,7 @@ class MovieGuide(DefaultScreen):
             for evt in evts:
                 event = evt[3]
                 print_info('Query event', str(event.getEventName()))
-                df = self.engine.query(MT_MOVIE, self.__getQueryTitle(event), 
+                df = self.engine.query(self.__getQueryType(event), self.__getQueryTitle(event), 
                                        self.__getQueryYear(event), False, refreshListCallback, evt)
                 ds.append(df)
             print_info('Create DeferredList')
@@ -172,6 +173,9 @@ class MovieGuide(DefaultScreen):
     '''        
     # --- Private methods ------------------------------------------------
     
+    def __getQueryType(self, evt):
+        return MT_MOVIE
+        
     def __getQueryTitle(self, evt):
         return evt.getEvetName()
     
