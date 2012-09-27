@@ -503,7 +503,7 @@ class Filmweb(DefaultScreen):
         if self.has_key('status_bar'):
             self["status_bar"].setText(_("Filmweb Download failed"))
             
-    def queryCallback(self, rlista, type):
+    def queryCallback(self, rlista, type, data=None):
         self.resultlist = rlista
         self.searchType = type
         lista = []
