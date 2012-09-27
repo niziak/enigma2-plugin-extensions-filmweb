@@ -67,12 +67,12 @@ class FilmwebEngine(object):
     def queryDetails(self, link, callback=None, sessionId=None):
         return getPage(link, cookies=COOKIES).addCallback(self.__fetchDetailsOK, link, callback, sessionId).addErrback(self.__fetchFailed) 
         
-    def query(self, type, title, year=None, tryOther=False, callback=None):
+    def query(self, type, title, year=None, tryOther=False, callback=None, data=None):
         fetchurl = SEARCH_QUERY_URL + type + "?q=" + mautils.quote(title.encode('utf8'))
         if year:
             fetchurl += '&startYear=' + year + '&endYear=' + year
         print_info("Filmweb Query", fetchurl)
-        return self.__fetchEntries(fetchurl, type, callback, tryOther)
+        return self.__fetchEntries(fetchurl, type, callback, tryOther, data)
 
     def searchWallpapers(self, link_, callback):
         if link_:  
@@ -229,11 +229,11 @@ class FilmwebEngine(object):
         if (callback):
             callback(self.detailsData)
             
-    def __fetchEntries(self, fetchurl, type, callback, tryOther=True):
+    def __fetchEntries(self, fetchurl, type, callback, tryOther=True, data=None):
         self.resultlist = []
-        return getPage(fetchurl, cookies=COOKIES).addCallback(self.__fetchOK, callback, tryOther, fetchurl, type).addErrback(self.__fetchFailed) 
+        return getPage(fetchurl, cookies=COOKIES).addCallback(self.__fetchOK, callback, tryOther, fetchurl, type, data).addErrback(self.__fetchFailed) 
         
-    def __fetchOK(self, txt_, callback, tryOther, fetchurl, type):        
+    def __fetchOK(self, txt_, callback, tryOther, fetchurl, type, data):        
         print_info("Fetch OK", str(COOKIES))                
         if self.statusComponent:
             self.statusComponent.setText(_("Filmweb Download completed"))
@@ -243,7 +243,7 @@ class FilmwebEngine(object):
                 df = None
                 if self.loopx == 0:
                     self.loopx = 1
-                    df = self.__fetchEntries(fetchurl, type, callback)
+                    df = self.__fetchEntries(fetchurl, type, callback, tryOther, data)
                 else:
                     self.loopx = 0
                 return df
@@ -254,9 +254,9 @@ class FilmwebEngine(object):
                     type = MT_MOVIE
                 else:
                     type = MT_SERIE
-                return self.__fetchEntries(fetchurl, type, callback, False)
+                return self.__fetchEntries(fetchurl, type, callback, False, data)
         if callback:
-            callback(self.resultlist, type)            
+            return callback(self.resultlist, type, data)            
         return None
         
     def __fetchFailed(self, txt_):

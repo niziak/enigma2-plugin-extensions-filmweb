@@ -19,12 +19,10 @@
 # GNU General Public License, version 3 or later
 ######################################################################
 
-from Tools.Directories import resolveFilename, SCOPE_PLUGINS, SCOPE_CURRENT_SKIN
+from Tools.Directories import resolveFilename, SCOPE_PLUGINS
 from Components.Language import language
-from Screens.Screen import Screen
 import os
 import gettext
-import sys
 
 
 def _(txt):
@@ -51,3 +49,5 @@ def print_info(nfo, data=None):
 
 localeInit()
 language.addCallback(localeInit)
+
+
