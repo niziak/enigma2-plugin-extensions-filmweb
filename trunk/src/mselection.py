@@ -83,6 +83,24 @@ class FilmwebRateChannelSelection(SimpleChannelSelection):
         config.plugins.mfilmweb.selserv.setValue(txt)
         config.plugins.mfilmweb.save()
         configfile.save()
+        
+        '''
+        try:
+            from ServiceReference import ServiceReference
+            sfile = open('/tmp/services.dat', "w")
+            lista = self.servicelist.getRootServices()
+            for x in lista:
+                print_info('ser', x)
+                ref = eServiceReference(x)
+                ser = ServiceReference(ref)
+                sfile.write(x + ',' + ser.getServiceName() + ',\n')
+        except Exception, e:
+            import traceback
+            traceback.print_exc() 
+        finally:
+            if sfile is not None:
+                sfile.close()
+        '''                
     
 class FilmwebChannelSelection(SimpleChannelSelection):
     def __init__(self, session):

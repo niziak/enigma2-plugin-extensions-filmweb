@@ -127,25 +127,25 @@ def html2utf8(in_html, code='utf8'):
         if key not in entitydict:
             elem = x.group(1)
             entitydict[key] = htmlentitydefs.name2codepoint[elem]
-            print_info("Dictionary-1", str(key) + "->" + str(elem) + "->" + str(entitydict[key]))
+            #print_info("Dictionary-1", str(key) + "->" + str(elem) + "->" + str(entitydict[key]))
 
     entities = re.finditer('&#x([0-9A-Fa-f]{2,2}?);', in_html)
     for x in entities:
         key = x.group(0)
         if key not in entitydict:
             entitydict[key] = "%d" % int(key[3:5], 16)
-            print_info("Dictionary-2", str(key) + "->" + str(int(key[3:5], 16)) + "->" + str(entitydict[key]))
+            #print_info("Dictionary-2", str(key) + "->" + str(int(key[3:5], 16)) + "->" + str(entitydict[key]))
 
     entities = re.finditer('&#(\d{1,5}?);', in_html)
     for x in entities:
         key = x.group(0)
         if key not in entitydict:
             entitydict[key] = x.group(1)
-            print_info("Dictionary-3", str(key) + "->" + str(entitydict[key]))
+            #print_info("Dictionary-3", str(key) + "->" + str(entitydict[key]))
 
     for key, codepoint in iteritems(entitydict):
         utfchar = unichr(int(codepoint)).encode(code, 'ignore')
-        print_info("KEY-CODEPOINT-UTF", str(key) + "->" + str(codepoint) + "->" + utfchar)            
+        #print_info("KEY-CODEPOINT-UTF", str(key) + "->" + str(codepoint) + "->" + utfchar)            
         in_html = in_html.replace(key, utfchar)
         
     #print_info("MAUTILS","result", in_html)
