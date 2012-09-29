@@ -23,9 +23,11 @@
 
 from twisted.web.client import downloadPage, getPage
 from __common__ import print_info
+import time
 import mautils
 import urllib
 import os
+import sys
 
 MT_MOVIE = 'film'
 MT_SERIE = 'serial'
@@ -38,8 +40,33 @@ PAGE_URL = 'http://www.filmweb.pl'
 SEARCH_QUERY_URL = PAGE_URL + "/search/"
 LOGIN_QUERY_URL = 'https://ssl.filmweb.pl/j_login'
 
-COOKIES = {} 
+COOKIES = {}
+MAPPING = {}
 
+def loadMappings():
+    try:
+        rpath = os.path.dirname(sys.modules[__name__].__file__)
+        print_info('Mappings loading', rpath)
+        global MAPPING
+        path = '%s/resource/services.dat' % (rpath)
+        if os.path.exists(path):
+            sfile = open(path, "r")
+            lines = sfile.readlines()
+            for x in lines:
+                dt = x.strip().split(',')
+                if dt and len(dt) == 3:
+                    #print_info('mapping line', dt[1] + '=' +dt[2])
+                    MAPPING[dt[1]] = dt[2]
+        #print_info('mp', str(MAPPING))
+    except:
+        import traceback
+        traceback.print_exc() 
+    finally:
+        if sfile is not None:
+            sfile.close()  
+
+loadMappings()
+ 
 class FilmwebEngine(object):
     def __init__(self, failureHandler=None, statusComponent=None):
         self.inhtml = None
@@ -570,5 +597,104 @@ class FilmwebEngine(object):
                 descres = descres + element + '\n\n'
         return descres
              
+class TelemagEngine(object):
+    def __init__(self):
+        pass
+    
+    def query(self, ref, typ, dz):       
+        ch = self.__getChannel(ref)
+        print_info('channel', ch)
+        if not ch:
+            return None
+        tp = self.__getType(typ)
+        fetchurl = 'http://www.telemagazyn.pl/%s/%s/%s,3,1,dz,go,cpr.html' % (ch, tp, dz)
+        return getPage(fetchurl).addCallback(self.__fetchOK,(ref,typ,dz)).addErrback(self.__fetchFailed)
+    
+    def __fetchOK(self, res, tup):
+        result = []
+        service = tup[0]
+        typ = tup[1]
+        dzien = tup[2]
+        lastnum = 0
+        inhtml = mautils.html2utf8(res, 'ISO8859-2')
+        idx = inhtml.find('id="lista-programow"')
+        if idx > -1:
+            inhtml = inhtml[idx:]
+            elements = inhtml.split('<td class="lewy')
+            for element in elements:
+                num = mautils.before(element, '<div class="m1"')                
+                if not num or len(num) == 0:
+                    continue
+                num = num.strip()
+                idxm = num.find('<span>')
+                if idxm < 0:
+                    continue 
+                else:
+                    numv = mautils.between(num, '<span>', '</span>')
+                    if numv.isdigit():
+                        num = int(numv)
+                    else:
+                        continue
+                prog =  mautils.between(element, '<td>', '</td>')
+                #print_info('PROG', str(prog))
+                ds = None
+                hr = mautils.between(prog, '<div class="m1"', '<div')
+                #print_info('HR', str(hr))
+                ds = mautils.between(prog, '<div class="opisProgramu">', '</div>')
+                #print_info('DS', str(ds))
+                if not ds or len(ds) == 0:
+                    ds = None
+                if not hr and len(hr) == 0:
+                    hr = None    
+                if hr and ds:         
+                    row = []       
+                    idxp = hr.find("<p")
+                    #print_info('HRP idx', str(idxp))
+                    if idxp > -1:
+                        hr = hr[idxp:]
+                        hr = mautils.strip_tags(hr)
+                        hr = hr.strip('"')
+                        hr = hr.strip()
+                        tm = time.strptime(dzien + hr,'%Y%m%d%H:%M')
+                        sec = time.mktime(tm)
+                        if num < lastnum:
+                            sec += 86400
+                        row.append(sec)
+                        print_info('Godzina', str(hr) + ', sec: ' + str(sec))
+                    idxp = ds.find("<p")
+                    #print_info('DSP idx', str(idxp))
+                    if idxp > -1:
+                        dsa = ds[idxp:]
+                        dsa = mautils.strip_tags(dsa)
+                        dsa = dsa.strip()
+                        print_info('Opis', str(dsa))
+                        row.append(dsa)
+                        
+                        dsa = ds[:idxp]
+                        dsa = mautils.strip_tags(dsa)
+                        dsa = dsa.strip()
+                        print_info('Tytuł', str(dsa))
+                        row.append(dsa)
+                    if len(row) == 3:
+                        row.append(service)
+                        row.append(typ)
+                        result.append(row)
+                lastnum = num            
+        ''' ROW to (begin, opis, tytul, service, typ)'''
+        #print_info('ROW', str(result))            
+        return result
+    
+    def __fetchFailed(self, res):
+        pass
+    
+    def __getChannel(self, ref):              
+        x = ref.getServiceName()
+        #print_info('xx', x +', map: '+ str(MAPPING))
+        return MAPPING.get(x)
         
+    def __getType(self, typ):
+        return 'film'
+    
+    
+    
         

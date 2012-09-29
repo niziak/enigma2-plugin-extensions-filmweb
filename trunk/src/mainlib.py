@@ -541,11 +541,11 @@ class Filmweb(DefaultScreen):
                 self.eventName = evt and evt.getEventName()  
             print_info("Getting data for event with name", str(self.eventName))
             if self.eventName:
-                idx = self.eventName.find(' -')
-                if idx > 0:
-                    self.eventName = self.eventName[:idx]
-                if tryOther and self.eventName.find('odc.') > 0:
+                if tryOther and (self.eventName.find('odc.') > -1 or self.eventName.find('serial') > -1):
                     self.searchType = MT_SERIE
+                idx = self.eventName.find(' - ')
+                if idx > 0:
+                    self.eventName = self.eventName[:idx]                                        
                 self["status_bar"].setText(_("Query Filmweb: %s...") % (self.eventName))
                 self.engine.query(self.searchType, self.eventName, None, tryOther, self.queryCallback)
             else:
