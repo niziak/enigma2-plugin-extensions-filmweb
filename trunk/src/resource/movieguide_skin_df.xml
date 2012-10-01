@@ -7,18 +7,18 @@
 	<widget source="key_green" render="Label" position="140,0" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="#1f771f" transparent="1" />
 	<widget source="key_yellow" render="Label" position="280,0" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="#a08500" transparent="1" />
 	<widget source="key_blue" render="Label" position="420,0" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="#18188b" transparent="1" />
-	<widget source="list" render="Listbox" position="5,50" size="550,280" zPosition="10" scrollbarMode="showOnDemand">
-		<convert type="TemplatedMultiContent"> 
-			{"template": [
-					MultiContentEntryText(pos = (85, 6), size = (440, 28), font=0, flags = RT_HALIGN_LEFT|RT_VALIGN_TOP, text = 1), 
-					MultiContentEntryText(pos = (85, 43), size = (440, 20), font=1, flags = RT_HALIGN_LEFT|RT_VALIGN_BOTTOM, text = 2), 
-					MultiContentEntryPixmapAlphaTest(pos = (2, 8), size = (54, 54), png = 3), 
-					MultiContentEntryPixmapAlphaTest(pos = (63, 46), size = (15, 16), png = 4), 
-				],
-			"fonts": [gFont("Regular", 28),gFont("Regular", 20)],
-			"itemHeight": 70
-			}
-		</convert>
+	<widget source="list" render="Listbox" position="5,50" size="550,400" zPosition="10" scrollbarMode="showOnDemand">
+	<convert type="TemplatedMultiContent"> 
+	{"template": [
+	MultiContentEntryText(pos = (0, 0), size = (60, 48), font=2, flags = RT_HALIGN_CENTER|RT_VALIGN_CENTER, text = 4),
+	MultiContentEntryText(pos = (65, 0), size = (760, 25), font=0, flags = RT_HALIGN_LEFT|RT_VALIGN_TOP, text = 1, color=0x00F0B400, color_sel=0x00F0B400),
+	MultiContentEntryText(pos = (270, 25), size = (490, 22), font=1, flags = RT_HALIGN_LEFT|RT_VALIGN_BOTTOM, text = 3, color=0x0058bcff, color_sel=0x0058bcff), 
+	MultiContentEntryText(pos = (65, 25), size = (200, 22), font=1, flags = RT_HALIGN_LEFT|RT_VALIGN_BOTTOM, text = 2), 
+	],
+	"fonts": [gFont("Regular", 20),gFont("Regular", 16),gFont("Regular", 28)],
+	"itemHeight": 48
+	}
+	</convert>
 	</widget>
 	<ePixmap pixmap="skin_default/div-h.png" position="0,340" zPosition="1" size="560,2" />
 </screen> 
