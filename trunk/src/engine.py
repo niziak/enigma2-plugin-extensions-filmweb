@@ -24,6 +24,7 @@
 from twisted.web.client import downloadPage, getPage
 from __common__ import print_info
 import time
+import datetime
 import mautils
 import urllib
 import os
@@ -42,22 +43,24 @@ LOGIN_QUERY_URL = 'https://ssl.filmweb.pl/j_login'
 
 COOKIES = {}
 MAPPING = {}
+MAPPING2 = {}
 
 def loadMappings():
     try:
         rpath = os.path.dirname(sys.modules[__name__].__file__)
         print_info('Mappings loading', rpath)
         global MAPPING
+        global MAPPING2
         path = '%s/resource/services.dat' % (rpath)
         if os.path.exists(path):
             sfile = open(path, "r")
             lines = sfile.readlines()
             for x in lines:
                 dt = x.strip().split(',')
-                if dt and len(dt) == 3:
-                    #print_info('mapping line', dt[1] + '=' +dt[2])
+                if dt and len(dt) > 2:
                     MAPPING[dt[1]] = dt[2]
-        #print_info('mp', str(MAPPING))
+                    if len(dt) > 3:
+                        MAPPING2[dt[1]] = dt[3]
     except:
         import traceback
         traceback.print_exc() 
@@ -340,6 +343,7 @@ class FilmwebEngine(object):
                     #self.links.append('http://www.filmweb.pl' + link)                    
                     title = mautils.between(element, '">', '</a>')
                     title = title.replace('\t', '')
+                    title = mautils.strip_tags(title)
                     print_info("The movie title", title)
                     element = mautils.after(element, 'class=searchResultDetails')
                     year = mautils.between(element, '>', '|')
@@ -365,7 +369,8 @@ class FilmwebEngine(object):
                         element += '\n' + cast.strip()
                     print_info("The movie serach title", element)
                     #self.titles.append(element)
-                    self.resultlist.append((element, PAGE_URL + link, basic_data, title, rating, year, country))
+                    rt = rating.split()
+                    self.resultlist.append((element, PAGE_URL + link, basic_data, title, rt[0], year, country))
         
     def parsePlot(self):
         print_info("parsePlot", "started")
@@ -638,7 +643,7 @@ class TelemagEngine(object):
                 prog =  mautils.between(element, '<td>', '</td>')
                 #print_info('PROG', str(prog))
                 ds = None
-                hr = mautils.between(prog, '<div class="m1"', '<div')
+                hr = mautils.between(prog, '<div class="m1', '<div')
                 #print_info('HR', str(hr))
                 ds = mautils.between(prog, '<div class="opisProgramu">', '</div>')
                 #print_info('DS', str(ds))
@@ -695,6 +700,72 @@ class TelemagEngine(object):
     def __getType(self, typ):
         return 'film'
     
+class FilmwebTvEngine(object):
+    def __init__(self):
+        pass
     
+    def query(self, ref, typ, dz):
+        ch = self.__getChannel(ref)
+        print_info('channel', ch)
+        if not ch:
+            return None
+        tms = time.strptime(dz,"%Y%m%d")
+        now =time.strptime(time.strftime("%Y%m%d", time.localtime(time.time())),"%Y%m%d")
+        #now = time.localtime(time.time())
+        tt = time.mktime(tms) - time.mktime(now) 
+        d = datetime.timedelta(seconds=tt)
+        fetchurl = 'http://www.filmweb.pl/guide/%s?day=%s' % (ch, str(d.days))
+        print_info('URL', str(fetchurl))
+        return getPage(fetchurl, cookies=COOKIES).addCallback(self.__fetchOK,(ref,typ,dz)).addErrback(self.__fetchFailed)
+    
+    def __fetchOK(self, res, tup):
+        result = []
+        service = tup[0]
+        typ = tup[1]
+        dzien = tup[2]
+        inhtml = mautils.html2utf8(res)
+        inhtml = mautils.between(inhtml, '<div class="channel first">', '<div class="channel">')
+        inhtml = mautils.after(inhtml,'brak programów dla wybranych filtrów')
+        #print_info('++++++++++++ page', str(inhtml))
+        elements = inhtml.split('<div class="singleProg seance seance_film')
+        for element in elements:
+            row = []
+            #print_info('----------- page', str(element))
+            if element.find('<span class="hour">') < 0:
+                continue
+            hr = mautils.between(element, '<span class="hour">', '</span>')
+            #print_info('--', hr)
+            hr = mautils.strip_tags(hr)
+            hr = hr.strip()
+            #print_info('--', hr)
+            tm = time.strptime(dzien + hr,'%Y%m%d%H:%M')
+            sec = time.mktime(tm)
+            row.append(sec)
+            print_info('Godzina', str(hr) + ', sec: ' + str(sec))
+            
+            hr = mautils.between(element, '<p>', '</p>')
+            if hr.find('title='):
+                hrt = mautils.between(hr, 'title="', '"')
+                hrt = hrt.strip(')')
+                print_info('Opis', str(hrt))
+                row.append(hrt)
+                
+                hrt = mautils.between(hr, '">', '</a>')
+                print_info('Tytuł', str(hrt))
+                row.append(hrt)
+            if len(row) == 3:
+                row.append(service)
+                row.append(typ)
+                result.append(row)
+        return result
+           
+    def __fetchFailed(self, res):
+        pass
+    
+    def __getChannel(self, ref):              
+        x = ref.getServiceName()
+        #print_info('xx', x +', map: '+ str(MAPPING))
+        return MAPPING2.get(x)
+     
     
         
