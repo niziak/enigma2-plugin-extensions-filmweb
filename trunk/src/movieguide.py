@@ -90,7 +90,7 @@ class MovieGuide(DefaultScreen):
     
     def redAction(self):
         print_info("RED action")
-        self.session.openWithCallback(self.refreshList, FilmwebRateChannelSelection)
+        self.session.open(FilmwebRateChannelSelection)
     
     def greenAction(self):
         print_info("GREEN action")
@@ -142,7 +142,7 @@ class MovieGuide(DefaultScreen):
         print_info('----- Refreshing Service', service.getServiceName() + ", index: " + str(index))
         try:
             #eng = TelemagEngine()
-            eng = FilmwebTvEngine()
+            #eng = FilmwebTvEngine()
             filmeng = FilmwebEngine()
     
             tim = time()
@@ -151,14 +151,16 @@ class MovieGuide(DefaultScreen):
             for idx in range(1,count+1):   
                 self["list"].modifyEntry(index, ((service.getServiceName(), (idx - 1) * rng + int(rng / 4))))                 
                 tms = strftime("%Y%m%d", (localtime(tim)))
-                print_info('Query date', tms + ', service: ' + service.getServiceName())
-                tim += idx * 86400  
-                df = eng.query(service, MT_MOVIE, tms)
+                print_info('----->> Query date', tms + ', service: ' + service.getServiceName())
+                tim += 86400  
+                df = FilmwebTvEngine().query(service, MT_MOVIE, tms)
                 if not df:
                     continue                
                 result = yield df
                 self["list"].modifyEntry(index, ((service.getServiceName(), (idx - 1) * rng + int(rng / 4) * 2)))
                 print_info('Query result', str(result) + ', service: ' + service.getServiceName())
+                if not result:
+                    continue
                 for x in result:
                     df = self.processRes(x, filmeng)
                     if df:

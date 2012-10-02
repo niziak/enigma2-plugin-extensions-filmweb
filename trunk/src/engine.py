@@ -710,10 +710,15 @@ class FilmwebTvEngine(object):
         if not ch:
             return None
         tms = time.strptime(dz,"%Y%m%d")
-        now =time.strptime(time.strftime("%Y%m%d", time.localtime(time.time())),"%Y%m%d")
+        local = time.localtime(time.time())
+        now =time.strptime(time.strftime("%Y%m%d", local),"%Y%m%d")
         #now = time.localtime(time.time())
         tt = time.mktime(tms) - time.mktime(now) 
         d = datetime.timedelta(seconds=tt)
+        
+        if local[3] < 6:
+            tx = time.localtime(time.mktime(tms) - 6 * 60 * 60)
+            dz = time.strftime("%Y%m%d", tx)
         
         params ={}
         params['day'] = str(d.days)
@@ -728,7 +733,7 @@ class FilmwebTvEngine(object):
         typ = tup[1]
         dzien = tup[2]
         
-        lastsec = 0
+        lastsec = time.mktime(time.strptime(dzien + '05:59','%Y%m%d%H:%M'))
         off = 0
         
         inhtml = mautils.html2utf8(res)
@@ -792,7 +797,7 @@ class FilmwebTvEngine(object):
         return result
            
     def __fetchFailed(self, res):
-        pass
+        print_info('----> FAILED', str(res))
     
     def __getChannel(self, ref):              
         x = ref.getServiceName()
