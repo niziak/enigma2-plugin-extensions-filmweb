@@ -714,21 +714,37 @@ class FilmwebTvEngine(object):
         #now = time.localtime(time.time())
         tt = time.mktime(tms) - time.mktime(now) 
         d = datetime.timedelta(seconds=tt)
-        fetchurl = 'http://www.filmweb.pl/guide/%s?day=%s' % (ch, str(d.days))
+        
+        params ={}
+        params['day'] = str(d.days)
+        getdata = urllib.urlencode(params)        
+        fetchurl = 'http://www.filmweb.pl/guide/%s?%s' % (ch, getdata)
         print_info('URL', str(fetchurl))
-        return getPage(fetchurl, cookies=COOKIES).addCallback(self.__fetchOK,(ref,typ,dz)).addErrback(self.__fetchFailed)
+        return getPage(fetchurl, method='GET', cookies=COOKIES, headers={'Referer':'http://www.filmweb.pl/guide', 'X-Requested-With':'XMLHttpRequest'}).addCallback(self.__fetchOK,(ref,typ,dz)).addErrback(self.__fetchFailed)
     
-    def __fetchOK(self, res, tup):
+    def __fetchOK(self, res, tup):        
         result = []
         service = tup[0]
         typ = tup[1]
         dzien = tup[2]
+        
+        lastsec = 0
+        off = 0
+        
         inhtml = mautils.html2utf8(res)
-        inhtml = mautils.between(inhtml, '<div class="channel first">', '<div class="channel">')
-        inhtml = mautils.after(inhtml,'brak programów dla wybranych filtrów')
+        #inhtml = mautils.between(inhtml, '<div class="channel first">', '<div class="channel">')
         #print_info('++++++++++++ page', str(inhtml))
+        inhtml = mautils.after(inhtml,'brak programów dla wybranych filtrów')
+        inhtml = mautils.after(inhtml, '<div class=toScroll>') 
+        #print_info('+++++------- page', str(inhtml))
+        print_info('------------------')
+        
         elements = inhtml.split('<div class="singleProg seance seance_film')
+        skip = True
         for element in elements:
+            if skip:
+                skip = False
+                continue
             row = []
             #print_info('----------- page', str(element))
             if element.find('<span class="hour">') < 0:
@@ -739,12 +755,17 @@ class FilmwebTvEngine(object):
             hr = hr.strip()
             #print_info('--', hr)
             tm = time.strptime(dzien + hr,'%Y%m%d%H:%M')
-            sec = time.mktime(tm)
+            sec = time.mktime(tm) + off * 86400 
+            if sec < lastsec:
+                off += 1
+                sec += 86400
+            lastsec = sec
             row.append(sec)
             print_info('Godzina', str(hr) + ', sec: ' + str(sec))
             
             hr = mautils.between(element, '<p>', '</p>')
-            if hr.find('title='):
+            print_info('HR', str(hr))
+            if hr.find('title=') > -1:
                 hrt = mautils.between(hr, 'title="', '"')
                 hrt = hrt.strip(')')
                 print_info('Opis', str(hrt))
@@ -753,10 +774,21 @@ class FilmwebTvEngine(object):
                 hrt = mautils.between(hr, '">', '</a>')
                 print_info('Tytuł', str(hrt))
                 row.append(hrt)
+            else:
+                if hr.find('<br>') > -1:
+                    hrt = mautils.after(hr, '<br>')
+                    hrt = mautils.strip_tags(hrt)
+                    print_info('Opis', str(hrt))
+                    row.append(hrt)
+                    
+                    hrt = mautils.before(hr, '<br>')
+                    hrt = mautils.strip_tags(hrt)
+                    print_info('Tytuł', str(hrt))
+                    row.append(hrt)                    
             if len(row) == 3:
                 row.append(service)
                 row.append(typ)
-                result.append(row)
+                result.append(row)             
         return result
            
     def __fetchFailed(self, res):
