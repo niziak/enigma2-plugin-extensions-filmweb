@@ -116,10 +116,12 @@ class Filmweb(DefaultScreen):
     def moveLeft(self):
         if self.mode == VT_DETAILS:
             self.detailDir = 0
+            self.setFocus(self["cast_label"])
                             
     def moveRight(self):
         if self.mode == VT_DETAILS:
             self.detailDir = 1
+            self.setFocus(self["plot_label"])
             
     def pageDown(self):
         if self.mode == VT_MENU:

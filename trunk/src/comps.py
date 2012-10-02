@@ -116,12 +116,16 @@ def ActorEntryComponent(inst, img_url = "", text = ["--"], index=0):
     return res
 
 class Scroller(object):
-    def __init__(self):
-        self.scroller = None   
+    def __init__(self, component=None):
+        self.scroller = None
+        self.component = component   
         self.pixpath = resolveFilename(SCOPE_CURRENT_SKIN, 'skin_default/scroll.png')
         if (os.path.exists(self.pixpath)):
             self.scroller = Pixmap()
-        self.onVisibilityChange.append(self.__visChanged)        
+        if self.component:
+            self.component.onVisibilityChange.append(self.__visChanged)
+        else:
+            self.onVisibilityChange.append(self.__visChanged)
     
     def __visChanged(self, flag):      
         if self.scroller:  
@@ -138,13 +142,14 @@ class Scroller(object):
         if self.scroller:
             self.scroller.GUIdelete()
             
-    def applyScroller(self, desktop, parent):
-        attrmap = {}
-        for (attrib, value) in self.skinAttributes:
-            print_info('ATTRIB', attrib + ": " + value)
-            attrmap[attrib] = value
-            
+    def applyScroller(self, desktop, parent):            
         if self.scroller:
+            attrmap = {}
+            attribs = self.component and self.component.skinAttributes or self.skinAttributes
+            for (attrib, value) in attribs:
+                print_info('ATTRIB', attrib + ": " + value)
+                attrmap[attrib] = value
+
             self.scroller.skinAttributes = []
             
             self.scroller.skinAttributes.append(('pixmap', self.pixpath))
@@ -156,8 +161,8 @@ class Scroller(object):
                 self.scroller.skinAttributes.append(('zPosition', str(zpn)))  
             self.scroller.applySkin(desktop, parent)
             
-            px,py = self.getPosition()
-            pt = self.instance.size()         
+            px,py = self.component and self.component.getPosition() or self.getPosition()
+            pt = self.component and self.component.instance.size() or self.instance.size()        
             self.scroller.setPosition(px + pt.width() - 22,py-2)
             self.scroller.resize(22,pt.height() + 2)
 

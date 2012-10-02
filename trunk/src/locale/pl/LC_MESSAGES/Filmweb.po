@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Filmweb 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-09-27 14:08+0100\n"
-"PO-Revision-Date: 2012-09-27 14:08+0100\n"
+"POT-Creation-Date: 2012-10-02 02:51+0100\n"
+"PO-Revision-Date: 2012-10-02 02:51+0100\n"
 "Last-Translator: Marcin Słowik <masl@op.pl>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -34,48 +34,48 @@ msgstr "Email lub nick"
 msgid "Password"
 msgstr "Hasło"
 
-#: engine.py:55
+#: engine.py:85
 msgid "Logging in ..."
 msgstr "Logowanie do portalu …"
 
-#: engine.py:126
+#: engine.py:156
 msgid "Descriptions loading completed"
 msgstr "Ładowanie opisów zakończone"
 
-#: engine.py:143
+#: engine.py:173
 msgid "Wallpaper loading completed"
 msgstr "Ładowanie tapety zakończone"
 
-#: engine.py:170
+#: engine.py:200
 msgid "Poster downloading finished"
 msgstr "Pobieranie plakatu zakończone"
 
-#: engine.py:191
+#: engine.py:221
 msgid "Login done"
 msgstr "Logowanie zakończone"
 
-#: engine.py:202
+#: engine.py:232
 msgid "Movie details loading completed"
 msgstr "Pobieranie danych filmu zakończone"
 
-#: engine.py:239
+#: engine.py:269
 msgid "Filmweb Download completed"
 msgstr "Pobieranie danych z Filmweb zakończone"
 
-#: engine.py:414
+#: engine.py:446
 msgid "User Rating"
 msgstr "Ocena"
 
-#: engine.py:418
+#: engine.py:450
 msgid "no user rating yet"
 msgstr "brak oceny społeczności"
 
-#: engine.py:516
+#: engine.py:548
 #, python-format
 msgid "Downloading Movie Poster: %s..."
 msgstr "Pobieranie plakatu: %s…"
 
-#: engine.py:548
+#: engine.py:580
 msgid " as "
 msgstr " jako "
 
@@ -237,20 +237,19 @@ msgstr "Wprowadź nazwę filmu do wyszukania"
 msgid "Enter movie title to search for"
 msgstr "Wprowadź szukany tytuł"
 
-#: movieguide.py:59
-#, fuzzy
+#: movieguide.py:56
 msgid "Config"
-msgstr "Konfiguracja"
+msgstr "Konfig"
 
-#: movieguide.py:60
+#: movieguide.py:57
 msgid "Refresh"
 msgstr "Odśwież"
 
-#: mselection.py:36 mselection.py:89
+#: mselection.py:36 mselection.py:107
 msgid "Channel Selection"
 msgstr "Wybór kanału"
 
-#: mselection.py:118
+#: mselection.py:136
 msgid "Lookup"
 msgstr "Wyszukaj"
 

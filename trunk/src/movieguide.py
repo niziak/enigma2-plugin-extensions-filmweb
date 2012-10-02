@@ -25,7 +25,7 @@ from enigma import eEPGCache, eServiceReference
 from time import localtime, strftime, time
 from __common__ import print_info, _
 from mselection import FilmwebRateChannelSelection
-from comps import DefaultScreen
+from comps import DefaultScreen, Scroller
 from engine import TelemagEngine, FilmwebTvEngine, FilmwebEngine, MT_MOVIE, MT_SERIE
 
 from ServiceReference import ServiceReference
@@ -40,6 +40,7 @@ class MovieGuide(DefaultScreen):
     def __init__(self, session):
         DefaultScreen.__init__(self, session, 'movieguide')
         
+        self.scroller = None
         self.list = []
         self.services = []
         self.mapping = {}
@@ -48,6 +49,8 @@ class MovieGuide(DefaultScreen):
         self.createGUI()
         self.initActions()
         
+        #self.onExecBegin.append(self.__installScroller)
+        #self.onClose.append(self.__uninstallScroller)
         self.onLayoutFinish.append(self.__startMe)
 
     # --- Screen Manipulation ------------------------------------------------  
@@ -57,6 +60,8 @@ class MovieGuide(DefaultScreen):
         self["key_green"] = StaticText(_("Refresh"))
         self["key_yellow"] = StaticText("")
         self["key_blue"] = StaticText("")
+        
+        self["list"].style = "default"
     
     def initActions(self):
         self["actions"] = ActionMap(["OkCancelActions", "ColorActions"], {
@@ -100,78 +105,102 @@ class MovieGuide(DefaultScreen):
     # --- Overwrite methods ---------------------------------------------
     
     # --- Public methods ------------------------------------------------    
-                
+             
+    @defer.inlineCallbacks       
     def refreshList(self, res=None):
         try:
             self.list = []
-            self["list"].setList(self.list)
             
-            print_info('Update services ...')
+            progressList = []
+            self["list"].style = "progress"
+            self["list"].setList(progressList)
+            
+            print_info('---- Update services ...')
             self.__updateServices()
-            ds = []  
+            ds = []              
             for x in self.services:
                 print_info('Getting events for service', str(x))
-                #eng = TelemagEngine()
-                eng = FilmwebTvEngine()
-                tim = time()
-                for idx in range(1,3):                    
-                    tms = strftime("%Y%m%d", (localtime(tim)))
-                    print_info('Query date', tms)
-                    tim += idx * 86400  
-                    df = eng.query(x, MT_MOVIE, tms)
-                    if not df:
-                        continue
-                    ds.append(df)
-            print_info('Create DeferredList')
-            dlist = defer.DeferredList(ds, consumeErrors=True)
-            print_info('Add DeferredList callback')
-            dlist.addCallback(self.queryTelemagDone)                          
+                tup = (x.getServiceName(), 0)
+                progressList.append((tup))
+                self["list"].changed((self["list"].CHANGED_ALL,))
+                count = len(progressList)
+                df = self.refreshService(x, count - 1)                                    
+                ds.append(df)
+            print_info('----- Yield DeferredList -----')
+            yield defer.DeferredList(ds, consumeErrors=True)
+            print_info('----- DeferredList finished -----')
+            if self.execing:
+                self.list = sorted_data(self.list, 0)
+                self["list"].style = "default"
+                self["list"].setList(self.list)
         except:
             import traceback
             traceback.print_exc()  
             
-    def queryTelemagDone(self, result):
+    @defer.inlineCallbacks
+    def refreshService(self, service, index):
+        print_info('----- Refreshing Service', service.getServiceName() + ", index: " + str(index))
         try:
-            print_info('Refresh List Done')            
-            
-            ds = []
-            
-            # (begin, opis, tytul, service, typ)
-            for e, (success, value) in enumerate(result):
-                print_info('refreshListDone Entry', '[%d]:' % e),
-                if success:
-                    #print_info('refreshListDone Success', str(value))
-                    if value:    
-                        for x in value:                            
-                            begin = int(x[0])
-                            tms = strftime("%Y-%m-%d %H:%M", (localtime(begin)))
-                            print_info('EVT', '[' + tms + '] - ' + x[2] + ' / ' + x[3].getServiceName())
-                            evt = self.epg.lookupEventTime(x[3].ref,begin)
-                            if evt:
-                                title = x[2]
-                                if not title or len(title) == 0:
-                                    continue
-                                opis = x[1].strip()
-                                rok = opis[-4:]
-                                if not rok.isdigit():
-                                    rok = None
-                                if title == 'Film fabularny':
-                                    title = evt.getEventName() 
-                                title = self.__replaceTitle(title)
-                                df = FilmwebEngine().query(MT_MOVIE, title, rok, False, self.filmwebQueryCallback, (x,tms, evt))
-                                print_info('EVT EPG 1', 'rok:' + str(rok) + ", name: " + evt.getEventName())  
-                                ds.append(df)                                              
-                else:
-                    print_info('refreshListDone Failure', str(value.getErrorMessage()))
-            
-            print_info('Create DeferredList')
-            dlist = defer.DeferredList(ds, consumeErrors=True)
-            print_info('Add DeferredList callback')
-            dlist.addCallback(self.refreshListDone)                          
+            #eng = TelemagEngine()
+            eng = FilmwebTvEngine()
+            filmeng = FilmwebEngine()
+    
+            tim = time()
+            count = 4
+            rng = int(100 / count)            
+            for idx in range(1,count+1):   
+                self["list"].modifyEntry(index, ((service.getServiceName(), (idx - 1) * rng + int(rng / 4))))                 
+                tms = strftime("%Y%m%d", (localtime(tim)))
+                print_info('Query date', tms + ', service: ' + service.getServiceName())
+                tim += idx * 86400  
+                df = eng.query(service, MT_MOVIE, tms)
+                if not df:
+                    continue                
+                result = yield df
+                self["list"].modifyEntry(index, ((service.getServiceName(), (idx - 1) * rng + int(rng / 4) * 2)))
+                print_info('Query result', str(result) + ', service: ' + service.getServiceName())
+                for x in result:
+                    df = self.processRes(x, filmeng)
+                    if df:
+                        result = yield df
+                        self["list"].modifyEntry(index, ((service.getServiceName(), (idx - 1) * rng + int(rng / 4) * 3)))
+                        print_info('Query Filmweb result', str(result) + ', service: ' + service.getServiceName())
+                        while isinstance(result, defer.Deferred):
+                            result = yield result
+                        if result:
+                            self.list.append((result))
+                        self["list"].modifyEntry(index, ((service.getServiceName(), (idx - 1) * rng + int(rng / 4) * 4)))
+            self["list"].modifyEntry(index, ((service.getServiceName(), 100)))
         except:
             import traceback
-            traceback.print_exc()
-
+            traceback.print_exc()  
+        
+        
+    def processRes(self, result, engine):
+        try:
+            begin = int(result[0])
+            tms = strftime("%Y-%m-%d %H:%M", (localtime(begin)))
+            print_info('EVT', '[' + tms + '] - ' + result[2] + ' / ' + result[3].getServiceName())
+            evt = self.epg.lookupEventTime(result[3].ref,begin)
+            if evt:
+                title = result[2]
+                if not title or len(title) == 0:
+                    return None
+                opis = result[1].strip()
+                rok = opis[-4:]
+                if not rok.isdigit():
+                    rok = None
+                if title == 'Film fabularny':
+                    title = evt.getEventName() 
+                title = self.__replaceTitle(title)
+                df = engine.query(MT_MOVIE, title, rok, False, self.filmwebQueryCallback, (result,tms, evt))
+                print_info('EVT EPG 1', 'rok:' + str(rok) + ", name: " + evt.getEventName())
+                return df
+            return None
+        except:
+            import traceback
+            traceback.print_exc()  
+                    
     # (ref.getPath(), evt.getEventName(), evt.getBeginTime(), evt, None)
     # (strig_rep, URL, string_rep_first_line, title, rating, year, country)
     def filmwebQueryCallback(self, lista, typ, data):
@@ -184,18 +213,16 @@ class MovieGuide(DefaultScreen):
         
         if lista and len(lista) > 0:
             rating = lista[0][4]
-            self.list.append(((int(x[0]),lista[0][2],tms + ' - ' + tots, 
-                               x[3].getServiceName(),rating, x[3], evt)))
+            try:
+                rt = float(rating.replace(',','.'))
+            except:
+                rt = 0
+            rts = "%1.1f" % rt
+            return (int(x[0]),lista[0][2],tms + ' - ' + tots, 
+                               x[3].getServiceName(),rts, x[3], evt)
         else:
-            self.list.append(((int(x[0]),x[2],tms + ' - ' + tots, 
-                               x[3].getServiceName(),'0,0', x[3], evt)))
-        return ''
-        
-    def refreshListDone(self, result):
-        if self.execing:
-            self.list = sorted_data(self.list, 0)
-            #self.list = (x for x in self.list)
-            self["list"].setList(self.list)
+            return (int(x[0]),x[2],tms + ' - ' + tots, 
+                               x[3].getServiceName(),'0.0', x[3], evt)
         
     # --- Private methods ------------------------------------------------
     
@@ -211,6 +238,15 @@ class MovieGuide(DefaultScreen):
         title = title.replace(' I ',' 1 ')        
         title = title.replace(' V ',' 5 ')
         return title
+        
+    def __uninstallScroller(self):
+        if self.scroller:
+            self.scroller.deleteScroller()
+            
+    def __installScroller(self):
+        self.scroller = Scroller(self.renderer[0])
+        self.scroller.createScroller(self)
+        self.scroller.applyScroller(self.desktop, self)
         
     def __startMe(self):
         self.refreshList()
