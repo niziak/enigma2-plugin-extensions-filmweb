@@ -19,7 +19,7 @@
 # GNU General Public License, version 3 or later
 ######################################################################
 
-from __common__ import print_info, _
+from __common__ import print_info, print_debug, _
 from enigma import eServiceReference, gRGB, eListboxServiceContent
 from Components.config import config, configfile
 #from Tools.LoadPixmap import LoadPixmap
@@ -41,7 +41,7 @@ class FilmwebRateChannelSelection(SimpleChannelSelection):
         
     def channelSelected(self):
         ref = self.getCurrentSelection()
-        print_info("Channel selected", str(ref) + ", flags: " + str(ref.flags))
+        print_debug("Channel selected", str(ref) + ", flags: " + str(ref.flags))
         if (ref.flags & eServiceReference.flagDirectory) == eServiceReference.flagDirectory:
             self.enterPath(ref)
         # when service is not directory and is not marker that means playable service
@@ -67,7 +67,7 @@ class FilmwebRateChannelSelection(SimpleChannelSelection):
     
     def __load(self):
         txt = config.plugins.mfilmweb.selserv.getText()
-        print_info("config", str(txt))
+        print_debug("config", str(txt))
         if txt:
             entries = txt.split('|')
             for x in entries:
@@ -77,7 +77,7 @@ class FilmwebRateChannelSelection(SimpleChannelSelection):
         marked = self.servicelist.getMarked()
         txt = ''
         for x in marked:
-            print_info("marked", str(x)) 
+            print_debug("marked", str(x)) 
             txt += str(x) + '|'   
         txt = txt.strip('|')
         config.plugins.mfilmweb.selserv.setValue(txt)
@@ -90,7 +90,7 @@ class FilmwebRateChannelSelection(SimpleChannelSelection):
             sfile = open('/tmp/services.dat', "w")
             lista = self.servicelist.getRootServices()
             for x in lista:
-                print_info('ser', x)
+                print_debug('ser', x)
                 ref = eServiceReference(x)
                 ser = ServiceReference(ref)
                 sfile.write(x + ',' + ser.getServiceName() + ',\n')
@@ -113,7 +113,7 @@ class FilmwebChannelSelection(SimpleChannelSelection):
 
     def processSelected(self):
         ref = self.getCurrentSelection()
-        print_info("Channel selected", str(ref) + ", flags: " + str(ref.flags))
+        print_debug("Channel selected", str(ref) + ", flags: " + str(ref.flags))
         # flagDirectory = isDirectory|mustDescent|canDescent
         if (ref.flags & eServiceReference.flagDirectory) == eServiceReference.flagDirectory:
             self.enterPath(ref)
@@ -125,7 +125,7 @@ class FilmwebChannelSelection(SimpleChannelSelection):
             )
 
     def onClosed(self, ret = None):
-        print_info("Closed", str(ret)) 
+        print_debug("Closed", str(ret)) 
         if ret:
             self.close(ret)
     
@@ -146,23 +146,23 @@ class FilmwebEPGSelection(EPGSelection):
     #def onSelectionChanged(self):
     #    cur = self["list"].getCurrent()
     #    evt = cur[0]
-    #    print_info("Selection Changed Event", str(evt))        
+    #    print_debug("Selection Changed Event", str(evt))        
     
     def lookup(self):
         cur = self["list"].getCurrent()
         evt = cur[0]
         sref = cur[1]        
-        print_info("Lookup EVT", str(evt))
-        print_info("Lookup SREF", str(sref)) 
+        print_debug("Lookup EVT", str(evt))
+        print_debug("Lookup SREF", str(sref)) 
         if not evt: 
             return
         
         # when openPlugin is TRUE - open filmweb data window
         # otherwise only return the selected event name           
         if self.screen is not None:
-            print_info("EVT short desc", str(evt.getShortDescription()))
-            print_info("EVT ext desc", str(evt.getExtendedDescription()))
-            print_info("EVT ptr", str(evt.getPtrString()))
+            print_debug("EVT short desc", str(evt.getShortDescription()))
+            print_debug("EVT ext desc", str(evt.getExtendedDescription()))
+            print_debug("EVT ptr", str(evt.getPtrString()))
             self.session.open(self.screen, evt.getEventName())
         else:
             self.close(evt.getEventName())              

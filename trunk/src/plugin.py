@@ -29,14 +29,25 @@ import comps
 import engine
 import movieguide
     
-def main(session, eventName="", **kwargs):
+def reloadlibs():
     reload(mautils)    
     reload(comps)
     reload(config)
     reload(engine)
     reload(mselection)  
     reload(movieguide)      
-    reload(mainlib)    
+    reload(mainlib)
+        
+def guide(session, eventName="", **kwargs):
+    reloadlibs()
+    try:
+        session.open(movieguide.MovieGuide)
+    except:
+        import traceback
+        traceback.print_exc()
+        
+def main(session, eventName="", **kwargs):
+    reloadlibs()
     try:
         session.open(mainlib.Filmweb, eventName)
     except:
@@ -44,13 +55,7 @@ def main(session, eventName="", **kwargs):
         traceback.print_exc()
         
 def eventinfo(session, servicelist, **kwargs):
-    reload(mautils)    
-    reload(comps)
-    reload(config)
-    reload(engine)
-    reload(mselection)   
-    reload(movieguide)     
-    reload(mainlib)  
+    reloadlibs()  
     try:
         ref = session.nav.getCurrentlyPlayingServiceReference()
         print_info("Current Service ref", str(ref))
@@ -65,6 +70,11 @@ def Plugins(path, **kwargs):
                            where=PluginDescriptor.WHERE_PLUGINMENU,
                            needsRestart=False,
                            fnc=main),
+         PluginDescriptor(name=_("Movie Guide"),
+                           description=_("Query movies info on selected channels"),
+                           where=PluginDescriptor.WHERE_PLUGINMENU,
+                           needsRestart=False,
+                           fnc=guide),
          PluginDescriptor(name=_("Filmweb Details"),
             description=_("Query details from the Filmweb.pl Database"),
             where=PluginDescriptor.WHERE_EVENTINFO,

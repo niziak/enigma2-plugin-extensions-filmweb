@@ -26,7 +26,7 @@ from config import FilmwebConfig
 from engine import FilmwebEngine,MT_MOVIE, MT_SERIE, POSTER_PATH
 from mselection import FilmwebChannelSelection
 from movieguide import MovieGuide
-from __common__ import print_info, _
+from __common__ import print_info, print_debug, _
 from comps import ActorChoiceList, ScrollLabelExt, MenuChoiceList, StarsComp, DefaultScreen
 import mautils
 import os
@@ -184,12 +184,12 @@ class Filmweb(DefaultScreen):
 
     def menuCallback(self, ret = None):
         v = ret and ret[1]()
-        print_info("Context menu selected value", str(v))
+        print_debug("Context menu selected value", str(v))
         return v
         
         
     def channelSelection(self):      
-        print_info("Channel selection")  
+        print_debug("Channel selection")  
         self.session.openWithCallback(
             self.serachSelectedChannel,
             FilmwebChannelSelection
@@ -202,13 +202,13 @@ class Filmweb(DefaultScreen):
             #self.switchView(to_mode=VT_MENU)  
             serviceHandler = eServiceCenter.getInstance()  
             info = serviceHandler.info(ret)               
-            print_info("Service info", str(info)) 
+            print_debug("Service info", str(info)) 
             #sname = info and info.getName(ret) or ""  
-            #print_info("Service name", str(sname))  
+            #print_debug("Service name", str(sname))  
             evt = info and info.getEvent(ret) 
-            print_info("Event", str(evt))  
+            print_debug("Event", str(evt))  
             #evtname = evt and evt.getEventName()
-            #print_info("Event name", str(evtname))  
+            #print_debug("Event name", str(evtname))  
             self.eventName = evt and evt.getEventName()           
             self.resultlist = []
             self.switchView(to_mode=VT_NONE)            
@@ -320,7 +320,7 @@ class Filmweb(DefaultScreen):
     def createGUI(self):
         self["title_label"] = Label()
         def setLText(txt):
-            print_info("setLText - Title Label", str(txt))
+            print_debug("setLText - Title Label", str(txt))
             if len(txt) > TITLE_MAX_SIZE:
                 txt = txt[0:TITLE_MAX_SIZE - 3] + "..."
             Label.setText(self["title_label"], txt)
@@ -361,7 +361,7 @@ class Filmweb(DefaultScreen):
         else:
             if to_mode == VT_MENU:
                 size = len(self.resultlist)
-                print_info("The movies list size", str(size))
+                print_debug("The movies list size", str(size))
                 self["title_label"].setText('')
                 if size == 0:
                     if self.searchType == MT_MOVIE:
@@ -399,7 +399,7 @@ class Filmweb(DefaultScreen):
     def loadDetails(self, link, title):
         print_info("LOAD DETAILS", "link: " + link + ", title: " + title)
         self["status_bar"].setText(_("Seraching details for: %s...") % (title))
-        print_info("Filmweb Details Query ", link)        
+        print_debug("Filmweb Details Query ", link)        
         self.detailslink = link
         self["poster"].hide()
         self.cast_list = []
@@ -512,7 +512,7 @@ class Filmweb(DefaultScreen):
         for entry in self.resultlist:            
             caption = entry[0]
             link = entry[1]
-            print_info("LISTA", "caption: " + str(caption) + ", lnk: " + link)
+            print_debug("LISTA", "caption: " + str(caption) + ", lnk: " + link)
             lista.append(self["menu"].createEntry(caption))
         if len(lista) == 0:
             self["title_label"].setText(_("Entry not found in Filmweb.pl database"))
@@ -531,9 +531,9 @@ class Filmweb(DefaultScreen):
             print_info("Getting data for event", str(self.eventName))
             if not self.eventName or len(self.eventName.strip()) == 0:
                 s = self.session.nav.getCurrentService()
-                print_info("Current Service", str(s))
+                print_debug("Current Service", str(s))
                 ref = self.session.nav.getCurrentlyPlayingServiceReference()
-                print_info("Current Service ref", str(ref))
+                print_debug("Current Service ref", str(ref))
                 
                 serviceHandler = eServiceCenter.getInstance()  
                 info = serviceHandler.info(ref)               
@@ -561,7 +561,7 @@ class Filmweb(DefaultScreen):
     def changeWallpaper(self):
         if self.mode != VT_DETAILS:
             return;
-        print_info("Change wallpaper", str(self.wallpaperidx) + ", filmId: " + str(self.filmId))
+        print_debug("Change wallpaper", str(self.wallpaperidx) + ", filmId: " + str(self.filmId))
         if self.filmId is None:
             return
         localfile = '/tmp/' + self.filmId + '.jpg'
@@ -581,13 +581,13 @@ class Filmweb(DefaultScreen):
                         
     def fetchWallDataOK(self, txt_, localfile=None):
         if self.has_key("wallpaper") and self.filmId and localfile:
-            print_info("Loading image data", str(localfile))
+            print_debug("Loading image data", str(localfile))
             self["wallpaper"].updateIcon(localfile)
             if self.mode == VT_DETAILS:  
                 self["wallpaper"].show()          
         
     def removeWallData(self, filename):
-        print_info("removeWallData - filename:", str(filename))
+        print_debug("removeWallData - filename:", str(filename))
         if filename:
             if os.path.exists(filename):
                 os.remove(filename)
@@ -602,7 +602,7 @@ class Filmweb(DefaultScreen):
             self["poster"].show()
 
     def paintPoster(self, picInfo=None):
-        print_info("Paint poster", str(picInfo))
+        print_debug("Paint poster", str(picInfo))
         ptr = self.picload.getData()
         if ptr != None:
             self["poster"].instance.setPixmap(ptr.__deref__())
@@ -619,11 +619,11 @@ class Filmweb(DefaultScreen):
         dlg["input"].end()
         
     def configData(self):
-        print_info("configData", "started")
+        print_debug("configData", "started")
         self.session.openWithCallback(self.configSaved, FilmwebConfig)
         
     def configSaved(self, val=False):
-        print_info("configSaved", str(val))
+        print_debug("configSaved", str(val))
         if val:
             self.loginPage()
     

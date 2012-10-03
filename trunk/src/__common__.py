@@ -37,14 +37,20 @@ def localeInit():
     print "Language: " + lang
     gettext.bindtextdomain("Filmweb", resolveFilename(SCOPE_PLUGINS, "Extensions/Filmweb/locale"))
 
-def __print_info(prefix, nfo, data):
-    txt = "[" + prefix + "] " + nfo
+def __print_info(prefix, level, nfo, data):
+    txt = "[" + prefix + "] " + level + '' + nfo
     if data is not None:
         txt = txt + ": " + data
     print txt
 
+def print_error(nfo, data=None):
+    __print_info("FILMWEB", 'ERROR ', nfo, data)
+    
+def print_debug(nfo, data=None):
+    __print_info("FILMWEB", 'DEBUG ', nfo, data)
+    
 def print_info(nfo, data=None):
-    __print_info("FILMWEB", nfo, data)
+    __print_info("FILMWEB", ' INFO ', nfo, data)
 
 
 localeInit()
