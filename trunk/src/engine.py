@@ -112,12 +112,11 @@ class FilmwebEngine(object):
         if link_:  
             return getPage(link_, cookies=COOKIES).addCallback(self.__fetchWallpaperOK, callback).addErrback(self.__fetchFailed)
         return None      
-        
-    def loadPoster(self, posterUrl, callback):
-        if posterUrl:                    
-            localfile = POSTER_PATH
+                
+    def loadPoster(self, posterUrl, callback=None, localfile = POSTER_PATH):
+        if posterUrl:                                
             print_info("Downloading poster", posterUrl + " to " + localfile)
-            return downloadPage(posterUrl, localfile).addCallback(self.__fetchPosterOK, callback).addErrback(self.__fetchFailed)
+            return downloadPage(posterUrl, localfile).addCallback(self.__fetchPosterOK, localfile, callback).addErrback(self.__fetchFailed)
         return None
                         
     def loadWallpaper(self, furl, localfile, callback):
@@ -195,17 +194,21 @@ class FilmwebEngine(object):
             import traceback
             traceback.print_exc()
                     
-    def __fetchPosterOK(self, data, callback):
+    def __fetchPosterOK(self, data, localfile, callback=None):
         try:
             print_debug("Fetch Poster OK", str(COOKIES)) 
             #if not self.has_key('status_bar'):
             #    return
             if self.statusComponent:
                 self.statusComponent.setText(_("Poster downloading finished"))
-            rpath = os.path.realpath(POSTER_PATH)
+            rpath = os.path.realpath(localfile)
             print_debug("Poster local real path", rpath)
-            if callback and os.path.exists(rpath):
-                callback(rpath)
+            if os.path.exists(rpath):
+                if callback:
+                    return callback(rpath)
+                else:
+                    return rpath
+            return None
         except:
             import traceback
             traceback.print_exc()
