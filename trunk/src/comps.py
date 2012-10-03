@@ -22,7 +22,7 @@
 ######################################################################
 
 from twisted.web.client import downloadPage
-from __common__ import print_info
+from __common__ import print_info, print_debug
 import os
 import sys
 
@@ -40,13 +40,13 @@ from Components.ProgressBar import ProgressBar
 
 ACTOR_IMG_PREFIX = "/tmp/actor_img_"
 
-actorPicload = {}
-
+actorPicload = {}    
+    
 class DefaultScreen(Screen):
     def __init__(self, session, temat):
         mf = sys.modules[__name__].__file__
         self.ppath = os.path.dirname(mf)
-        print_info('Plugin path', self.ppath)
+        print_debug('Plugin path', self.ppath)
         fn = resolveFilename(SCOPE_CURRENT_SKIN, 'skin_default/menu/BlackHoleEpgBackup.png')
         if (os.path.exists(fn)):
             skin = "%s/resource/%s_skin_bh.xml" % (self.ppath, temat)
@@ -57,7 +57,7 @@ class DefaultScreen(Screen):
         f.close()
         
         Screen.__init__(self, session)
-        print_info("Screen init")
+        print_debug("Screen init")
         
     
 def MovieSearchEntryComponent(text = ["--"]):
@@ -87,18 +87,18 @@ def ActorEntryComponent(inst, img_url = "", text = ["--"], index=0):
         print_info("Paint Actor Image", str(idx))
         ptr = actorPicload[idx].getData()
         if ptr != None:
-            print_info("RES append", str(res) + " - img: " + str(ptr))
+            print_debug("RES append", str(res) + " - img: " + str(ptr))
             res.append((eListboxPythonMultiContent.TYPE_PIXMAP_ALPHATEST, 5, 0, 40, 45, ptr))
             inst.l.invalidate()
         del actorPicload[idx]        
     
     def fetchImgOK(data, idx):
-        print_info("fetchImgOK", str(idx))
+        print_debug("fetchImgOK", str(idx))
         rpath = os.path.realpath(ACTOR_IMG_PREFIX + str(idx) + ".jpg")
         if os.path.exists(rpath):
             sc = AVSwitch().getFramebufferScale()
             actorPicload[idx].setPara((40, 45, sc[0], sc[1], False, 1, "#00000000"))
-            print_info("Decode Image", rpath)
+            print_debug("Decode Image", rpath)
             actorPicload[idx].startDecode(rpath)
     
     def fetchImgFailed(data,idx):
@@ -111,7 +111,7 @@ def ActorEntryComponent(inst, img_url = "", text = ["--"], index=0):
         actorPicload[index].PictureData.get().append(boundFunction(paintImage, index)) 
         res.append((eListboxPythonMultiContent.TYPE_TEXT, 45, 0, 750, 45, 0, RT_HALIGN_LEFT, text[0]))        
         localfile = ACTOR_IMG_PREFIX + str(index) + ".jpg"
-        print_info("Downloading actor img", img_url + " to " + localfile)
+        print_debug("Downloading actor img", img_url + " to " + localfile)
         downloadPage(img_url, localfile).addCallback(fetchImgOK, index).addErrback(fetchImgFailed, index)
     return res
 
@@ -147,7 +147,7 @@ class Scroller(object):
             attrmap = {}
             attribs = self.component and self.component.skinAttributes or self.skinAttributes
             for (attrib, value) in attribs:
-                print_info('ATTRIB', attrib + ": " + value)
+                print_debug('ATTRIB', attrib + ": " + value)
                 attrmap[attrib] = value
 
             self.scroller.skinAttributes = []
@@ -263,7 +263,7 @@ class StarsComp(ProgressBar):
         idx = 0
         pixmap_path = None
         for (attrib, value) in self.skinAttributes:
-            print_info('ATTRIB - stars', attrib + ": " + value)
+            print_debug('ATTRIB - stars', attrib + ": " + value)
             attrmap[attrib] = value
             if attrib == 'pixmap_bg':
                 pixmap_path = "%s%s" % (self.ppath, value)
