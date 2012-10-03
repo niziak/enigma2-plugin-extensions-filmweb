@@ -41,7 +41,32 @@ from Components.ProgressBar import ProgressBar
 ACTOR_IMG_PREFIX = "/tmp/actor_img_"
 
 actorPicload = {}    
-    
+
+class PixLoader(Pixmap):
+    def __init__(self, callback = None):
+        Pixmap.__init__(self)
+        self.picload = ePicLoad()
+        self.picload.PictureData.get().append(self.paintMe)
+        self.callback = callback
+        self.filename = None
+ 
+    def onShow(self):
+        Pixmap.onShow(self)
+        sc = AVSwitch().getFramebufferScale()
+        self.picload.setPara((self.instance.size().width(), self.instance.size().height(), sc[0], sc[1], False, 1, "#00000000"))
+ 
+    def paintMe(self, picInfo=None):
+        ptr = self.picload.getData()
+        if ptr != None:
+            self.instance.setPixmap(ptr.__deref__())
+        if self.callback is not None:
+            self.callback(self.filename)
+ 
+    def updateIcon(self, filename):
+        self.filename = filename
+        self.picload.startDecode(filename)
+        
+        
 class DefaultScreen(Screen):
     def __init__(self, session, temat):
         mf = sys.modules[__name__].__file__

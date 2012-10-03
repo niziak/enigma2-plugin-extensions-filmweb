@@ -38,7 +38,7 @@ def reloadlibs():
     reload(movieguide)      
     reload(mainlib)
         
-def guide(session, eventName="", **kwargs):
+def guide(session, **kwargs):
     reloadlibs()
     try:
         session.open(movieguide.MovieGuide)
