@@ -674,6 +674,7 @@ class TelemagEngine(object):
                             sec += 86400
                         row.append(sec)
                         print_debug('Godzina', str(hr) + ', sec: ' + str(sec))
+                                                
                     idxp = ds.find("<p")
                     #print_debug('DSP idx', str(idxp))
                     if idxp > -1:
@@ -688,7 +689,11 @@ class TelemagEngine(object):
                         dsa = dsa.strip()
                         print_debug('Tytuł', str(dsa))
                         row.append(dsa)
-                    if len(row) == 3:
+                        
+                    # duration value - always None
+                    row.append(None)
+                    
+                    if len(row) == 4:
                         row.append(service)
                         row.append(typ)
                         result.append(row)
@@ -776,6 +781,14 @@ class FilmwebTvEngine(object):
             row.append(sec)
             print_debug('Godzina', str(hr) + ', sec: ' + str(sec))
             
+            duration = None
+            hr = mautils.between(element, '<span class="duration">', '</span>')
+            hr = hr and hr.strip()
+            if hr and len(hr) > 0:                
+                print_debug('Czas Trwania', str(hr))
+                if hr.isdigit():
+                    duration = int(hr)            
+            
             hr = mautils.between(element, '<p>', '</p>')
             print_debug('HR', str(hr))
             if hr.find('title=') > -1:
@@ -797,8 +810,11 @@ class FilmwebTvEngine(object):
                     hrt = mautils.before(hr, '<br>')
                     hrt = mautils.strip_tags(hrt)
                     print_debug('Tytuł', str(hrt))
-                    row.append(hrt)                    
-            if len(row) == 3:
+                    row.append(hrt)
+
+            row.append(duration)
+                                
+            if len(row) == 4:
                 row.append(service)
                 row.append(typ)
                 result.append(row)             

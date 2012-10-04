@@ -2,17 +2,17 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Filmweb 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-03 13:36+0100\n"
-"PO-Revision-Date: 2012-10-03 13:43+0100\n"
+"POT-Creation-Date: 2012-10-05 00:03+0100\n"
+"PO-Revision-Date: 2012-10-05 00:03+0100\n"
 "Last-Translator: Marcin Słowik <marcin.slowik@gmail.com>\n"
 "Language-Team:  <marcin.slowik@gmail.com>\n"
+"Language: Polski\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Poedit-KeywordsList: _;gettext;gettext_noop\n"
 "X-Poedit-Basepath: /--HomeData--/enigma2-plugins/enigma2-filmweb/src\n"
 "X-Generator: Poedit 1.5.3\n"
-"Language: Polski\n"
 "X-Poedit-SourceCharset: UTF-8\n"
 "X-Poedit-SearchPath-0: .\n"
 
@@ -40,44 +40,44 @@ msgstr "Hasło"
 msgid "Logging in ..."
 msgstr "Logowanie do portalu … "
 
-#: engine.py:160
+#: engine.py:159
 msgid "Descriptions loading completed"
-msgstr "Ładowanie opisów zakończone"
+msgstr "Ładowanie opisów zakończone "
 
-#: engine.py:177
+#: engine.py:176
 msgid "Wallpaper loading completed"
-msgstr "Ładowanie tapety zakończone"
+msgstr "Ładowanie tapety zakończone "
 
-#: engine.py:204
+#: engine.py:203
 msgid "Poster downloading finished"
-msgstr "Pobieranie plakatu zakończone"
+msgstr "Pobieranie plakatu zakończone "
 
-#: engine.py:225
+#: engine.py:228
 msgid "Login done"
 msgstr "Logowanie zakończone"
 
-#: engine.py:236
+#: engine.py:239
 msgid "Movie details loading completed"
 msgstr "Pobieranie danych filmu zakończone"
 
-#: engine.py:273
+#: engine.py:277
 msgid "Filmweb Download completed"
-msgstr "Pobieranie danych z Filmweb zakończone "
+msgstr "Pobieranie danych z Filmweb zakończone sukcesem"
 
-#: engine.py:450
+#: engine.py:454
 msgid "User Rating"
 msgstr "Ocena"
 
-#: engine.py:454
+#: engine.py:458
 msgid "no user rating yet"
 msgstr "brak oceny społeczności"
 
-#: engine.py:552
+#: engine.py:556
 #, python-format
 msgid "Downloading Movie Poster: %s..."
 msgstr "Pobieranie plakatu: %s… "
 
-#: engine.py:584
+#: engine.py:588
 msgid " as "
 msgstr " jako "
 
@@ -239,13 +239,57 @@ msgstr "Wprowadź nazwę filmu do wyszukania"
 msgid "Enter movie title to search for"
 msgstr "Wprowadź szukany tytuł"
 
-#: movieguide.py:59
+#: movieguide.py:51
+msgid "Begin Time"
+msgstr "Czas Rozpocz."
+
+#: movieguide.py:51
+msgid "Rating"
+msgstr "Ocena"
+
+#: movieguide.py:51
+msgid "Year"
+msgstr "Rok"
+
+#: movieguide.py:52
+msgid "Title"
+msgstr "Tytuł"
+
+#: movieguide.py:52
+msgid "Service Name"
+msgstr "Nazwa Kanału"
+
+#: movieguide.py:338
 msgid "Config"
 msgstr "Konfiguracja"
 
-#: movieguide.py:60
+#: movieguide.py:339
 msgid "Refresh"
 msgstr "Odśwież"
+
+#: movieguide.py:340
+msgid "Next Period"
+msgstr "Następny Przedział"
+
+#: movieguide.py:341
+msgid "Change Sort"
+msgstr "Zmień sortowanie"
+
+#: movieguide.py:342
+msgid "Sorted by"
+msgstr "Sortowane po"
+
+#: movieguide.py:342
+msgid "DESC"
+msgstr "v"
+
+#: movieguide.py:342
+msgid "ASC"
+msgstr "^"
+
+#: movieguide.py:585 plugin.py:73
+msgid "Movie Guide"
+msgstr "Przewodnik filmowy"
 
 #: mselection.py:36 mselection.py:107
 msgid "Channel Selection"
@@ -262,10 +306,6 @@ msgstr "Wtyczka Filmweb.pl"
 #: plugin.py:69 plugin.py:79
 msgid "Query details from the Filmweb.pl Database"
 msgstr "Wyszukiwanie danych z bazy Filmweb.pl"
-
-#: plugin.py:73
-msgid "Movie Guide"
-msgstr "Przewodnik filmowy"
 
 #: plugin.py:74
 msgid "Query movies info on selected channels"

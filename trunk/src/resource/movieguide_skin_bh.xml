@@ -23,6 +23,9 @@
 	</convert>
 	</widget>
 
+	<widget name="sort" position="470,16" size="400,78" zPosition="5" valign="center" font="Regular;22" foregroundColor="white" transparent="1" />
+	<widget name="nstars" pixmap="/resource/stars-full.png" pixmap_bg="/resource/stars-empty.png" position="1150,150" zPosition="5" size="100,16" transparent="1" />
+	
 	<widget source="ServiceEvent" render="Label" position="890,120" zPosition="2" size="350,28" font="Regular;20" halign="left" foregroundColor="#F0B400" backgroundColor="transpBlack" transparent="1" noWrap="1">
 		<convert type="EventName">#MovieGuideEventConv;title</convert>
 	</widget>
