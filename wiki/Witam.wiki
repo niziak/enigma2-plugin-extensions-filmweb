@@ -1,4 +1,5 @@
 [Welcome English Version]
+#sidebar TableOfContents
 = Wprowadzenie =
 ----
 Plugin został przygotowany w PYTHON-ie i działa w środowisku ENIGMA2 zainstalowanym na STB. Działanie polega na wyszukiwaniu informacji dotyczących filmów i seriali z EPG w portalu Filmweb i wyświetlaniu tych informacji na ekranie telewizora. W przypadku, gdy rezultatem wyszukiwania jest więcej niż jeden wynik plugin umożliwia wybór odpowiedniej pozycji z menu. Użytkownik dostaje pełną informację o filmie czy serialu czyli tytuł, tytuł oryginalny, rok produkcji, czas trwania, opis skrócony, opisy, plakat itp. Plugin umożliwia również zalogowanie do portalu i wykonanie operacji dostępnych dla zalogowanego użytkownika takich jak własna ocena.
@@ -28,6 +29,8 @@ Możesz uruchomić plugin z dwóch miejsc:
   * z menu na długim naciśnięciu INFO / EPG - tutaj wyświetlana jest lista wyboru kanału
 
 Ja osobiście zainstalowałem sobie skrót na naciśnięciu ŻÓŁTEGO klawisza przy użyciu plugina MultiQuickButton. 
+
+[Opcje Szczegółowy opis opcji pluginu]
 
 = Planowane zmiany =
 ----
