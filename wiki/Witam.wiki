@@ -1,3 +1,5 @@
+<wiki:toc max_depth="2" />
+----
 [Welcome English Version]
 = Wprowadzenie =
 ----
