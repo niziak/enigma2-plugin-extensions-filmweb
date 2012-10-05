@@ -40,7 +40,9 @@ I've assigned function registered in the Extension Manager on the YELLOW key but
   * support for showing recommendations information
   * skin handling fix
   * 'want to see' support
-  * support for showing ratings for movies from EPG for selected channels in one list (recommendation for choice of what to see in the near future)
+  * MOVIE GUIDE - support for showing ratings for movies from EPG for selected channels in one list (recommendation for choice of what to see in the near future) - sorting by rating, begin time, name etc.
+  * MOVIE GUIDE - zapping and adding timers on <OK>
+  * MOVIE GUIDE - favourites channels selection for showing movies guide
 === ver. 1.0.9 ===
   * Series data fetching added
   * New entry for searching TV Series added to context menu in main window
