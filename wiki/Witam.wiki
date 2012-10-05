@@ -1,0 +1,39 @@
+= Wprowadzenie =
+----
+Plugin został przygotowany w PYTHON-ie i działa w środowisku ENIGMA2 zainstalowanym na STB. Działanie polega na wyszukiwaniu informacji dotyczących filmów i seriali z EPG w portalu Filmweb i wyświetlaniu tych informacji na ekranie telewizora. W przypadku, gdy rezultatem wyszukiwania jest więcej niż jeden wynik plugin umożliwia wybór odpowiedniej pozycji z menu. Użytkownik dostaje pełną informację o filmie czy serialu czyli tytuł, tytuł oryginalny, rok produkcji, czas trwania, opis skrócony, opisy, plakat itp. Plugin umożliwia również zalogowanie do portalu i wykonanie operacji dostępnych dla zalogowanego użytkownika takich jak własna ocena.
+ 
+= Instalacja =
+----
+  * Zaloguj się do dreambox-a przez SSH czy Telnet
+  * Zainstaluj biblioteki: python-html, python-twisted-web, openssl, python-pyopenssl
+{{{
+ipkg update
+ipkg install python-html
+ipkg install python-twisted-web
+ipkg install openssl
+ipkg install python-pyopenssl
+}}}
+  * Skopiuj plik IPK do katalogu /tmp 
+  * Wykonaj manulaną instalację pakietu IPK z menu dreamboxa
+
+{{{
+ipkg install /tmp/enigma2-plugin-extensions-filmweb_1.0.9_mipsel.ipk
+}}}
+
+= Sposób użycia =
+----
+Możesz uruchomić plugin z dwóch miejsc:
+  * z Menadżera Pluginów - automatycznie wyszukuje informacje o aktualnie oglądanym programie
+  * z menu na długim naciśnięciu INFO / EPG - tutaj wyświetlana jest lista wyboru kanału
+
+Ja osobiście zainstalowałem sobie skrót na naciśnięciu ŻÓŁTEGO klawisza przy użyciu plugina MultiQuickButton. 
+
+= Planowane zmiany =
+----
+  * Dodanie kombajnu o nazwie Przewodnik Filmowy, który służył będzie do przedstawienia pozycji filmowych na wybranych kanałach wraz z oceną i opisem ściągniętym z Filmweb-u
+  * Umożliwienie sortowania w przewodniku po ocenie, dacie produkcji, nazwie pozycji czy nazwie kanału
+  * Umożliwienie przejścia do oglądania pozycji czy dodania timera
+  * Wprowadzenie poprawek i fixów działania
+  * Wprowadzenie odpowiedniej obsługi dla skórek innych niż domyślna dla BlackHola
+  * Dodanie pokazywania informacji o rekomendacjach z Filmweb
+  * Dodanie obsługi związanej z informacją o tym, że chciałbym oglądnąć jakąś pozycję
