@@ -20,6 +20,8 @@
 ######################################################################
 
 import twisted.internet.defer as defer
+import os
+import xml.etree.ElementTree as xml
 
 from enigma import eEPGCache, eServiceReference, eTimer
 from time import localtime, strftime, time
@@ -183,6 +185,8 @@ class SelectionEventInfo:
             filmDetails = None
             evid = self.getEventId(cur)     
             engine = FilmwebEngine()
+            # loads data from cache
+            self.loadNfo(evid)
             if link and not self.eventDetails.has_key(evid):
                 filmDetails = yield engine.queryDetails(link)
                 filmDetails['fullname'] = self.__createFullName(filmDetails)  
@@ -193,17 +197,70 @@ class SelectionEventInfo:
                 if len(strr.strip()) > 0:
                     filmDetails['runtime'] = strr + ' min.'
                 print_debug('Poster URL', filmDetails['poster_url'])
-                df = engine.loadPoster(filmDetails['poster_url'], None, '/tmp/poster_' + filmDetails['film_id'] + '.jpg')
+                df = engine.loadPoster(filmDetails['poster_url'], None, self.path + '/poster_' + filmDetails['film_id'] + '.jpg')
                 if df:
-                    filmDetails['poster'] = yield df
+                    filmDetails['poster'] = yield df                
                 self.eventDetails[evid] = filmDetails
+                # save data to cache
+                self.saveNfo(evid)
             if self.eventDetails.has_key(evid):
                 filmDetails = self.eventDetails[evid]
             self["ServiceEvent"].updateDetails(filmDetails, evid)
         except:
             import traceback
             traceback.print_exc()
-                                        
+                     
+    def loadNfo(self, evid):
+        sfile = None
+        try:
+            mp = self.path + '/' + evid + '.nfo'
+            if os.path.exists(mp):
+                res = {}                
+                import codecs
+                sfile = codecs.open(mp, 'r', encoding='utf-8')
+                tree = xml.parse(sfile)
+                root = tree.getroot()
+                for x in root:            
+                    print_debug("TAG", str(x))
+                    typ = x.attrib.get('typ')
+                    value = x.text
+                    if typ == 'str':
+                        res[x.tag] = value
+                    elif typ == 'int':
+                        res[x.tag] = int(value)
+                self.eventDetails[evid] = res
+        except:
+            import traceback
+            traceback.print_exc()
+        finally:
+            if sfile is not None:
+                sfile.close()
+
+    def saveNfo(self, evid):
+        sfile = None
+        try:
+            details = self.eventDetails[evid]        
+            root = xml.Element('movie')
+            sfile = open(self.path + '/' + evid + '.nfo', "w")
+            for key, value in details.items():
+                child = xml.Element(key)
+                if value:
+                    typ = type(value)
+                    child.set('typ', typ.__name__);
+                    print_debug('element', key + ' - type: ' + str(type(value)))
+                    if typ is list:
+                        child.text = str(value)
+                    else:
+                        child.text = str(value) 
+                root.append(child)
+            xml.ElementTree(root).write(sfile, encoding='utf-8')
+        except:
+            import traceback
+            traceback.print_exc()
+        finally:
+            if sfile is not None:
+                sfile.close()
+
     def __createFullName(self, detailsData):
         val = detailsData['title']            
         title = detailsData['org_title']
@@ -228,6 +285,10 @@ class MovieGuide(DefaultScreen, SelectionEventInfo):
         
         self.createGUI()
         self.initActions()
+        
+        self.path = config.plugins.mfilmweb.tmpPath.getValue()
+        if not os.path.exists(self.path):
+            os.mkdir(self.path)
         
         self.eventlist = self["list"]
         SelectionEventInfo.__init__(self)
@@ -366,7 +427,7 @@ class MovieGuide(DefaultScreen, SelectionEventInfo):
             self.displayProgressList(progressList)
                         
             ds = []     
-            days_count = 2       
+            days_count = 1       
             for x in self.services:
                 print_info('Getting events for service', str(x))
                 tup = (x.getServiceName(), 0)

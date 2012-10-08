@@ -46,6 +46,9 @@ from Components.config import config
 
 TITLE_MAX_SIZE = 67
 WALLPAPER_REFRESH_TIME=15000
+RATE_CHOICES = [(_("Watched"), "0"), (_("Misunderstanding"), "1"), (_("Very Bad"), "2"), \
+                (_("Poor"), "3"), (_("It can be"), "4"), (_("Average"), "5"), (_("Good Enough"), "6"), \
+                (_("Good"), "7"),  (_("Very Good"), "8"),  (_("Sensational"), "9"), (_("Masterwork"), "10")]
 
 VT_NONE = 'none'
 VT_MENU = 'MENU'
@@ -631,22 +634,20 @@ class Filmweb(DefaultScreen):
         if self.sessionId is None or self.userToken is None:
             self.session.open(MessageBox,_('In order to enter vote value you should be logged in'), MessageBox.TYPE_INFO)
         else:
-            defa = '0 '
+            defa = 0
             if self.myvote > 0:
-                defa = str(self.myvote) + ' '
-            dlg = self.session.openWithCallback(self.rateEntered, InputBox, 
-                                          windowTitle = _("Rating input"),
+                defa = self.myvote
+            dlg = self.session.openWithCallback(self.rateEntered, ChoiceBox,                                           
                                            title=_("Enter rating value"), 
-                                           text=defa, 
-                                           maxSize=55, 
-                                           type=Input.NUMBER)
-            dlg["input"].end()
+                                           list = RATE_CHOICES,
+                                           selection = defa)
+            #dlg["input"].end()
         
     def rateEntered(self, val):
         if val is None:
-            pass 
+            return 
         else:
-            voteVal = val.strip()
+            voteVal = val[1].strip()
             isok = False
             if len(voteVal) > 0 and voteVal.isdigit():
                 voteNum = int(voteVal) 

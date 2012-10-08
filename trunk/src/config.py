@@ -28,12 +28,13 @@ from Screens.Screen import Screen
 from Components.ActionMap import ActionMap
 from Components.Sources.StaticText import StaticText
 from Components.ConfigList import ConfigListScreen
-from Components.config import config, configfile, getConfigListEntry, ConfigPassword, ConfigText, ConfigSubsection
+from Components.config import config, configfile, getConfigListEntry, ConfigDirectory, ConfigPassword, ConfigText, ConfigSubsection
 
 config.plugins.mfilmweb = ConfigSubsection()
 config.plugins.mfilmweb.user = ConfigText(default = "", fixed_size = False)
 config.plugins.mfilmweb.password = ConfigPassword(default="",visible_width = 50,fixed_size = False)
 config.plugins.mfilmweb.selserv = ConfigText(default = "", fixed_size = False)
+config.plugins.mfilmweb.tmpPath = ConfigDirectory(default="/tmp/filmweb")
 
 class FilmwebConfig(Screen, ConfigListScreen):
     def __init__(self, session):
@@ -56,6 +57,7 @@ class FilmwebConfig(Screen, ConfigListScreen):
         self.list = []
         self.list.append(getConfigListEntry(_("User Name"), config.plugins.mfilmweb.user))
         self.list.append(getConfigListEntry(_("Password"), config.plugins.mfilmweb.password))
+        self.list.append(getConfigListEntry(_("Temporary Folder"), config.plugins.mfilmweb.tmpPath))
         self["config"].list = self.list
         self["config"].l.setList(self.list)   
         
