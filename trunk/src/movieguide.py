@@ -467,15 +467,20 @@ class MovieGuide(DefaultScreen, SelectionEventInfo):
                 if not result:
                     continue
                 for x in result:
-                    df = self.processRes(x, filmeng)
+                    res = None
+                    df = self.processRes(x, filmeng)                    
                     if df:
-                        result = yield df
+                        if isinstance(df, defer.Deferred):
+                            res = yield df                            
+                        else:
+                            res = df
+                    if res:
                         self.eventlist.modifyEntry(index, ((service.getServiceName(), (idx - 1) * rng + int(rng / 4) * 3)))
-                        print_debug('Query Filmweb result', str(result) + ', service: ' + service.getServiceName())
-                        while isinstance(result, defer.Deferred):
-                            result = yield result
-                        if result:
-                            self.list.append(result)
+                        print_debug('Query Filmweb result', str(res) + ', service: ' + service.getServiceName())
+                        while isinstance(res, defer.Deferred):
+                            res = yield res
+                        if res:                            
+                            self.list.append(res)
                 self.eventlist.modifyEntry(index, ((service.getServiceName(), (idx - 1) * rng + int(rng / 4) * 4)))   
             self.eventlist.modifyEntry(index, ((service.getServiceName(), 100)))
         except:
@@ -507,11 +512,18 @@ class MovieGuide(DefaultScreen, SelectionEventInfo):
             rok = self.parseYear(description)
             if evt and title == 'Film fabularny':
                 title = evt.getEventName() 
-            title = self.__replaceTitle(title)
-            df = engine.query(MT_MOVIE, title, rok, False, self.filmwebQueryCallback, (result,tms, evt, rok))
-            evn = evt and evt.getEventName() or '???'
-            print_debug('EVT EPG 1', 'rok:' + str(rok) + ", name: " + evn)
-            return df
+            title = self.__replaceTitle(title)            
+            evid = service.getServiceName() + '___' + str(begin)
+            lista = self.__loadNfo(evid)
+            if lista:
+                print_debug('----> Lista', str(lista))
+                lst = [lista]
+                return self.filmwebQueryCallback(lst, MT_MOVIE, (result,tms, evt, rok, False))
+            else:
+                df = engine.query(MT_MOVIE, title, rok, False, self.filmwebQueryCallback, (result,tms, evt, rok, True))
+                evn = evt and evt.getEventName() or '???'
+                print_debug('EVT EPG 1', 'rok:' + str(rok) + ", name: " + evn)
+                return df
         except:
             import traceback
             traceback.print_exc()  
@@ -524,6 +536,7 @@ class MovieGuide(DefaultScreen, SelectionEventInfo):
         parsed_rok = data[3]
         begin = int(x[0])
         duration = x[3] and x[3] * 60
+        save = data[4]
         
         if evt:
             evtb = evt.getBeginTime()
@@ -544,6 +557,7 @@ class MovieGuide(DefaultScreen, SelectionEventInfo):
             
         print_debug('Result filmweb query list', str(lista))
         
+        resme = None
         if lista and len(lista) > 0:
             rating = lista[0][4]
             try:
@@ -551,16 +565,75 @@ class MovieGuide(DefaultScreen, SelectionEventInfo):
             except:
                 rt = 0
             rts = "%1.1f" % rt
-            return (begin,lista[0][2],tms + ' - ' + tots, 
+            resme = (begin,lista[0][2],tms + ' - ' + tots, 
                                x[4].getServiceName(),rts, x[4], evt, 
                                lista[0][1], lista[0][5], rt, duration)
+            if save:
+                self.__saveNfo(lista[0], x[4].getServiceName() + '___' + str(begin))           
         else:
-            return (begin,x[2],tms + ' - ' + tots, 
+            resme = (begin,x[2],tms + ' - ' + tots, 
                     x[4].getServiceName(),'0.0', x[4], evt, 
-                    None, parsed_rok, 0, duration)        
+                    None, parsed_rok, 0, duration)     
+        return resme        
         
     # --- Private methods ------------------------------------------------
     
+    # (begin_time, caption, event_duration_desc, service_name, rating_string, 
+    #  ServiceReference, eServiceEvent, details_URL, movie_year, rating_value, duration_in_sec) 
+
+# (caption, url, basic_caption, title, rating, year, country)
+    def __saveNfo(self, data, evid):
+        sfile = None
+        try:                              
+            root = xml.Element('data')
+            sfile = open(self.path + '/' + evid + '.nfo', "w")
+            idx = 0
+            for x in data:
+                child = xml.Element('key' + str(idx))
+                if x:
+                    typ = type(x)
+                    child.set('typ', typ.__name__)
+                    child.text = str(x) 
+                else:
+                    child.set('typ', 'None')
+                root.append(child)
+                idx += 1
+            xml.ElementTree(root).write(sfile, encoding='utf-8')
+        except:
+            import traceback
+            traceback.print_exc()
+        finally:
+            if sfile is not None:
+                sfile.close()    
+    
+    def __loadNfo(self, evid):
+        sfile = None
+        try:
+            mp = self.path + '/' + evid + '.nfo'
+            if os.path.exists(mp):
+                res = []
+                import codecs
+                sfile = codecs.open(mp, 'r', encoding='utf-8')
+                tree = xml.parse(sfile)
+                root = tree.getroot()
+                for x in root:            
+                    typ = x.attrib.get('typ')
+                    value = x.text
+                    if typ == 'str':
+                        res.append(str(value))
+                    elif typ == 'int':
+                        res.append(int(value))
+                    elif typ == 'None':
+                        res.append(None)
+                return res
+        except:
+            import traceback
+            traceback.print_exc()
+        finally:
+            if sfile is not None:
+                sfile.close()
+        return None
+                
     # (begin_time, caption, event_duration_desc, service_name, rating_string, 
     #  ServiceReference, eServiceEvent, details_URL, movie_year, rating_value, duration_in_sec)    
 

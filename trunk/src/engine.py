@@ -378,6 +378,7 @@ class FilmwebEngine(object):
                     print_info("The movie serach title", element)
                     #self.titles.append(element)
                     rt = rating.split()
+                    # (caption, url, basic_caption, title, rating, year, country)
                     self.resultlist.append((element, PAGE_URL + link, basic_data, title, rt[0], year, country))
         
     def parsePlot(self):
