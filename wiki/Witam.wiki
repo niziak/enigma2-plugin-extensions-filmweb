@@ -43,3 +43,4 @@ Ja osobiście zainstalowałem sobie skrót na naciśnięciu ŻÓŁTEGO klawisza 
   * Wprowadzenie odpowiedniej obsługi dla skórek innych niż domyślna dla BlackHola
   * Dodanie pokazywania informacji o rekomendacjach z Filmweb
   * Dodanie obsługi związanej z informacją o tym, że chciałbym oglądnąć jakąś pozycję
+  * Zmiana sposobu wprowadzania własnej oceny filmu na wybór pozycji zamiast wpisywania wartości liczbowej
