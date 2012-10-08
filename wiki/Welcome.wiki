@@ -41,6 +41,7 @@ I've assigned function registered in the Extension Manager on the YELLOW key but
 = Change log =
 ----
 === TO-DO ===
+  * vote can be entered by selection from list of defined positions  
   * support for showing recommendations information
   * skin handling fix
   * 'want to see' support
