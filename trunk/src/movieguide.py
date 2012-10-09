@@ -30,11 +30,13 @@ from mselection import FilmwebRateChannelSelection
 from comps import DefaultScreen, StarsComp
 from engine import TelemagEngine, FilmwebTvEngine, FilmwebEngine, MT_MOVIE, MAPPING, MAPPING2
 
+from Tools.LoadPixmap import LoadPixmap
+
 from ServiceReference import ServiceReference
 
 from Screens.Screen import Screen
 from Components.Element import cached
-from Components.config import config
+from Components.config import config, configfile
 from Components.ActionMap import ActionMap
 from Components.Sources.List import List
 from Components.Sources.StaticText import StaticText
@@ -64,6 +66,7 @@ class MovieGuideEventConv(Converter, object):
             self.type = sp[0]
             self.args = sp[1]        
     
+    @cached
     def getText(self):
         details = self.source.details
         print_debug('searching text for', self.type)
@@ -73,7 +76,14 @@ class MovieGuideEventConv(Converter, object):
             return strg
         return ''  
             
-    def getPixmap(self):
+    @cached
+    def getPixmap(self): 
+        return self.__getRescalledPixmap()        
+    
+    pixmap = property(getPixmap)            
+    text = property(getText)
+    
+    def __getRescalledPixmap(self):
         from Components.AVSwitch import AVSwitch
         from enigma import ePicLoad
         details = self.source.details
@@ -102,10 +112,7 @@ class MovieGuideEventConv(Converter, object):
                 except:
                     import traceback
                     traceback.print_exc()            
-        return None            
-    
-    pixmap = property(getPixmap)            
-    text = property(getText)
+        return None      
     
 class MovieGuideEvent(ServiceEvent, object):
     def __init__(self):
@@ -155,7 +162,7 @@ class SelectionEventInfo:
             #self.updateEventInfo()
 
 # (begin_time, caption, event_duration_desc, service_name, rating_string, 
-#  ServiceReference, eServiceEvent, details_URL, movie_year, rating_value, duration_in_sec)    
+#  ServiceReference, eServiceEvent, details_URL, movie_year, rating_value, duration_in_sec, pixmap)    
     def updateEventInfo(self):
         cur = self.getCurrentSelection()
         self["nstars"].hide()
@@ -169,8 +176,11 @@ class SelectionEventInfo:
             #self.dtimer.stop()
             self.dtimer.start(200, True)
     
+    def getEventIdByData(self, service, begin):
+        return str(service) + '__' + str(begin)
+    
     def getEventId(self, cur):
-        return str(cur[3]) + '__' + str(cur[0])  
+        return self.getEventIdByData(cur[3], cur[0])        
         
     @defer.inlineCallbacks
     def updateDetails(self):   
@@ -274,8 +284,8 @@ class MovieGuide(DefaultScreen, SelectionEventInfo):
     def __init__(self, session):
         DefaultScreen.__init__(self, session, 'movieguide')
         
-        self.sortOrder = True
-        self.sortIndex = 0
+        self.sortOrder = config.plugins.mfilmweb.sortOrder.getValue()
+        self.sortIndex = config.plugins.mfilmweb.sort.getValue()
         self.timeline = time()
         
         self.list = []
@@ -294,6 +304,7 @@ class MovieGuide(DefaultScreen, SelectionEventInfo):
         SelectionEventInfo.__init__(self)
         
         self.onLayoutFinish.append(self.__startMe)
+        self.onClose.append(self.__finishMe)
 
     # --- Screen Manipulation ------------------------------------------------  
     def createGUI(self):
@@ -516,7 +527,7 @@ class MovieGuide(DefaultScreen, SelectionEventInfo):
             evid = service.getServiceName() + '___' + str(begin)
             lista = self.__loadNfo(evid)
             if lista:
-                print_debug('----> Lista', str(lista))
+                #print_debug('----> Lista', str(lista))
                 lst = [lista]
                 return self.filmwebQueryCallback(lst, MT_MOVIE, (result,tms, evt, rok, False))
             else:
@@ -537,6 +548,7 @@ class MovieGuide(DefaultScreen, SelectionEventInfo):
         begin = int(x[0])
         duration = x[3] and x[3] * 60
         save = data[4]
+        service = x[4]
         
         if evt:
             evtb = evt.getBeginTime()
@@ -556,7 +568,7 @@ class MovieGuide(DefaultScreen, SelectionEventInfo):
             tots = strftime("%H:%M", (localtime(tot)))
             
         print_debug('Result filmweb query list', str(lista))
-        
+                
         resme = None
         if lista and len(lista) > 0:
             rating = lista[0][4]
@@ -566,20 +578,56 @@ class MovieGuide(DefaultScreen, SelectionEventInfo):
                 rt = 0
             rts = "%1.1f" % rt
             resme = (begin,lista[0][2],tms + ' - ' + tots, 
-                               x[4].getServiceName(),rts, x[4], evt, 
-                               lista[0][1], lista[0][5], rt, duration)
+                               service.getServiceName(),rts, service, evt, 
+                               lista[0][1], lista[0][5], rt, duration, None)
             if save:
-                self.__saveNfo(lista[0], x[4].getServiceName() + '___' + str(begin))           
+                self.__saveNfo(lista[0], service.getServiceName() + '___' + str(begin))           
         else:
             resme = (begin,x[2],tms + ' - ' + tots, 
-                    x[4].getServiceName(),'0.0', x[4], evt, 
-                    None, parsed_rok, 0, duration)     
+                    service.getServiceName(),'0.0', service, evt, 
+                    None, parsed_rok, 0, duration, None)
+        self.__updatePixmap(resme)
         return resme        
         
     # --- Private methods ------------------------------------------------
     
+    def __updatePixmap(self, cur):
+        pixmap = None
+        #timer = self.session.nav.RecordTimer        
+        #eventid = evt and evt.getEventId() or self.getEventIdByData(service.getServiceName(), begin)        
+        #if duration and timer.isInTimer(eventid, begin, duration, service.ref):
+        
+        evt = cur[6]
+        service = cur[5]
+        begin = cur[0]
+        duration = cur[10]
+        
+        if self.__isInTimer(evt, service, begin):
+            pathe = "%s/resource/clock.png" % (self.ppath)
+            pixmap = LoadPixmap(cached=True, path=pathe)            
+        else:
+            now = time()
+            if duration and begin + duration < now:
+                pathe = "%s/resource/out.png" % (self.ppath)
+                pixmap = LoadPixmap(cached=True, path=pathe)
+            elif duration and begin < now < begin + duration:
+                pathe = "%s/resource/play-2.png" % (self.ppath)
+                pixmap = LoadPixmap(cached=True, path=pathe)
+            else:
+                pathe = "%s/resource/next.png" % (self.ppath)
+                pixmap = LoadPixmap(cached=True, path=pathe)   
+        cur[11] = pixmap             
+                
+    def __isInTimer(self, evt, service, begin):
+        refstr = service.ref.toString()
+        eventid = evt and evt.getEventId() or self.getEventIdByData(service.getServiceName(), begin)
+        for timer in self.session.nav.RecordTimer.timer_list:
+            if timer.eit == eventid and timer.service_ref.ref.toString() == refstr:
+                return True
+        return False
+    
     # (begin_time, caption, event_duration_desc, service_name, rating_string, 
-    #  ServiceReference, eServiceEvent, details_URL, movie_year, rating_value, duration_in_sec) 
+    #  ServiceReference, eServiceEvent, details_URL, movie_year, rating_value, duration_in_sec, pixmap) 
 
 # (caption, url, basic_caption, title, rating, year, country)
     def __saveNfo(self, data, evid):
@@ -679,7 +727,8 @@ class MovieGuide(DefaultScreen, SelectionEventInfo):
                         self.session.nav.RecordTimer.timeChanged(x)
                 simulTimerList = self.session.nav.RecordTimer.record(entry)
                 if simulTimerList is not None:
-                    self.session.openWithCallback(self.__finishedAdd, TimerSanityConflict, simulTimerList)            
+                    self.session.openWithCallback(self.__finishedAdd, TimerSanityConflict, simulTimerList)
+            self.__updatePixmap(self.getCurrentSelection())
 
     def __query(self, service, tms):
         res = None
@@ -747,6 +796,12 @@ class MovieGuide(DefaultScreen, SelectionEventInfo):
         self.setTitle(_("Movie Guide"))
         self.__updateServices()        
         self.refreshList()
+        
+    def __finishMe(self):
+        config.plugins.mfilmweb.sort.setValue(self.sortIndex)
+        config.plugins.mfilmweb.sortOrder.setValue(self.sortOrder)
+        config.plugins.mfilmweb.save()
+        configfile.save()
         
     def __updateServices(self):
         print_debug('---- Update services ...')
