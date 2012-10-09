@@ -716,7 +716,6 @@ class MovieGuide(DefaultScreen, SelectionEventInfo):
                 simulTimerList = self.session.nav.RecordTimer.record(entry)
                 if simulTimerList is not None:
                     self.session.openWithCallback(self.__finishedAdd, TimerSanityConflict, simulTimerList)
-            self.__updatePixmap(self.getCurrentSelection())
 
     def __query(self, service, tms):
         res = None
