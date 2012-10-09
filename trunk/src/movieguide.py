@@ -568,40 +568,8 @@ class MovieGuide(DefaultScreen, SelectionEventInfo):
             tots = strftime("%H:%M", (localtime(tot)))
             
         print_debug('Result filmweb query list', str(lista))
-                
-        resme = None
-        if lista and len(lista) > 0:
-            rating = lista[0][4]
-            try:
-                rt = float(rating.replace(',','.'))
-            except:
-                rt = 0
-            rts = "%1.1f" % rt
-            resme = (begin,lista[0][2],tms + ' - ' + tots, 
-                               service.getServiceName(),rts, service, evt, 
-                               lista[0][1], lista[0][5], rt, duration, None)
-            if save:
-                self.__saveNfo(lista[0], service.getServiceName() + '___' + str(begin))           
-        else:
-            resme = (begin,x[2],tms + ' - ' + tots, 
-                    service.getServiceName(),'0.0', service, evt, 
-                    None, parsed_rok, 0, duration, None)
-        self.__updatePixmap(resme)
-        return resme        
-        
-    # --- Private methods ------------------------------------------------
-    
-    def __updatePixmap(self, cur):
-        pixmap = None
-        #timer = self.session.nav.RecordTimer        
-        #eventid = evt and evt.getEventId() or self.getEventIdByData(service.getServiceName(), begin)        
-        #if duration and timer.isInTimer(eventid, begin, duration, service.ref):
-        
-        evt = cur[6]
-        service = cur[5]
-        begin = cur[0]
-        duration = cur[10]
-        
+             
+        pixmap = None 
         if self.__isInTimer(evt, service, begin):
             pathe = "%s/resource/clock.png" % (self.ppath)
             pixmap = LoadPixmap(cached=True, path=pathe)            
@@ -615,9 +583,29 @@ class MovieGuide(DefaultScreen, SelectionEventInfo):
                 pixmap = LoadPixmap(cached=True, path=pathe)
             else:
                 pathe = "%s/resource/next.png" % (self.ppath)
-                pixmap = LoadPixmap(cached=True, path=pathe)   
-        cur[11] = pixmap             
-                
+                pixmap = LoadPixmap(cached=True, path=pathe) 
+                  
+        resme = None
+        if lista and len(lista) > 0:
+            rating = lista[0][4]
+            try:
+                rt = float(rating.replace(',','.'))
+            except:
+                rt = 0
+            rts = "%1.1f" % rt
+            resme = (begin,lista[0][2],tms + ' - ' + tots, 
+                               service.getServiceName(),rts, service, evt, 
+                               lista[0][1], lista[0][5], rt, duration, pixmap)
+            if save:
+                self.__saveNfo(lista[0], service.getServiceName() + '___' + str(begin))           
+        else:
+            resme = (begin,x[2],tms + ' - ' + tots, 
+                    service.getServiceName(),'0.0', service, evt, 
+                    None, parsed_rok, 0, duration, pixmap)
+        return resme        
+        
+    # --- Private methods ------------------------------------------------
+    
     def __isInTimer(self, evt, service, begin):
         refstr = service.ref.toString()
         eventid = evt and evt.getEventId() or self.getEventIdByData(service.getServiceName(), begin)
