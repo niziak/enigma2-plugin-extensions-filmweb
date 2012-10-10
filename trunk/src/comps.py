@@ -22,7 +22,7 @@
 ######################################################################
 
 from twisted.web.client import downloadPage
-from __common__ import print_info, print_debug
+from __common__ import print_info, print_debug,_
 import os
 import sys
 
@@ -248,6 +248,30 @@ class ScrollLabelExt(ScrollLabel, Scroller):
     def applySkin(self, desktop, parent):
         ScrollLabel.applySkin(self, desktop, parent)
         self.applyScroller(desktop, parent)             
+        
+class MPixmap(Pixmap):
+    def __init__(self):
+        Pixmap.__init__(self)
+        mf = sys.modules[__name__].__file__
+        self.ppath = os.path.dirname(mf)
+     
+    def applySkin(self, desktop, parent):   
+        attrmap = {}
+        pixmap_path = None
+        for (attrib, value) in self.skinAttributes:
+            attrmap[attrib] = value          
+
+        if attrmap.has_key('pixmap'):
+            pxm = attrmap['pixmap']
+            pixmap_path = "%s%s" % (self.ppath, pxm)
+            idx = 0;
+            for (attrib, value) in self.skinAttributes:
+                if attrib == 'pixmap':
+                    self.skinAttributes.pop(idx)                    
+                    break;
+                idx += 1;            
+            self.skinAttributes.append(('pixmap', pixmap_path))            
+        Pixmap.applySkin(self, desktop, parent)   
         
 class StarsComp(ProgressBar):
     def __init__(self):

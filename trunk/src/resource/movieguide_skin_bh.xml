@@ -4,6 +4,10 @@
 	<eLabel text="Movie Guide" position="80,30" size="800,44" font="RegularAA;36" halign="left" foregroundColor="#58bcff" backgroundColor="transpBlack" transparent="1"/>
 	<ePixmap position="798,118" zPosition="5" size="22,486" pixmap="skin_default/scroll.png" alphatest="blend" transparent="1" /> 
 	<ePixmap position="450,16" zPosition="2" size="811,78" pixmap="skin_default/r1130x78.png" alphatest="blend" transparent="1" />
+	<widget name="clock-str" position="940,16" size="250,78" zPosition="5" font="Regular;20" halign="right" valign="center" foregroundColor="#58bcff" transparent="1" />
+	<widget name="clock" position="1200,27" zPosition="5" size="60,51" pixmap="/resource/clock_panel.png" alphatest="blend" transparent="1" />
+	<widget name="clock-min" position="1200,27" zPosition="7" size="60,51" pixmap="/resource/clock_panel.png" alphatest="blend" transparent="1" />
+	<widget name="clock-hr" position="1200,27" zPosition="6" size="60,51" pixmap="/resource/clock_panel.png" alphatest="blend" transparent="1" />
 	<widget source="list" render="Listbox" position="60,120" size="760,484" zPosition="3" scrollbarMode="showOnDemand" transparent="1">
 	<convert type="TemplatedMultiContent"> 
 	{"templates": 
@@ -14,9 +18,9 @@
 	MultiContentEntryText(pos = (95, 25), size = (200, 22), font=1, flags = RT_HALIGN_LEFT|RT_VALIGN_BOTTOM, text = 2), 
 	MultiContentEntryPixmapAlphaTest(pos = (0, 9), size = (30, 30), png = 11)
 	]),
-	"progress": (25,[
-	MultiContentEntryText(pos = (0, 0), size = (200, 25), font=1, flags = RT_HALIGN_LEFT | RT_VALIGN_CENTER| RT_WRAP, text = 0),
-	MultiContentEntryProgress(pos = (205, 0), size = (550, 15), percent = -1),
+	"progress": (20,[
+	MultiContentEntryText(pos = (0, 0), size = (200, 20), font=1, flags = RT_HALIGN_LEFT | RT_VALIGN_CENTER| RT_WRAP, text = 0),
+	MultiContentEntryProgress(pos = (205, 0), size = (550, 12), percent = -1),
 	], False)},
 	"fonts": [gFont("Regular", 20),gFont("Regular", 16),gFont("Regular", 28)],
 	"itemHeight": 48
@@ -25,7 +29,7 @@
 	</widget>
 
 	<widget name="sort" position="470,16" size="400,78" zPosition="5" valign="center" font="Regular;22" foregroundColor="white" transparent="1" />
-	<widget name="nstars" pixmap="/resource/stars-full.png" pixmap_bg="/resource/stars-empty.png" position="1150,150" zPosition="5" size="100,16" transparent="1" />
+	<widget name="nstars" pixmap="/resource/stars-full.png" pixmap_bg="/resource/stars-empty.png" position="1155,150" zPosition="5" size="100,16" transparent="1" />
 	
 	<widget source="ServiceEvent" render="Label" position="890,120" zPosition="2" size="350,28" font="Regular;20" halign="left" foregroundColor="#F0B400" backgroundColor="transpBlack" transparent="1" noWrap="1">
 		<convert type="EventName">#MovieGuideEventConv;title</convert>
@@ -57,7 +61,7 @@
 	<widget source="ServiceEvent" render="Label" position="1005,290" zPosition="2" size="240,20" font="Regular;16" halign="left" transparent="1" >
 		<convert type="EventName">#MovieGuideEventConv;vote</convert>
 	</widget>	
-	<widget source="ServiceEvent" render="Label" position="895,320" zPosition="3" size="360,220" font="Regular;16" foregroundColor="#58bcff" transparent="1" >
+	<widget source="ServiceEvent" render="Label" position="895,320" zPosition="3" size="360,280" font="Regular;16" foregroundColor="#58bcff" transparent="1" >
 		<convert type="EventName">#MovieGuideEventConv;plot</convert>
 	</widget> 	
 	<widget source="ServiceEvent" render="Pixmap" position="890,150" zPosition="3" size="112,160" alphatest="on" transparent="1">

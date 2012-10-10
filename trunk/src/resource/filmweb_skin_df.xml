@@ -3,13 +3,13 @@
   <ePixmap pixmap="skin_default/buttons/green.png" position="356,505" size="140,40" alphatest="on" />
   <ePixmap pixmap="skin_default/buttons/yellow.png" position="604,505" size="140,40" alphatest="on" />
   <ePixmap pixmap="skin_default/buttons/blue.png" position="852,505" size="140,40" alphatest="on" />
-  <widget name="key_red" position="108,508" size="140,40" zPosition="2" font="Regular;20" valign="center" halign="center"
+  <widget name="key_red" position="108,508" size="140,40" zPosition="2" font="Regular;16" valign="center" halign="center"
     backgroundColor="transpBlack" transparent="1" />
-  <widget name="key_green" position="356,508" size="140,40" zPosition="2" font="Regular;20" valign="center" halign="center"
+  <widget name="key_green" position="356,508" size="140,40" zPosition="2" font="Regular;16" valign="center" halign="center"
     backgroundColor="transpBlack" transparent="1" />
-  <widget name="key_yellow" position="604,508" size="140,40" zPosition="2" font="Regular;20" valign="center" halign="center"
+  <widget name="key_yellow" position="604,508" size="140,40" zPosition="2" font="Regular;16" valign="center" halign="center"
     backgroundColor="transpBlack" transparent="1" />
-  <widget name="key_blue" position="852,508" size="140,40" zPosition="2" font="Regular;20" valign="center" halign="center"
+  <widget name="key_blue" position="852,508" size="140,40" zPosition="2" font="Regular;16" valign="center" halign="center"
     backgroundColor="transpBlack" transparent="1" />
   <widget name="title_label" position="10,0" size="850,30" zPosition="5" valign="center" font="Regular;22" foregroundColor="#f0b400"
     transparent="1" />

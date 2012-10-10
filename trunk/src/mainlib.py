@@ -22,14 +22,15 @@
 ######################################################################
 
 from enigma import eTimer, ePicLoad, eServiceCenter
+import mautils
+import os
+
 from config import FilmwebConfig
 from engine import FilmwebEngine,MT_MOVIE, MT_SERIE, POSTER_PATH
 from mselection import FilmwebChannelSelection
 from movieguide import MovieGuide
 from __common__ import print_info, print_debug, _
 from comps import ActorChoiceList, ScrollLabelExt, MenuChoiceList, StarsComp, DefaultScreen
-import mautils
-import os
 
 from Screens.InputBox import InputBox
 from Screens.ChoiceBox import ChoiceBox
