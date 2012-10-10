@@ -19,11 +19,17 @@
 # GNU General Public License, version 3 or later
 ######################################################################
 
+from time import localtime, strftime, time
+from enigma import getDesktop
 from Tools.Directories import resolveFilename, SCOPE_PLUGINS
 from Components.Language import language
 import os
 import gettext
 
+WIDTH = getDesktop(0).size().width()
+HEIGHT = getDesktop(0).size().height()
+
+APP_PREFIX = "[FILMWEB]"
 
 def _(txt):
     t = gettext.dgettext("Filmweb", txt)
@@ -38,19 +44,21 @@ def localeInit():
     gettext.bindtextdomain("Filmweb", resolveFilename(SCOPE_PLUGINS, "Extensions/Filmweb/locale"))
 
 def __print_info(prefix, level, nfo, data):
-    txt = "[" + prefix + "] " + level + '' + nfo
-    if data is not None:
-        txt = txt + ": " + data
-    print txt
+    #txt = "[" + prefix + "] " + level + '' + nfo
+    #if data is not None:
+    #    txt = txt + ": " + data
+    tm = strftime('%Y-%m-%d %H:%M:%S', localtime(time()))
+    print prefix, tm, level, nfo, data or ''
 
 def print_error(nfo, data=None):
-    __print_info("FILMWEB", 'ERROR ', nfo, data)
+    __print_info(APP_PREFIX, 'ERROR', nfo, data)
     
 def print_debug(nfo, data=None):
-    __print_info("FILMWEB", 'DEBUG ', nfo, data)
+    pass
+    #__print_info(APP_PREFIX, 'DEBUG', nfo, data)
     
 def print_info(nfo, data=None):
-    __print_info("FILMWEB", ' INFO ', nfo, data)
+    __print_info(APP_PREFIX, 'INFO', nfo, data)
 
 
 localeInit()
