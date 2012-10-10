@@ -438,7 +438,7 @@ class MovieGuide(DefaultScreen, SelectionEventInfo):
             self.displayProgressList(progressList)
                         
             ds = []     
-            days_count = 1       
+            days_count = 2       
             for x in self.services:
                 print_info('Getting events for service', str(x))
                 tup = (x.getServiceName(), 0)
