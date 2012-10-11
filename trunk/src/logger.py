@@ -27,17 +27,17 @@ APP_PREFIX = "[FILMWEB]"
 def print_error(nfo, data=None):
     val = config.plugins.mfilmweb.logs.value
     if val == 'error' or val == 'info' or val == 'debug':
-        cmn.print_info(APP_PREFIX, 'ERROR', nfo, data)
+        cmn.print_info_(APP_PREFIX, 'ERROR', nfo, data)
     
 def print_debug(nfo, data=None):
     val = config.plugins.mfilmweb.logs.value
     if val == 'debug':
-        cmn.print_info(APP_PREFIX, 'DEBUG', nfo, data)
+        cmn.print_info_(APP_PREFIX, 'DEBUG', nfo, data)
     
 def print_info(nfo, data=None):
     val = config.plugins.mfilmweb.logs.value
     if val == 'info' or val == 'debug':
-        cmn.print_info(APP_PREFIX, 'INFO', nfo, data)
+        cmn.print_info_(APP_PREFIX, 'INFO', nfo, data)
     
     
     
