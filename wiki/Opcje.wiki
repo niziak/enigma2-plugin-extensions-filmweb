@@ -4,7 +4,7 @@
 ----
 == Opcje pluginu Filmweb ==
 
-<table cellpadding=2 cellspacing=2 border=0><tr><td>http://enigma2-plugin-extensions-filmweb.googlecode.com/svn/wiki/rc-main.png</td>
-<td>Opis klawiszy dla okna głównego</td></tr></table>
+<table cellpadding=2 cellspacing=2 border=0>
+<tbody><tr><td>http://enigma2-plugin-extensions-filmweb.googlecode.com/svn/wiki/rc-main.png</td><td>Opis klawiszy dla okna głównego</td></tr></tbody></table>
 
 == Opcje Przewodnika Filmowego (Movie Guide) ==
