@@ -4,6 +4,6 @@
 ----
 == Opcje pluginu Filmweb ==
 
-http://enigma2-plugin-extensions-filmweb.googlecode.com/svn/wiki/rc-main.png
+|| http://enigma2-plugin-extensions-filmweb.googlecode.com/svn/wiki/rc-main.png || Opcje programu ||
 
 == Opcje Przewodnika Filmowego (Movie Guide) ==
