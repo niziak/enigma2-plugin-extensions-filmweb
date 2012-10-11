@@ -10,6 +10,10 @@ Plugin został przygotowany w PYTHON-ie i działa w środowisku ENIGMA2 zainstal
 = Instalacja =
 ----
   * Zaloguj się do dreambox-a przez SSH czy Telnet
+  * Usuń poprzednią wersję pluginu - niekonieczne ale zalecane
+{{{
+ipkg remove enigma2-plugin-extensions-filmweb
+}}}
   * Zainstaluj biblioteki: python-html, python-twisted-web, openssl, python-pyopenssl
 {{{
 ipkg update
