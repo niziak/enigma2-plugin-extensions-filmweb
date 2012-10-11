@@ -2,6 +2,12 @@
 
 <wiki:toc max_depth="2" />
 ----
+== Ekran wyboru pozycji z EPG ==
+Wciśnij klawisz EPG długo a zostanie wyświetlony ekran wyboru pozycji na bieżącym kanale - patrz obrazek niżej. Potem wybierz pozycję która Cię interesuje i wciśnij CZERWONY, a przejdziesz do prezentacji informacji o wybranej pozycji - patrz obrazek niżej.
+
+<table cellpadding=2 cellspacing=2 border=0>
+<tbody><tr valign="top"><td>http://enigma2-plugin-extensions-filmweb.googlecode.com/svn/wiki/EPG-SEL-SCREEN.png</td><td></td></tr></tbody></table>
+
 == Opcje Konfiguracyjne ==
 
 || Opcja || Znaczenie ||
