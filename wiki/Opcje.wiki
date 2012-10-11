@@ -8,6 +8,12 @@ Wciśnij klawisz EPG długo a zostanie wyświetlony ekran wyboru pozycji na bie�
 <table cellpadding=2 cellspacing=2 border=0>
 <tbody><tr valign="top"><td>http://enigma2-plugin-extensions-filmweb.googlecode.com/svn/wiki/EPG-SEL-SCREEN.png</td><td>http://enigma2-plugin-extensions-filmweb.googlecode.com/svn/wiki/MOVIE-INFO-SCREEN.png</td></tr></tbody></table>
 
+== Przewodnik Filmowy (Movie Guide) ==
+Ustaw przeszukiwane kanały na ekranie konfiguracyjnym - patrz obrazek niżej. Wyboru dokonujesz poprzez wciśnięcie klawisza OK. Kanał zostanie podświetlony na niebiesko. Podobnie jeżeli chcesz odznaczyć na zaznaczonym kanale naciśnij OK. Wyjście z okna konfiguracji na klawiszu EXIT - konfiguracja automatycznie się zapisuje. Po skonfigurowaniu naciśnij GREEN a dostaniesz opisy filmów na wybranych kanałach - patrz obrazek niżej.
+
+<table cellpadding=2 cellspacing=2 border=0>
+<tbody><tr valign="top"><td>http://enigma2-plugin-extensions-filmweb.googlecode.com/svn/wiki/MOVIE-GUIDE-SCREEN.png</td><td>http://enigma2-plugin-extensions-filmweb.googlecode.com/svn/wiki/MOVIE-INFO-SCREEN.png</td></tr></tbody></table>
+
 == Opcje Konfiguracyjne ==
 
 || Opcja || Znaczenie ||
