@@ -2,6 +2,15 @@
 
 <wiki:toc max_depth="2" />
 ----
+== Opcje Konfiguracyjne ==
+
+|| Opcja || Znaczenie ||
+|| User Name || Login do konta Filmweb ||
+|| Password || Hasło do konta Filmweb ||
+|| Temporary Folder || Ścieżka do katalogu z plikami tymczasowymi (cache) dla Przewodnika Filmowego ||
+|| Logging Level || Poziom logowania w logu Enigmy - debug: najbardziej szczegółowe, error: najmniej szczegółów ||
+|| Number of days in movie guide search || Określa wielkość paczki informacji pobieranych przez Przewodnik Filmowy. Jako paczkę należy rozumieć informacje o programach TV na określoną liczbę dni ||
+
 == Opcje pluginu Filmweb ==
 
 <table cellpadding=2 cellspacing=2 border=0>
