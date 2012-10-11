@@ -19,35 +19,26 @@
 # GNU General Public License, version 3 or later
 ######################################################################
 
-from time import localtime, strftime, time
-from enigma import getDesktop
-from Tools.Directories import resolveFilename, SCOPE_PLUGINS
-from Components.Language import language
-import os
-import gettext
+import __common__ as cmn
+from Components.config import config
 
-WIDTH = getDesktop(0).size().width()
-HEIGHT = getDesktop(0).size().height()
+APP_PREFIX = "[FILMWEB]"
 
-def _(txt):
-    t = gettext.dgettext("Filmweb", txt)
-    if t == txt:
-        t = gettext.gettext(txt)
-    return t
-
-def localeInit():
-    lang = language.getLanguage()[:2] 
-    os.environ["LANGUAGE"] = lang 
-    print "Language: " + lang
-    gettext.bindtextdomain("Filmweb", resolveFilename(SCOPE_PLUGINS, "Extensions/Filmweb/locale"))
-
-def print_info(prefix, level, nfo, data):
-    tm = strftime('%Y-%m-%d %H:%M:%S', localtime(time()))
-    print prefix, tm, level, nfo, data or ''
-
-
-
-localeInit()
-language.addCallback(localeInit)
-
-
+def print_error(nfo, data=None):
+    val = config.plugins.mfilmweb.logs.value
+    if val == 'error' or val == 'info' or val == 'debug':
+        cmn.print_info(APP_PREFIX, 'ERROR', nfo, data)
+    
+def print_debug(nfo, data=None):
+    val = config.plugins.mfilmweb.logs.value
+    if val == 'debug':
+        cmn.print_info(APP_PREFIX, 'DEBUG', nfo, data)
+    
+def print_info(nfo, data=None):
+    val = config.plugins.mfilmweb.logs.value
+    if val == 'info' or val == 'debug':
+        cmn.print_info(APP_PREFIX, 'INFO', nfo, data)
+    
+    
+    
+    

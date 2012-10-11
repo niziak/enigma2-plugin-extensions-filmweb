@@ -21,7 +21,8 @@
 # GNU General Public License, version 3 or later
 ######################################################################
 
-from __common__ import print_info,_
+from __common__ import _
+from logger import print_info, print_debug
 
 import os
 import re

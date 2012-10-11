@@ -22,7 +22,8 @@
 ######################################################################
 
 from twisted.web.client import downloadPage, getPage
-from __common__ import print_info, print_debug,_
+from __common__ import _
+from logger import print_info, print_debug
 import time
 import datetime
 import mautils
