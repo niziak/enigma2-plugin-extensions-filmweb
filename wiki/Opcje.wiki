@@ -1,1 +1,5 @@
-[rc-main.png]
+== Opcje pluginu Filmweb ==
+
+http://enigma2-plugin-extensions-filmweb.googlecode.com/svn/wiki/rc-main.png
+
+== Opcje Przewodnika Filmowego (Movie Guide) ==
