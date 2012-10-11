@@ -21,3 +21,19 @@
 </td></tr></tbody></table>
 
 == Opcje Przewodnika Filmowego (Movie Guide) ==
+
+<table cellpadding=2 cellspacing=2 border=0>
+<tbody><tr valign="top"><td>http://enigma2-plugin-extensions-filmweb.googlecode.com/svn/wiki/rc-movieguide.png</td><td>
+
+=== Opis klawiszy dla Przewodnika ===
+
+|| Klawisz || Znaczenie ||
+|| RED || Uruchamia okno konfiguracji kanałów używanych do wyszukiwania filmów ||
+|| GREEN || Powoduje odświeżenie listy filmów - pobranie ponowne informacji o pozycjach filmowych na wybranych kanałach ||
+|| YELLOW || Pobranie następnej paczki informacji. Na wejściu plugin pobiera informacje o pozycjach w programie TV dla określonej w konfiguracji dni (domyślnie 2 dni). Po naciśnięciu żółtego klawisza doczytywane są pozycje programowe na następne 2 dni i tak dalej. ||
+|| BLUE || Powoduje zmianę pola sortowania - możliwe wartości to: tytuł, czas rozpoczęcia, rok, ocena, nazwa kanału ||
+|| 0 || Zmiana sortowania z rosnącego na malejące i odwrotnie || 
+|| EXIT || Wyjście z Przewodnika do okna wywołującego ||
+
+</td></tr></tbody></table>
+
