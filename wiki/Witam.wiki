@@ -36,11 +36,53 @@ Ja osobiście zainstalowałem sobie skrót na naciśnięciu ŻÓŁTEGO klawisza 
 
 = Planowane zmiany =
 ----
+  * Dodanie obsługi związanej z informacją o tym, że chciałbym oglądnąć jakąś pozycję
+
+= Informacja o zmianach w wersjach =
+----
+=== ver. 1.1.0 ===
   * Dodanie kombajnu o nazwie Przewodnik Filmowy, który służył będzie do przedstawienia pozycji filmowych na wybranych kanałach wraz z oceną i opisem ściągniętym z Filmweb-u
   * Umożliwienie sortowania w przewodniku po ocenie, dacie produkcji, nazwie pozycji czy nazwie kanału
   * Umożliwienie przejścia do oglądania pozycji czy dodania timera
   * Wprowadzenie poprawek i fixów działania
   * Wprowadzenie odpowiedniej obsługi dla skórek innych niż domyślna dla BlackHola
   * Dodanie pokazywania informacji o rekomendacjach z Filmweb
-  * Dodanie obsługi związanej z informacją o tym, że chciałbym oglądnąć jakąś pozycję
   * Zmiana sposobu wprowadzania własnej oceny filmu na wybór pozycji zamiast wpisywania wartości liczbowej
+=== ver. 1.0.9 ===
+  * Series data fetching added
+  * New entry for searching TV Series added to context menu in main window
+  * Configuration entry added to the context menu 
+  * Login to portal based on the configuration data implemented 
+  * Added voting function entry to the context menu 
+  * Wallpapers fetching added
+  * Some improvements and fixes
+=== ver. 1.0.8 ===
+  * Switching to version UNK and MIPSEL
+=== ver. 1.0.7 ===
+  * Seraching by current event and by event from EPG fixed
+  * Runtime parsing fixed - changes on the Filmweb.pl page
+=== ver. 1.0.6 ===
+  * Added Left/Right key actions handling on Details page to enable scrolling cast list or plot list
+  * Query screen changed - added rating and other info
+=== ver. 1.0.5 ===
+  * Dependency fixed ininstallation script
+=== ver. 1.0.4 ===
+  * Added extra menu on the CTX-MENU button
+  * Color buttons look redesigned
+  * GUI changed
+  * Cast list changed - actor pictures showing added
+  * Movie runtime showing added
+  * Added actions on main window context menu
+    * action for enter the movie name to search
+    * action for channel selection from EPG
+  * Fixed swiching button labels regarding the active context  
+
+=== ver. 1.0.3 ===
+  * when the result list has 0 elements the input box is showed 
+=== ver. 1.0.2 ===
+  * fixed cookies handling - the Filmweb.pl shows the adverts and checks when advs are read by checking the cookies
+  * fixed handling DETAILS page when there are 0 movies in menu
+=== ver. 1.0.1 ===
+build scripts fixed so the binary installation package is deployable now
+=== ver. 1.0 ===
+the first release
