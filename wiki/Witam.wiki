@@ -46,9 +46,9 @@ Ja osobiście zainstalowałem sobie skrót na naciśnięciu ŻÓŁTEGO klawisza 
 = Informacja o zmianach w wersjach =
 ----
 === ver. 1.1.0 ===
-  * Dodanie kombajnu o nazwie Przewodnik Filmowy, który służył będzie do przedstawienia pozycji filmowych na wybranych kanałach wraz z oceną i opisem ściągniętym z Filmweb-u
+  * Dodanie kombajnu o nazwie Przewodnik Filmowy, który służy do przedstawienia pozycji filmowych na wybranych kanałach wraz z oceną i opisem ściągniętym z Filmweb-u
   * Umożliwienie sortowania w przewodniku po ocenie, dacie produkcji, nazwie pozycji czy nazwie kanału
-  * Umożliwienie przejścia do oglądania pozycji czy dodania timera
+  * Umożliwienie przejścia do oglądania pozycji czy dodania / usunięcia Timera
   * Wprowadzenie poprawek i fixów działania
   * Wprowadzenie odpowiedniej obsługi dla skórek innych niż domyślna dla BlackHola
   * Dodanie pokazywania informacji o rekomendacjach z Filmweb
