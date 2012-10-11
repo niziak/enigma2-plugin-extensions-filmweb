@@ -34,6 +34,6 @@
 || BLUE || Powoduje zmianę pola sortowania - możliwe wartości to: tytuł, czas rozpoczęcia, rok, ocena, nazwa kanału ||
 || 0 || Zmiana sortowania z rosnącego na malejące i odwrotnie || 
 || EXIT || Wyjście z Przewodnika do okna wywołującego ||
+|| OK || W zależności od wybranej pozycji powoduje: przejście do oglądania danej pozycji (pozycja z zielonym znakiem), ustawienie Timera (pozycja z niebieskim znakiem), skasowanie Timera (pozycja z zegarkiem) ||
 
 </td></tr></tbody></table>
-
