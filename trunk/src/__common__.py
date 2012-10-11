@@ -41,7 +41,7 @@ def localeInit():
     print "Language: " + lang
     gettext.bindtextdomain("Filmweb", resolveFilename(SCOPE_PLUGINS, "Extensions/Filmweb/locale"))
 
-def print_info(prefix, level, nfo, data):
+def print_info_(prefix, level, nfo, data):
     tm = strftime('%Y-%m-%d %H:%M:%S', localtime(time()))
     print prefix, tm, level, nfo, data or ''
 
