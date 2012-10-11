@@ -25,7 +25,8 @@ import xml.etree.ElementTree as xml
 from enigma import eEPGCache, eServiceReference, eTimer
 from time import localtime, strftime, time
 
-from __common__ import print_info, print_debug, _
+from __common__ import _
+from logger import print_info, print_debug
 from mselection import FilmwebRateChannelSelection
 from comps import DefaultScreen, StarsComp, MPixmap
 from engine import TelemagEngine, FilmwebTvEngine, FilmwebEngine, MT_MOVIE, MAPPING, MAPPING2
@@ -455,7 +456,7 @@ class MovieGuide(DefaultScreen, SelectionEventInfo):
             self.displayProgressList(progressList)
                         
             ds = []     
-            days_count = 2       
+            days_count = config.plugins.mfilmweb.guideDays.value    
             for x in self.services:
                 print_info('Getting events for service', str(x))
                 tup = (x.getServiceName(), 0)
@@ -571,8 +572,8 @@ class MovieGuide(DefaultScreen, SelectionEventInfo):
             evtb = evt.getBeginTime()
             inrange = (begin - 30) < evtb < (begin + 30)
             if not inrange:
-                print_info('------> EPG Event is not the same as entry <-----------')
-                print_info('------> EPG', evt.getEventName() + ", RES: " + str(x[2]))
+                print_debug('------> EPG Event is not the same as entry <-----------')
+                print_debug('------> EPG', evt.getEventName() + ", RES: " + str(x[2]) + ', service: ' + service.getServiceName())
                 evt = None 
         
         tots = '??'

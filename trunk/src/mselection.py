@@ -19,7 +19,8 @@
 # GNU General Public License, version 3 or later
 ######################################################################
 
-from __common__ import print_info, print_debug, _
+from __common__ import  _
+from logger import print_info, print_debug
 from enigma import eServiceReference, gRGB, eListboxServiceContent
 from Components.config import config, configfile
 #from Tools.LoadPixmap import LoadPixmap

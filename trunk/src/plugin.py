@@ -20,7 +20,8 @@
 ######################################################################
 
 from Plugins.Plugin import PluginDescriptor
-from __common__ import print_info, _
+from __common__ import  _
+import logger 
 import mselection
 import mainlib
 import config
@@ -30,6 +31,7 @@ import engine
 import movieguide
     
 def reloadlibs():
+    reload(logger)   
     reload(mautils)    
     reload(comps)
     reload(config)
@@ -58,7 +60,7 @@ def eventinfo(session, servicelist, **kwargs):
     reloadlibs()  
     try:
         ref = session.nav.getCurrentlyPlayingServiceReference()
-        print_info("Current Service ref", str(ref))
+        print "Current Service ref", str(ref)
         session.open(mselection.FilmwebEPGSelection, ref, mainlib.Filmweb)
     except:
         import traceback

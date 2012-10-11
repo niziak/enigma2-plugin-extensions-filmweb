@@ -21,20 +21,23 @@
 # GNU General Public License, version 3 or later
 ######################################################################
 
-from __common__ import print_info, _
+from __common__ import _
+from logger import print_info, print_debug
 
 from Screens.Screen import Screen
 
 from Components.ActionMap import ActionMap
 from Components.Sources.StaticText import StaticText
 from Components.ConfigList import ConfigListScreen
-from Components.config import config, configfile, getConfigListEntry, ConfigBoolean, ConfigInteger, ConfigDirectory, ConfigPassword, ConfigText, ConfigSubsection
+from Components.config import config, configfile, getConfigListEntry, ConfigSelection, ConfigBoolean, ConfigInteger, ConfigDirectory, ConfigPassword, ConfigText, ConfigSubsection
 
 config.plugins.mfilmweb = ConfigSubsection()
 config.plugins.mfilmweb.user = ConfigText(default = "", fixed_size = False)
 config.plugins.mfilmweb.password = ConfigPassword(default="",visible_width = 50,fixed_size = False)
 config.plugins.mfilmweb.selserv = ConfigText(default = "", fixed_size = False)
 config.plugins.mfilmweb.tmpPath = ConfigDirectory(default="/tmp/filmweb")
+config.plugins.mfilmweb.logs = ConfigSelection([('debug', _('Debug Level')),('info', _('Info Level')),('error', _('Error Level'))],default='debug')
+config.plugins.mfilmweb.guideDays = ConfigInteger(default=1, limits=(1, 4))
 config.plugins.mfilmweb.sort = ConfigInteger(default=0)
 config.plugins.mfilmweb.sortOrder = ConfigBoolean()
 
@@ -60,6 +63,8 @@ class FilmwebConfig(Screen, ConfigListScreen):
         self.list.append(getConfigListEntry(_("User Name"), config.plugins.mfilmweb.user))
         self.list.append(getConfigListEntry(_("Password"), config.plugins.mfilmweb.password))
         self.list.append(getConfigListEntry(_("Temporary Folder"), config.plugins.mfilmweb.tmpPath))
+        self.list.append(getConfigListEntry(_("Logging Level"), config.plugins.mfilmweb.logs))
+        self.list.append(getConfigListEntry(_("Number of days in movie guide search"),config.plugins.mfilmweb.guideDays))
         self["config"].list = self.list
         self["config"].l.setList(self.list)   
         

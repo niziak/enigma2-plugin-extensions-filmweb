@@ -34,37 +34,37 @@
 	<widget source="ServiceEvent" render="Label" position="890,120" zPosition="2" size="350,28" font="Regular;20" halign="left" foregroundColor="#F0B400" backgroundColor="transpBlack" transparent="1" noWrap="1">
 		<convert type="EventName">#MovieGuideEventConv;title</convert>
 	</widget>
-	<widget source="ServiceEvent" render="Label" position="1005,150" size="240,20" zPosition="2" halign="left" font="Regular;16" foregroundColor="#58bcff" backgroundColor="transpBlack" transparent="1" noWrap="1">
+	<widget source="ServiceEvent" render="Label" position="1010,150" size="240,20" zPosition="2" halign="left" font="Regular;16" foregroundColor="#58bcff" backgroundColor="transpBlack" transparent="1" noWrap="1">
 		<convert type="ServiceName">Name</convert>
 	</widget>	
-	<widget source="ServiceEvent" render="Label" position="1005,170" zPosition="2" size="240,20" font="Regular;16" foregroundColor="grey" halign="left" transparent="1" >
+	<widget source="ServiceEvent" render="Label" position="1010,170" zPosition="2" size="240,20" font="Regular;16" foregroundColor="grey" halign="left" transparent="1" >
 		<convert type="EventName">#MovieGuideEventConv;event_time</convert>
 	</widget>
-	<widget source="ServiceEvent" render="Label" position="1005,190" zPosition="2" size="240,20" font="Regular;16" halign="left" transparent="1">
+	<widget source="ServiceEvent" render="Label" position="1010,190" zPosition="2" size="240,20" font="Regular;16" halign="left" transparent="1">
 		<convert type="EventName">#MovieGuideEventConv;genre</convert>
 	</widget>
-	<widget source="ServiceEvent" render="Label" position="1005,210" zPosition="2" size="150,20" font="Regular;16" halign="left" transparent="1">
+	<widget source="ServiceEvent" render="Label" position="1010,210" zPosition="2" size="150,20" font="Regular;16" halign="left" transparent="1">
 		<convert type="EventName">#MovieGuideEventConv;year</convert>
 	</widget>
-	<widget source="ServiceEvent" render="Label" position="1075,210" zPosition="2" size="170,20" font="Regular;16" halign="left" transparent="1">
+	<widget source="ServiceEvent" render="Label" position="1080,210" zPosition="2" size="170,20" font="Regular;16" halign="left" transparent="1">
 		<convert type="EventName">#MovieGuideEventConv;country</convert>
 	</widget>
-	<widget source="ServiceEvent" render="Label" position="1005,230" zPosition="2" size="240,20" font="Regular;16" halign="left" transparent="1" >
+	<widget source="ServiceEvent" render="Label" position="1010,230" zPosition="2" size="240,20" font="Regular;16" halign="left" transparent="1" >
 		<convert type="EventName">#MovieGuideEventConv;director</convert>
 	</widget>
-	<widget source="ServiceEvent" render="Label" position="1005,250" zPosition="2" size="240,20" font="Regular;16" halign="left" transparent="1" >
+	<widget source="ServiceEvent" render="Label" position="1010,250" zPosition="2" size="240,20" font="Regular;16" halign="left" transparent="1" >
 		<convert type="EventName">#MovieGuideEventConv;writer</convert>
 	</widget>
-	<widget source="ServiceEvent" render="Label" position="1005,270" zPosition="2" size="240,20" font="Regular;16" halign="left" transparent="1" >
+	<widget source="ServiceEvent" render="Label" position="1010,270" zPosition="2" size="240,20" font="Regular;16" halign="left" transparent="1" >
 		<convert type="EventName">#MovieGuideEventConv;runtime</convert>
 	</widget>
-	<widget source="ServiceEvent" render="Label" position="1005,290" zPosition="2" size="240,20" font="Regular;16" halign="left" transparent="1" >
+	<widget source="ServiceEvent" render="Label" position="1010,290" zPosition="2" size="240,20" font="Regular;16" halign="left" transparent="1" >
 		<convert type="EventName">#MovieGuideEventConv;vote</convert>
 	</widget>	
 	<widget source="ServiceEvent" render="Label" position="895,320" zPosition="3" size="360,280" font="Regular;16" foregroundColor="#58bcff" transparent="1" >
 		<convert type="EventName">#MovieGuideEventConv;plot</convert>
 	</widget> 	
-	<widget source="ServiceEvent" render="Pixmap" position="890,150" zPosition="3" size="112,160" alphatest="on" transparent="1">
+	<widget source="ServiceEvent" render="Pixmap" position="895,150" zPosition="3" size="112,160" alphatest="on" transparent="1">
 		<convert type="EventName">#MovieGuideEventConv;poster:112,160</convert>
 	</widget> 
 	 
