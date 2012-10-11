@@ -5,9 +5,18 @@
 == Opcje pluginu Filmweb ==
 
 <table cellpadding=2 cellspacing=2 border=0>
-<tbody><tr valign="top"><td>http://enigma2-plugin-extensions-filmweb.googlecode.com/svn/wiki/rc-main.png</td><td><b>Opis klawiszy dla okna głównego</b>
+<tbody><tr valign="top"><td>http://enigma2-plugin-extensions-filmweb.googlecode.com/svn/wiki/rc-main.png</td><td>
+
+=== Opis klawiszy dla okna głównego ===
 
 || Klawisz || Znaczenie ||
+|| RED || Powoduje wyjście z pluginu ||
+|| GREEN || Pokazuje listę wyszukanych pozycji w przypadku, gdy natrafiono na więcej niż jedną w trakcie przeszukiwania bazy Filmweb ||
+|| YELLOW || Pokazuje podstawowe informacje na temat pozycji oraz przełącza tryb działania z wyszukiwania filmów na wyszukiwanie seriali ||
+|| BLUE || Przełącza widok w tryb pokazywania opisów dotyczących wyszukanej pozycji ||
+|| EPG || W tym momencie to samo co YELLOW ||
+|| MENU || Pokazuje menu kontekstowe pluginu ||
+|| MOVIE || Uruchamia okno Przewodnika Filmowego || 
 
 </td></tr></tbody></table>
 
