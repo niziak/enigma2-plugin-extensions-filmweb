@@ -22,7 +22,7 @@ ipkg install python-pyopenssl
   * Wykonaj manulaną instalację pakietu IPK z menu dreamboxa
 
 {{{
-ipkg install /tmp/enigma2-plugin-extensions-filmweb_1.0.9_mipsel.ipk
+ipkg install /tmp/enigma2-plugin-extensions-filmweb_1.1.0_mipsel.ipk
 }}}
 
 
