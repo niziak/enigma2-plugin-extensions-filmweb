@@ -52,6 +52,8 @@ Ja osobiście zainstalowałem sobie skrót na naciśnięciu ŻÓŁTEGO klawisza 
   * Modyfikacja skóry 
   * Dodanie wyświetlania informacji szczegółowych o aktorach
   * Dodanie listy ulubionych pozycji wybranych z Przewodnika i wyświetlanie przypomnień o tym, że na określonym kanale za określony czas będzie wyświetlana ulubiona pozycja w formie okienka notyfikacyjnego
+  * Konfiguracja i pobieranie w zależności od potrzeby pełnej listy aktorów a nie tylko 10-ciu
+  * Pobieranie pełnej listy potencjalnie pasujących pozycji do zapytania do wyboru po wyszukaniu  zamiast 10-ciu w przypadku
 
 
 
