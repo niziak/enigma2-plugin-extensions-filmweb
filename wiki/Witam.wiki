@@ -54,6 +54,10 @@ Ja osobiście zainstalowałem sobie skrót na naciśnięciu ŻÓŁTEGO klawisza 
   * Dodanie listy ulubionych pozycji wybranych z Przewodnika i wyświetlanie przypomnień o tym, że na określonym kanale za określony czas będzie wyświetlana ulubiona pozycja w formie okienka notyfikacyjnego
   * Konfiguracja i pobieranie w zależności od potrzeby pełnej listy aktorów a nie tylko 10-ciu
   * Pobieranie pełnej listy potencjalnie pasujących pozycji do zapytania do wyboru po wyszukaniu  zamiast 10-ciu w przypadku
+  * Dodanie w Przewodniku informacji o obsadzie
+  * Dodanie w Przewodniku wyświetlania opisów dla filmu
+  * Dodanie w Przewodniku obsługi wyświetlania tapet
+  * Dodanie w Przewodniku obsługi logowania do portalu oraz informacji związanej z rekomendacjami 
 
 
 
