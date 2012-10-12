@@ -94,22 +94,22 @@
 1:0:1:1C9C:332C:13E:820000:0:0:0:,Polsat Crime Investigation,
 1:0:1:DB2:2D50:13E:820000:0:0:0:,Discovery Historia Polska,,Discovery+Historia
 1:0:1:1139:2AF8:13E:820000:0:0:0:,History Channel Pl,
-1:0:1:C2F:1E78:71:820000:0:0:0:,HISTORY HD,
-1:0:1:DC4:2D50:13E:820000:0:0:0:,TVP Historia,
+1:0:1:C2F:1E78:71:820000:0:0:0:,HISTORY HD,history
+1:0:1:DC4:2D50:13E:820000:0:0:0:,TVP Historia,tvp_historia
 1:0:1:377E:44C:13E:820000:0:0:0:,PLANETE+ HD PL,,Planete%2B
 1:0:1:1136:2AF8:13E:820000:0:0:0:,Planete+,,Planete%2B
 1:0:1:3785:44C:13E:820000:0:0:0:,Planet Water,
-1:0:1:3B66:12C:13E:820000:0:0:0:,ANIMAL PLANET HD,
-1:0:1:1402:5DC:13E:820000:0:0:0:,Animal Planet,
+1:0:1:3B66:12C:13E:820000:0:0:0:,ANIMAL PLANET HD,animal_planete_hd
+1:0:1:1402:5DC:13E:820000:0:0:0:,Animal Planet,animal_planet
 1:0:1:1407:5DC:13E:820000:0:0:0:,Zone Reality,
 1:0:1:3915:32C8:13E:820000:0:0:0:,TLC Polska,
 1:0:1:1406:5DC:13E:820000:0:0:0:,Club TV Polska,
-1:0:1:390A:32C8:13E:820000:0:0:0:,BBC Entertainmen,
-1:0:1:390C:32C8:13E:820000:0:0:0:,BBC Lifestyle,
+1:0:1:390A:32C8:13E:820000:0:0:0:,BBC Entertainmen,bbc_entertainment
+1:0:1:390C:32C8:13E:820000:0:0:0:,BBC Lifestyle,bbc_lifestyle
 1:0:1:2918:1EDC:71:820000:0:0:0:,Travel Channel,
-1:0:1:10DD:3E8:13E:820000:0:0:0:,TTV,
-1:0:1:13EE:5DC:13E:820000:0:0:0:,TVS - TV Silesia,
-1:0:1:290E:1EDC:71:820000:0:0:0:,TV6 (Poland),
+1:0:1:10DD:3E8:13E:820000:0:0:0:,TTV,ttv
+1:0:1:13EE:5DC:13E:820000:0:0:0:,TVS - TV Silesia,tv_silesia
+1:0:1:290E:1EDC:71:820000:0:0:0:,TV6 (Poland),tv6
 1:0:1:3780:44C:13E:820000:0:0:0:,DOMO+ HD,
 1:0:1:12CB:2E7C:13E:820000:0:0:0:,Domo TV,
 1:0:1:332E:3390:71:820000:0:0:0:,Polsat Play,polsat_play,Polsat+Play
@@ -122,7 +122,7 @@
 1:0:1:12C4:2E7C:13E:820000:0:0:0:,Kuchnia TV,
 1:0:1:13ED:5DC:13E:820000:0:0:0:,TV Polonia,,TV+Polonia
 1:0:1:1292:3458:13E:820000:0:0:0:,TVR,
-1:0:1:3D5A:2C88:13E:820000:0:0:0:,Polonia 1,
+1:0:1:3D5A:2C88:13E:820000:0:0:0:,Polonia 1,polonia_1
 1:0:1:271:3C8C:13E:820000:0:0:0:,Kosmica TV (Polska),
 1:0:1:2013:24B8:13E:820000:0:0:0:,EuroNews,
 1:0:1:1B03:3FE:1:C00000:0:0:0:,TV5 Monde Eu. (txt Pl),
@@ -153,18 +153,18 @@
 1:0:1:1CAC:1CE8:71:820000:0:0:0:,ESPN Classic Sp,
 1:0:1:1C88:1CE8:71:820000:0:0:0:,Fightbox,
 1:0:1:1C89:1CE8:71:820000:0:0:0:,Extreme Sports,
-1:0:1:1D2B:2FA8:13E:820000:0:0:0:,Cartoon Network,
-1:0:1:377C:44C:13E:820000:0:0:0:,MINIMINI+ HD,
-1:0:1:1137:2AF8:13E:820000:0:0:0:,Mini Mini,
+1:0:1:1D2B:2FA8:13E:820000:0:0:0:,Cartoon Network,cartoon_network_pl
+1:0:1:377C:44C:13E:820000:0:0:0:,MINIMINI+ HD,minimini
+1:0:1:1137:2AF8:13E:820000:0:0:0:,Mini Mini,minimini
 1:0:1:377D:44C:13E:820000:0:0:0:,TELETOON+ HD & Hyper+ HD,
-1:0:1:12C6:2E7C:13E:820000:0:0:0:,teleTOON+ Pl,
-1:0:1:1D2A:2FA8:13E:820000:0:0:0:,Disney Channel,
-1:0:1:1CB5:1CE8:71:820000:0:0:0:,Disney XD Polska,
-1:0:1:2938:1EDC:71:820000:0:0:0:,Disney Junior,
-1:0:1:DAD:2D50:13E:820000:0:0:0:,Disney Junior Polska,
-1:0:1:290C:1EDC:71:820000:0:0:0:,Polsat Jim Jam,
-1:0:1:1F:578:13E:820000:0:0:0:,NICKELODEON HD,
-1:0:1:B:3200:13E:820000:0:0:0:,Nickelodeon Euro,
+1:0:1:12C6:2E7C:13E:820000:0:0:0:,teleTOON+ Pl,teletoon
+1:0:1:1D2A:2FA8:13E:820000:0:0:0:,Disney Channel,disney_channel
+1:0:1:1CB5:1CE8:71:820000:0:0:0:,Disney XD Polska,disney_xd
+1:0:1:2938:1EDC:71:820000:0:0:0:,Disney Junior,disney_junior
+1:0:1:DAD:2D50:13E:820000:0:0:0:,Disney Junior Polska,disney_junior
+1:0:1:290C:1EDC:71:820000:0:0:0:,Polsat Jim Jam,jim_jam
+1:0:1:1F:578:13E:820000:0:0:0:,NICKELODEON HD,nickelodeon
+1:0:1:B:3200:13E:820000:0:0:0:,Nickelodeon Euro,nickelodeon
 1:0:1:1E:578:13E:820000:0:0:0:,nick jr.,
 1:0:1:2906:1EDC:71:820000:0:0:0:,Boomerang,
 1:0:1:390D:32C8:13E:820000:0:0:0:,BBC CBeebies,

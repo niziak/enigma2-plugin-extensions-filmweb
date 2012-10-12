@@ -1,7 +1,7 @@
 <screen name="MovieGuide" position="0,0" size="1280,720" title="Movie Guide"  flags="wfNoBorder">
     <ePixmap position="0,0" zPosition="-1" size="1280,720" pixmap="skin_default/frame_base-fs8.png" />
     <ePixmap position="878,98" zPosition="1" size="380,520" pixmap="skin_default/r380x520.png" alphatest="blend" transparent="1" /> 
-	<eLabel text="Movie Guide" position="80,30" size="800,44" font="RegularAA;36" halign="left" foregroundColor="#58bcff" backgroundColor="transpBlack" transparent="1"/>
+	<eLabel text="Movie Guide" position="80,30" size="800,44" font="Regular;36" halign="left" foregroundColor="#58bcff" backgroundColor="transpBlack" transparent="1"/>
 	<ePixmap position="798,118" zPosition="5" size="22,486" pixmap="skin_default/scroll.png" alphatest="blend" transparent="1" /> 
 	<ePixmap position="450,16" zPosition="2" size="811,78" pixmap="skin_default/r1130x78.png" alphatest="blend" transparent="1" />
 	<widget name="clock-str" position="940,16" size="250,78" zPosition="5" font="Regular;20" halign="right" valign="center" foregroundColor="#58bcff" transparent="1" />

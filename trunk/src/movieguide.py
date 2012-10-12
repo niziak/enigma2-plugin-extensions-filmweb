@@ -49,8 +49,8 @@ from Components.Sources.ServiceEvent import ServiceEvent
 from Components.Converter.Converter import Converter
 from Components.Label import Label
 
-sorted_data = lambda data, idx, ordx: [b for _,b in sorted(((tup[idx], tup) for tup in data), reverse=ordx)]
-sorted_data2 = lambda data, idx, idx2, ordx: [b for _,b in sorted((((tup[idx], tup[idx2]), tup) for tup in data), reverse=ordx)]
+sorted_data = lambda data, idx, ordx: [b for _, b in sorted(((tup[idx], tup) for tup in data), reverse=ordx)]
+sorted_data2 = lambda data, idx, idx2, ordx: [b for _, b in sorted((((tup[idx], tup[idx2]), tup) for tup in data), reverse=ordx)]
 
 SORT_BEGIN_TIME = 0
 SORT_RATING = 9
@@ -58,7 +58,7 @@ SORT_YEAR = 8
 SORT_TITLE = 1
 SORT_SERVICE = 3
 
-SortData = {_('Begin Time'):SORT_BEGIN_TIME, _('Rating'):SORT_RATING, _('Year'):SORT_YEAR, 
+SortData = {_('Begin Time'):SORT_BEGIN_TIME, _('Rating'):SORT_RATING, _('Year'):SORT_YEAR,
             _('Title'):SORT_TITLE, _('Service Name'):SORT_SERVICE}
 
 class MovieGuideEventConv(Converter, object):
@@ -69,8 +69,8 @@ class MovieGuideEventConv(Converter, object):
         sp = self.type.split(':')
         if len(sp) > 1:
             self.type = sp[0]
-            self.args = sp[1]        
-    
+            self.args = sp[1]
+
     @cached
     def getText(self):
         details = self.source.details
@@ -79,15 +79,15 @@ class MovieGuideEventConv(Converter, object):
             strg = str(details.get(self.type)) or ''
             print_debug('text for', self.type + "=" + strg)
             return strg
-        return ''  
-            
+        return ''
+
     @cached
-    def getPixmap(self): 
-        return self.__getRescalledPixmap()        
-    
-    pixmap = property(getPixmap)            
+    def getPixmap(self):
+        return self.__getRescalledPixmap()
+
+    pixmap = property(getPixmap)
     text = property(getText)
-    
+
     def __getRescalledPixmap(self):
         from Components.AVSwitch import AVSwitch
         from enigma import ePicLoad
@@ -98,7 +98,7 @@ class MovieGuideEventConv(Converter, object):
                 return None
             parms = self.args.split(',')
             if not parms or len(parms) != 2:
-                return None        
+                return None
             width = int(parms[0])
             height = int(parms[1])
             if details and details.has_key(self.type):
@@ -107,18 +107,18 @@ class MovieGuideEventConv(Converter, object):
                 try:
                     picload = ePicLoad()
                     sc = AVSwitch().getFramebufferScale()
-                    picload.setPara((width, height, 
-                                      sc[0], sc[1], False, 1, "#00000000"))            
+                    picload.setPara((width, height,
+                                      sc[0], sc[1], False, 1, "#00000000"))
                     res = picload.startDecode(path)
                     print_debug('startDecode result', str(res))
                     picload.waitFinished()
-                    ptr = picload.getData()             
+                    ptr = picload.getData()
                     return ptr #.__deref__()   
                 except:
                     import traceback
-                    traceback.print_exc()            
-        return None      
-    
+                    traceback.print_exc()
+        return None
+
 class MovieGuideEvent(ServiceEvent, object):
     def __init__(self):
         ServiceEvent.__init__(self)
@@ -130,14 +130,16 @@ class MovieGuideEvent(ServiceEvent, object):
         return self._event
 
     def getMovieDetails(self):
-        return self._details 
-    
+        return self._details
+
     def updateDetails(self, details, evid):
-        print_info('Update Details - EVID', evid + ', this ID: ' + self._id)
+        print_info('Update Details - EVID', str(evid) + ', this ID: ' + str(self._id))
+        if not evid or not self._id:
+            self._details = None
         if evid == self._id:
             self._details = details
         self.changed((self.CHANGED_ALL,))
-            
+
     def newData(self, ref, evt, evid):
         if not self._id or not evid or self._id != evid:
             self._id = evid
@@ -147,9 +149,9 @@ class MovieGuideEvent(ServiceEvent, object):
                 self.changed((self.CHANGED_CLEAR,))
             else:
                 self.changed((self.CHANGED_ALL,))
-                
+
     details = property(getMovieDetails)
-    
+
 class SelectionEventInfo:
     def __init__(self):
         self.eventDetails = {}
@@ -158,14 +160,14 @@ class SelectionEventInfo:
         self.timer = eTimer()
         self.timer.callback.append(self.updateEventInfo)
         self.dtimer = eTimer()
-        self.dtimer.callback.append(self.updateDetails)        
+        self.dtimer.callback.append(self.updateDetails)
         #self.onShown.append(self.__selectionChanged)
-            
+
     def __selectionChanged(self):
         if self.execing:
             self.timer.start(100, True)
             #self.updateEventInfo()
-   
+
     def updateEventInfo(self):
         cur = self.getCurrentSelection()
         self["nstars"].hide()
@@ -173,38 +175,43 @@ class SelectionEventInfo:
             service = cur[5]
             event = cur[6]
             rate = cur[9]
-            evid = self.getEventId(cur)    
-            self["nstars"].setValue(int(rate * 10)) 
-            self["nstars"].show()        
+            evid = self.getEventId(cur)
+            self["nstars"].setValue(int(rate * 10))
+            self["nstars"].show()
             self["ServiceEvent"].newData(service and service.ref, event, evid)
             #self.dtimer.stop()
             self.dtimer.start(200, True)
-    
+        else:
+            self["ServiceEvent"].newData(None, None, None)
+            self.updateDetails()
+
+
     def getEventIdByData(self, service, begin):
         return str(service) + '__' + str(begin)
-    
+
     def getEventId(self, cur):
-        return self.getEventIdByData(cur[3], cur[0])        
-        
+        return self.getEventIdByData(cur[3], cur[0])
+
     @defer.inlineCallbacks
-    def updateDetails(self):   
-        try:     
+    def updateDetails(self):
+        try:
             if not self.execing:
                 return
             cur = self.getCurrentSelection()
             if not cur or len(cur) < 7:
+                self["ServiceEvent"].updateDetails(None, None)
                 return
-            event = cur[6]  
+            event = cur[6]
             link = cur[7]
             filmDetails = None
-            evid = self.getEventId(cur)     
+            evid = self.getEventId(cur)
             engine = FilmwebEngine()
             # ---> loads data from cache <---
             self.loadNfo(evid)
             if link and not self.eventDetails.has_key(evid):
                 filmDetails = yield engine.queryDetails(link)
-                filmDetails['fullname'] = self.__createFullName(filmDetails)  
-                filmDetails['event_time'] = cur[2]    
+                filmDetails['fullname'] = self.__createFullName(filmDetails)
+                filmDetails['event_time'] = cur[2]
                 if len(filmDetails['plot'].strip()) == 0:
                     filmDetails['plot'] = event and event.getExtendedDescription() or ''
                 strr = str(filmDetails['runtime'])
@@ -213,7 +220,7 @@ class SelectionEventInfo:
                 print_debug('Poster URL', filmDetails['poster_url'])
                 df = engine.loadPoster(filmDetails['poster_url'], None, self.path + '/poster_' + filmDetails['film_id'] + '.jpg')
                 if df:
-                    filmDetails['poster'] = yield df                
+                    filmDetails['poster'] = yield df
                 self.eventDetails[evid] = filmDetails
                 # ---> save data to cache <---
                 self.saveNfo(evid)
@@ -223,18 +230,18 @@ class SelectionEventInfo:
         except:
             import traceback
             traceback.print_exc()
-                     
+
     def loadNfo(self, evid):
         sfile = None
         try:
             mp = self.path + '/' + evid + '.nfo'
             if os.path.exists(mp):
-                res = {}                
+                res = {}
                 import codecs
                 sfile = codecs.open(mp, 'r', encoding='utf-8')
                 tree = xml.parse(sfile)
                 root = tree.getroot()
-                for x in root:            
+                for x in root:
                     print_debug("TAG", str(x))
                     typ = x.attrib.get('typ')
                     value = x.text
@@ -253,7 +260,7 @@ class SelectionEventInfo:
     def saveNfo(self, evid):
         sfile = None
         try:
-            details = self.eventDetails[evid]        
+            details = self.eventDetails[evid]
             root = xml.Element('movie')
             sfile = open(self.path + '/' + evid + '.nfo', "w")
             for key, value in details.items():
@@ -265,7 +272,7 @@ class SelectionEventInfo:
                     if typ is list:
                         child.text = str(value)
                     else:
-                        child.text = str(value) 
+                        child.text = str(value)
                 root.append(child)
             xml.ElementTree(root).write(sfile, encoding='utf-8')
         except:
@@ -276,45 +283,47 @@ class SelectionEventInfo:
                 sfile.close()
 
     def __createFullName(self, detailsData):
-        val = detailsData['title']            
+        val = detailsData['title']
         title = detailsData['org_title']
         if title != '':
             ls = len(val)
             if ls < 64:
                 val = val + " (" + title + ")"
         return val
-                
+
 class MovieGuide(DefaultScreen, SelectionEventInfo):
     def __init__(self, session):
         DefaultScreen.__init__(self, session, 'movieguide')
-        
+
         self.sortOrder = config.plugins.mfilmweb.sortOrder.getValue()
         self.sortIndex = config.plugins.mfilmweb.sort.getValue()
         self.timeline = time()
-        
+
+        self.initialized = False
         self.list = []
         self.services = []
         self.mapping = {}
-        self.epg = eEPGCache.getInstance()        
-        
+        self.epg = eEPGCache.getInstance()
+
         self.createGUI()
         self.initActions()
-                
+
         self.path = config.plugins.mfilmweb.tmpPath.getValue()
         if not os.path.exists(self.path):
             os.mkdir(self.path)
-        
+
         self.eventlist = self["list"]
         SelectionEventInfo.__init__(self)
-        
+
         self.clocktimer = eTimer()
         self.clocktimer.callback.append(self.__updateClock)
         self.clocktimer.start(60000, False)
-        
+
         self.updatetimer = eTimer()
         self.updatetimer.callback.append(self.__updateListData)
         self.updatetimer.start(90000, False)
-        
+
+        self.onShown.append(self.__shown)
         self.onLayoutFinish.append(self.__startMe)
         self.onClose.append(self.__finishMe)
 
@@ -325,15 +334,15 @@ class MovieGuide(DefaultScreen, SelectionEventInfo):
         self["key_green"] = StaticText('')
         self["key_yellow"] = StaticText('')
         self["key_blue"] = StaticText("")
-        self["nstars"] = StarsComp()  
+        self["nstars"] = StarsComp()
         self["sort"] = Label()
         self["clock"] = MPixmap()
         self["clock-min"] = MPixmap()
         self["clock-hr"] = MPixmap()
         self["clock-str"] = Label('')
-        
+
         self["list"].style = "progress"
-    
+
     def initActions(self):
         #global globalActionMap
         #globalActionMap.actions['showClock'] = self.ShowHide
@@ -345,10 +354,10 @@ class MovieGuide(DefaultScreen, SelectionEventInfo):
             "yellow": self.yellowAction,
             "blue": self.blueAction,
             "jumpPreviousMark" : self.prevAction,
-            "jumpNextMark": self.nextAction,            
+            "jumpNextMark": self.nextAction,
             "toggleMark": self.toggleAction
         }, -1)
-    
+
     # --- Actions definition ------------------------------------------------
     def prevAction(self):
         print_debug("PREV action")
@@ -360,37 +369,37 @@ class MovieGuide(DefaultScreen, SelectionEventInfo):
         print_debug("TOGGLE action")
         if self["list"].style == 'default':
             self.sortOrder = not self.sortOrder
-            self.displayEventList()        
-        
+            self.displayEventList()
+
     def okAction(self):
         print_debug("OK action")
         if self.execing:
             cur = self.getCurrentSelection()
-            print_debug('Current', str(cur)) 
-            self.zapOrTimer(cur)       
+            print_debug('Current', str(cur))
+            self.zapOrTimer(cur)
 
     def cancelAction(self):
         print_debug("CANCEL action")
         self.close()
-    
+
     def redAction(self):
         print_debug("RED action")
         if self["list"].style == 'default':
             self.session.open(FilmwebRateChannelSelection)
-    
+
     def greenAction(self):
         print_debug("GREEN action")
         if self["list"].style == 'default':
             self.list = []
-            self.timeline = time()            
+            self.timeline = time()
             self.__updateServices()
             self.refreshList()
-    
+
     def yellowAction(self):
         print_debug("YELLOW action")
         if self["list"].style == 'default':
             self.refreshList()
-    
+
     def blueAction(self):
         print_debug("BLUE action")
         if self["list"].style == 'default':
@@ -398,24 +407,24 @@ class MovieGuide(DefaultScreen, SelectionEventInfo):
             if self.sortIndex > 4:
                 self.sortIndex = 0
             self.displayEventList()
-            
+
     # --- Overwrite methods ---------------------------------------------
-    
-    def createGUIScreen(self, parent, desktop, updateonly = False):                                     
+
+    def createGUIScreen(self, parent, desktop, updateonly=False):
         self.__replaceConverters()
         Screen.createGUIScreen(self, parent, desktop, updateonly)
-    
+
     # --- Public methods ------------------------------------------------    
-                  
+
     def zapOrTimer(self, cur):
         if not cur:
             return
         service = cur[5]
         event = cur[6]
-        
+
         if not service:
             return
-        
+
         now = int(time())
         start_time = cur[0] #event.getBeginTime()
         duration = cur[10] #event.getDuration()
@@ -426,70 +435,74 @@ class MovieGuide(DefaultScreen, SelectionEventInfo):
 
     def getCurrentSelection(self):
         return self.eventlist.getCurrent()
-    
+
     def displayEventList(self):
+        print_debug('Display events - execting: ', str(self.execing))
         if self.execing:
             key, val = SortData.items()[self.sortIndex]
             self["key_red"].setText(_("Config"))
-            self["key_green"].setText(_("Refresh"))        
-            self["key_yellow"].setText(_("Next Period")) 
-            self["key_blue"].setText(_("Change Sort"))  
-            self["sort"].setText(_("Sorted by") + ": " + key + " " + (self.sortOrder and _("DESC") or _("ASC")))       
+            self["key_green"].setText(_("Refresh"))
+            self["key_yellow"].setText(_("Next Period"))
+            self["key_blue"].setText(_("Change Sort"))
+            self["sort"].setText(_("Sorted by") + ": " + key + " " + (self.sortOrder and _("DESC") or _("ASC")))
             print_debug('SORT_VAL', str(val))
             #print_debug('LIST', str(self.list)) 
-            self.list = sorted_data2(self.list, int(val), int(SORT_BEGIN_TIME), self.sortOrder)
-            self.eventlist.style = "default"            
+            if self.list and len(self.list) > 0:
+                self.list = sorted_data2(self.list, int(val), int(SORT_BEGIN_TIME), self.sortOrder)
+            self.eventlist.style = "default"
             self.eventlist.setList((self.list))
-                
+
     def displayProgressList(self, progressList):
         self["key_red"].setText('')
-        self["key_green"].setText('')        
-        self["key_yellow"].setText('') 
-        self["key_blue"].setText('') 
+        self["key_green"].setText('')
+        self["key_yellow"].setText('')
+        self["key_blue"].setText('')
         self.eventlist.style = "progress"
         self.eventlist.setList(progressList)
-        
-    @defer.inlineCallbacks       
+
+    @defer.inlineCallbacks
     def refreshList(self, res=None):
-        try:            
+        try:
             progressList = []
             self.displayProgressList(progressList)
-                        
-            ds = []     
-            days_count = config.plugins.mfilmweb.guideDays.value    
+
+            ds = []
+            days_count = config.plugins.mfilmweb.guideDays.value
             for x in self.services:
                 print_info('Getting events for service', str(x))
                 tup = (x.getServiceName(), 0)
                 progressList.append((tup))
                 self.eventlist.changed((self.eventlist.CHANGED_ALL,))
                 count = len(progressList)
-                df = self.refreshService(x, count - 1, days_count)                                    
+                df = self.refreshService(x, count - 1, days_count)
                 ds.append(df)
             print_debug('----- Yield DeferredList -----')
             yield defer.DeferredList(ds, consumeErrors=True)
             print_debug('----- DeferredList finished -----')
             self.timeline += 86400 * days_count
             self.displayEventList()
+            self.initialized = True
         except:
             import traceback
-            traceback.print_exc()  
-            
+            traceback.print_exc()
+
     @defer.inlineCallbacks
     def refreshService(self, service, index, count=1):
         print_info('----- Refreshing Service', service.getServiceName() + ", index: " + str(index))
         try:
             filmeng = FilmwebEngine()
-                
+
             tim = self.timeline
-            rng = int(100 / count)            
-            for idx in range(1,count+1):   
-                self.eventlist.modifyEntry(index, ((service.getServiceName(), (idx - 1) * rng + int(rng / 4))))                 
+            rng = int(100 / count)
+            for idx in range(1, count + 1):
+                self.eventlist.modifyEntry(index, ((service.getServiceName(), (idx - 1) * rng + int(rng / 4))))
                 tms = strftime("%Y%m%d", (localtime(tim)))
                 print_debug('----->> Query date', tms + ', service: ' + service.getServiceName())
-                tim += 86400  
+                tim += 86400
                 df = self.__query(service, tms)
+                print_debug('QUERY DEFERED: ', str(df))
                 if not df:
-                    continue                
+                    continue
                 result = yield df
                 self.eventlist.modifyEntry(index, ((service.getServiceName(), (idx - 1) * rng + int(rng / 4) * 2)))
                 print_debug('Query result', str(result) + ', service: ' + service.getServiceName())
@@ -497,10 +510,10 @@ class MovieGuide(DefaultScreen, SelectionEventInfo):
                     continue
                 for x in result:
                     res = None
-                    df = self.processRes(x, filmeng)                    
+                    df = self.processRes(x, filmeng)
                     if df:
                         if isinstance(df, defer.Deferred):
-                            res = yield df                            
+                            res = yield df
                         else:
                             res = df
                     if res:
@@ -508,31 +521,31 @@ class MovieGuide(DefaultScreen, SelectionEventInfo):
                         print_debug('Query Filmweb result', str(res) + ', service: ' + service.getServiceName())
                         while isinstance(res, defer.Deferred):
                             res = yield res
-                        if res:                            
+                        if res:
                             self.list.append(res)
-                self.eventlist.modifyEntry(index, ((service.getServiceName(), (idx - 1) * rng + int(rng / 4) * 4)))   
+                self.eventlist.modifyEntry(index, ((service.getServiceName(), (idx - 1) * rng + int(rng / 4) * 4)))
             self.eventlist.modifyEntry(index, ((service.getServiceName(), 100)))
         except:
             import traceback
-            traceback.print_exc()  
-        
+            traceback.print_exc()
+
     def parseYear(self, description):
         opis = description.strip()
         rok = opis[-4:]
         if not rok.isdigit():
             return None
         return rok
-    
+
     def processRes(self, result, engine):
         try:
             begin = int(result[0])
             description = result[1]
             eventName = result[2]
             service = result[4]
-            
+
             tms = strftime("%Y-%m-%d %H:%M", (localtime(begin)))
             print_debug('EVT', '[' + tms + '] - ' + eventName + ' / ' + service.getServiceName())
-            evt = self.epg.lookupEventTime(service.ref,begin + 30)
+            evt = self.epg.lookupEventTime(service.ref, begin + 30)
             if not evt:
                 return None
             title = eventName
@@ -540,23 +553,23 @@ class MovieGuide(DefaultScreen, SelectionEventInfo):
                 return None
             rok = self.parseYear(description)
             if evt and title == 'Film fabularny':
-                title = evt.getEventName() 
-            title = self.__replaceTitle(title)            
+                title = evt.getEventName()
+            title = self.__replaceTitle(title)
             evid = service.getServiceName() + '___' + str(begin)
             lista = self.__loadNfo(evid)
             if lista:
                 #print_debug('----> Lista', str(lista))
                 lst = [lista]
-                return self.filmwebQueryCallback(lst, MT_MOVIE, (result,tms, evt, rok, False))
+                return self.filmwebQueryCallback(lst, MT_MOVIE, (result, tms, evt, rok, False))
             else:
-                df = engine.query(MT_MOVIE, title, rok, False, self.filmwebQueryCallback, (result,tms, evt, rok, True))
+                df = engine.query(MT_MOVIE, title, rok, False, self.filmwebQueryCallback, (result, tms, evt, rok, True))
                 evn = evt and evt.getEventName() or '???'
                 print_debug('EVT EPG 1', 'rok:' + str(rok) + ", name: " + evn)
                 return df
         except:
             import traceback
-            traceback.print_exc()  
-                    
+            traceback.print_exc()
+
     # LISTA --> (strig_rep, URL, string_rep_first_line, title, rating, year, country)
     def filmwebQueryCallback(self, lista, typ, data):
         x = data[0]
@@ -567,60 +580,60 @@ class MovieGuide(DefaultScreen, SelectionEventInfo):
         duration = x[3] and x[3] * 60
         save = data[4]
         service = x[4]
-        
+
         if evt:
             evtb = evt.getBeginTime()
             inrange = (begin - 30) < evtb < (begin + 30)
             if not inrange:
                 print_debug('------> EPG Event is not the same as entry <-----------')
                 print_debug('------> EPG', evt.getEventName() + ", RES: " + str(x[2]) + ', service: ' + service.getServiceName())
-                evt = None 
-        
+                evt = None
+
         tots = '??'
         if evt:
             print_debug('Event duration', str(evt.getDuration() / 60))
             duration = evt.getDuration()
-        
+
         if duration:
             tot = begin + duration
             tots = strftime("%H:%M", (localtime(tot)))
-            
+
         print_debug('Result filmweb query list', str(lista))
-             
+
         pixmap, state = self.__getStateData(evt, service, begin, duration)
-                          
+
         resme = None
         if lista and len(lista) > 0:
             rating = lista[0][4]
             try:
-                rt = float(rating.replace(',','.'))
+                rt = float(rating.replace(',', '.'))
             except:
                 rt = 0
             rts = "%1.1f" % rt
-            resme = (begin,lista[0][2],tms + ' - ' + tots, 
-                               service.getServiceName(),rts, service, evt, 
+            resme = (begin, lista[0][2], tms + ' - ' + tots,
+                               service.getServiceName(), rts, service, evt,
                                lista[0][1], lista[0][5], rt, duration, pixmap, state)
             if save:
-                self.__saveNfo(lista[0], service.getServiceName() + '___' + str(begin))           
+                self.__saveNfo(lista[0], service.getServiceName() + '___' + str(begin))
         else:
-            resme = (begin,x[2],tms + ' - ' + tots, 
-                    service.getServiceName(),'0.0', service, evt, 
+            resme = (begin, x[2], tms + ' - ' + tots,
+                    service.getServiceName(), '0.0', service, evt,
                     None, parsed_rok, 0, duration, pixmap, state)
-        return resme        
-        
+        return resme
+
     # --- Private methods ------------------------------------------------
-    
+
     # (begin_time, caption, event_duration_desc, service_name, rating_string, 
     #  ServiceReference, eServiceEvent, details_URL, movie_year, rating_value, duration_in_sec, 
     #  pixmap, state) 
-    
+
     def __getStateData(self, evt, service, begin, duration):
-        pixmap = None 
+        pixmap = None
         state = 0
         if self.__isInTimer(evt, service, begin, duration):
             pathe = "%s/resource/clock.png" % (self.ppath)
             pixmap = LoadPixmap(cached=True, path=pathe)
-            state = 1            
+            state = 1
         else:
             now = time()
             if duration and begin + duration < now:
@@ -651,7 +664,7 @@ class MovieGuide(DefaultScreen, SelectionEventInfo):
         except:
             import traceback
             traceback.print_exc()
-        
+
     def __getFreshEntry(self, index, cur):
         if not cur:
             return None
@@ -666,14 +679,14 @@ class MovieGuide(DefaultScreen, SelectionEventInfo):
             lst[11] = pixmap
             return tuple(lst)
         return None
-                   
+
     def __isInTimer(self, evt, service, begin, duration):
         refstr = service.ref.toString()
         eventid = evt and evt.getEventId() or self.getEventIdByData(service.getServiceName(), begin)
         for timer in self.session.nav.RecordTimer.timer_list:
             if timer.eit == eventid and timer.service_ref.ref.toString() == refstr:
                 return timer
-        match = begin and duration and self.session.nav.RecordTimer.isInTimer(eventid, begin,duration, refstr)
+        match = begin and duration and self.session.nav.RecordTimer.isInTimer(eventid, begin, duration, refstr)
         #print_debug('IS IN TIMER match:', str(match))
         if match:
             endt = begin + duration
@@ -688,7 +701,7 @@ class MovieGuide(DefaultScreen, SelectionEventInfo):
 # (caption, url, basic_caption, title, rating, year, country)
     def __saveNfo(self, data, evid):
         sfile = None
-        try:                              
+        try:
             root = xml.Element('data')
             sfile = open(self.path + '/' + evid + '.nfo', "w")
             idx = 0
@@ -697,7 +710,7 @@ class MovieGuide(DefaultScreen, SelectionEventInfo):
                 if x:
                     typ = type(x)
                     child.set('typ', typ.__name__)
-                    child.text = str(x) 
+                    child.text = str(x)
                 else:
                     child.set('typ', 'None')
                 root.append(child)
@@ -708,8 +721,8 @@ class MovieGuide(DefaultScreen, SelectionEventInfo):
             traceback.print_exc()
         finally:
             if sfile is not None:
-                sfile.close()    
-    
+                sfile.close()
+
     def __loadNfo(self, evid):
         sfile = None
         try:
@@ -720,7 +733,7 @@ class MovieGuide(DefaultScreen, SelectionEventInfo):
                 sfile = codecs.open(mp, 'r', encoding='utf-8')
                 tree = xml.parse(sfile)
                 root = tree.getroot()
-                for x in root:            
+                for x in root:
                     typ = x.attrib.get('typ')
                     value = x.text
                     if typ == 'str':
@@ -737,15 +750,15 @@ class MovieGuide(DefaultScreen, SelectionEventInfo):
             if sfile is not None:
                 sfile.close()
         return None
-                
-    def __tryAddTimer(self, service, event, cur):        
+
+    def __tryAddTimer(self, service, event, cur):
         if not service or (not cur[10] and not event):
             return
-                
+
         eventid = event and event.getEventId()
-        refstr = service.ref.toString() 
+        refstr = service.ref.toString()
         print_debug('Trying to add timer for service', refstr + ' and event: ' + str(eventid))
-        tmr = self.__isInTimer(event, service, cur[0], cur[10])        
+        tmr = self.__isInTimer(event, service, cur[0], cur[10])
         if tmr:
             cb_func = lambda ret : not ret or self.__removeTimer(tmr)
             self.session.openWithCallback(cb_func, MessageBox, _("Do you really want to delete %s?") % cur[1])
@@ -753,7 +766,7 @@ class MovieGuide(DefaultScreen, SelectionEventInfo):
 
         #(begin, end, name, description, eit)
         if event:
-            newEntry = RecordTimerEntry(service, checkOldTimers = True, dirname = preferredTimerPath(), *parseEvent(event))
+            newEntry = RecordTimerEntry(service, checkOldTimers=True, dirname=preferredTimerPath(), *parseEvent(event))
         else:
             begin = cur[0] - config.recording.margin_before.value * 60
             end = cur[0] + cur[10] + config.recording.margin_after.value * 60
@@ -763,15 +776,15 @@ class MovieGuide(DefaultScreen, SelectionEventInfo):
             if evid and self.eventDetails.has_key(evid):
                 name = self.eventDetails[evid]['fullname']
                 desc = self.eventDetails[evid]['plot']
-            newEntry = RecordTimerEntry(service, begin, end, name, desc, evid, checkOldTimers = True, dirname = preferredTimerPath())
-        self.session.openWithCallback(self.__finishedAdd, TimerEntry, newEntry)            
-            
+            newEntry = RecordTimerEntry(service, begin, end, name, desc, evid, checkOldTimers=True, dirname=preferredTimerPath())
+        self.session.openWithCallback(self.__finishedAdd, TimerEntry, newEntry)
+
     def __removeTimer(self, timer):
         timer.afterEvent = AFTEREVENT.NONE
         self.session.nav.RecordTimer.removeEntry(timer)
         self.__updateListData()
-        
-    def __finishedAdd(self, answer):        
+
+    def __finishedAdd(self, answer):
         from Screens.TimerEdit import TimerSanityConflict
         if answer[0]:
             entry = answer[1]
@@ -786,26 +799,26 @@ class MovieGuide(DefaultScreen, SelectionEventInfo):
             self.__updateListData()
 
     def __query(self, service, tms):
-        res = None
         sname = service.getServiceName();
+        print_debug('Query service: ', str(sname))
         if sname:
             if MAPPING2.get(sname):
                 return FilmwebTvEngine().query(service, MT_MOVIE, tms)
             if MAPPING.get(sname):
                 return TelemagEngine().query(service, MT_MOVIE, tms)
-        return res
+        return None
 
     def __replaceTitle(self, title):
-        title = title.replace('IV','4')
-        title = title.replace('IX','9')
-        title = title.replace(' X ',' 10 ')
-        title = title.replace('VIII','8')
-        title = title.replace('VII','7')
-        title = title.replace('VI','6')        
-        title = title.replace('III','3')
-        title = title.replace('II','2')
-        title = title.replace(' I ',' 1 ')        
-        title = title.replace(' V ',' 5 ')
+        title = title.replace('IV', '4')
+        title = title.replace('IX', '9')
+        title = title.replace(' X ', ' 10 ')
+        title = title.replace('VIII', '8')
+        title = title.replace('VII', '7')
+        title = title.replace('VI', '6')
+        title = title.replace('III', '3')
+        title = title.replace('II', '2')
+        title = title.replace(' I ', ' 1 ')
+        title = title.replace(' V ', ' 5 ')
         return title
 
     def __replaceConverter(self, data):
@@ -826,8 +839,8 @@ class MovieGuide(DefaultScreen, SelectionEventInfo):
             mst = data.master
             data.disconnectAll()
             source.connect(src)
-            mst.connect(source) 
-                
+            mst.connect(source)
+
     def __replaceConverters(self):
         # replace converters
         for key in self:
@@ -836,7 +849,7 @@ class MovieGuide(DefaultScreen, SelectionEventInfo):
                 convs = []
                 for x in val.downstream_elements:
                     convs.append(x)
-                    
+
                 for conv in convs:
                     className = conv.__class__.__name__
                     print_debug('Replace converters', className)
@@ -845,27 +858,31 @@ class MovieGuide(DefaultScreen, SelectionEventInfo):
                             self.__replaceConverter(conv)
                         except:
                             import traceback
-                            traceback.print_exc()  
-                                        
+                            traceback.print_exc()
+
+    def __shown(self):
+        if self.initialized and self.eventlist.style == "progress":
+            self.displayEventList()
+
     def __startMe(self):
         self.setTitle(_("Movie Guide"))
-        self.__updateServices()        
+        self.__updateServices()
         self.refreshList()
         self.__updateClock()
-        
+
     def __finishMe(self):
         config.plugins.mfilmweb.sort.setValue(self.sortIndex)
         config.plugins.mfilmweb.sortOrder.setValue(self.sortOrder)
         config.plugins.mfilmweb.save()
         configfile.save()
-                
+
         if self.clocktimer:
             self.clocktimer.stop()
             self.clocktimer.callback.remove(self.__updateClock)
         if self.updatetimer:
             self.updatetimer.stop()
             self.updatetimer.callback.remove(self.__updateListData)
-        
+
     def __updateServices(self):
         print_debug('---- Update services ...')
         self.services = []
@@ -877,10 +894,10 @@ class MovieGuide(DefaultScreen, SelectionEventInfo):
                 sr = ServiceReference(ref)
                 print_info('--> SERV', str(x) + ', name: ' + sr.getServiceName())
                 self.services.append(sr)
-                
+
     def __updateClock(self):
         now = localtime(time())
-        
+
         txt = strftime('%Y-%m-%d | %H:%M', now)
         self["clock-str"].setText(txt)
         hrs = strftime('%I', now)
@@ -888,11 +905,10 @@ class MovieGuide(DefaultScreen, SelectionEventInfo):
         pathe = "%s/resource/hours/%s-nq8.png" % (self.ppath, hrs)
         print_debug('clock path hours', pathe)
         pixmap = LoadPixmap(cached=True, path=pathe)
-        self["clock-hr"].instance.setPixmap(pixmap) 
-        
+        self["clock-hr"].instance.setPixmap(pixmap)
+
         pathe = "%s/resource/minutes/%s-nq8.png" % (self.ppath, mns)
         print_debug('clock path minutes', pathe)
         pixmap = LoadPixmap(cached=True, path=pathe)
-        self["clock-min"].instance.setPixmap(pixmap) 
+        self["clock-min"].instance.setPixmap(pixmap)
 
-    
