@@ -63,6 +63,8 @@ Ja osobiście zainstalowałem sobie skrót na naciśnięciu ŻÓŁTEGO klawisza 
 
 = Informacja o zmianach w wersjach =
 ----
+=== ver. 1.1.1 ===
+  * Poprawki błędów w Przewodniku Filmowym
 === ver. 1.1.0 ===
   * Dodanie kombajnu o nazwie Przewodnik Filmowy, który służy do przedstawienia pozycji filmowych na wybranych kanałach wraz z oceną i opisem ściągniętym z Filmweb-u
   * Umożliwienie sortowania w przewodniku po ocenie, dacie produkcji, nazwie pozycji czy nazwie kanału
