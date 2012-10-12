@@ -46,6 +46,8 @@ Ja osobiście zainstalowałem sobie skrót na naciśnięciu ŻÓŁTEGO klawisza 
 
 = Planowane zmiany =
 ----
+  * Dodanie obsługi miniseriali w Przewodniku Filmowym
+  * Poprawa wyszukiwania w Przewodniku polegająca na wyszukiwaniu po tytule oryginalnym w przypadku gdy nie trafiono po tytule polskim
   * Dodanie obsługi związanej z informacją o tym, że chciałbym oglądnąć jakąś pozycję
   * Poprawa trafności wyszukiwania bezpośredniego oraz rozróżniania seriali od filmów
   * Modyfikacja standardowego panelu informacyjnego tak by wyświetlana była na nim informacja z Filmweb o aktualnie oglądanej pozycji
