@@ -1,8 +1,9 @@
 #!/bin/sh
 
 PTH=usr/lib/enigma2/python/Plugins/Extensions/Filmweb
-VER=1.1.0
+VER=1.1.1
 ARC=mipsel
+#ARC=unk
 
 opkg_extract_value() {
 	sed -e "s/^[^:]*:[[:space:]]*//"

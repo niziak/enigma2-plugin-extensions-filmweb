@@ -21,7 +21,7 @@
 # GNU General Public License, version 3 or later
 ######################################################################
 
-from twisted.web.client import downloadPage, getPage
+from twisted.web.client import downloadPage, getPage, defer
 from __common__ import _
 from logger import print_info, print_debug
 import time
@@ -61,29 +61,29 @@ def loadMappings():
                 if dt and len(dt) > 2:
                     srv = dt[2]
                     if len(srv.strip()) > 0:
-                        MAPPING[dt[1]] = srv                    
+                        MAPPING[dt[1]] = srv
                     if len(dt) > 3:
                         srv = dt[3]
                         if len(srv.strip()) > 0:
                             MAPPING2[dt[1]] = srv
     except:
         import traceback
-        traceback.print_exc() 
+        traceback.print_exc()
     finally:
         if sfile is not None:
-            sfile.close()  
+            sfile.close()
 
 loadMappings()
- 
+
 class FilmwebEngine(object):
     def __init__(self, failureHandler=None, statusComponent=None):
         self.inhtml = None
-        self.loopx = 0  
-        self.resultlist = []       
-        self.detailsData = {} 
+        self.loopx = 0
+        self.resultlist = []
+        self.detailsData = {}
         self.failureHandler = failureHandler
         self.statusComponent = statusComponent
-    
+
     def login(self, username, password, callback=None, resdata=None):
         print_debug("LoginPage", "started")
         if self.statusComponent:
@@ -91,17 +91,17 @@ class FilmwebEngine(object):
         if COOKIES.has_key(SESSION_KEY):
             COOKIES.pop(SESSION_KEY)
         if COOKIES.has_key(USER_TOKEN):
-            COOKIES.pop(USER_TOKEN)  
+            COOKIES.pop(USER_TOKEN)
         data = {'j_username': username, "j_password" : password}
         data = urllib.urlencode(data)
         print_info("LoginPage data", str(data))
-        return getPage(LOGIN_QUERY_URL, method='POST', postdata=data, 
+        return getPage(LOGIN_QUERY_URL, method='POST', postdata=data,
                 headers={'Content-Type':'application/x-www-form-urlencoded'},
-                cookies=COOKIES).addCallback(self.__fetchLoginRes, callback, resdata).addErrback(self.__fetchLoginRes, callback, resdata)        
+                cookies=COOKIES).addCallback(self.__fetchLoginRes, callback, resdata).addErrback(self.__fetchLoginRes, callback, resdata)
 
     def queryDetails(self, link, callback=None, sessionId=None):
-        return getPage(link, cookies=COOKIES).addCallback(self.__fetchDetailsOK, link, callback, sessionId).addErrback(self.__fetchFailed) 
-        
+        return getPage(link, cookies=COOKIES).addCallback(self.__fetchDetailsOK, link, callback, sessionId).addErrback(self.__fetchFailed)
+
     def query(self, type, title, year=None, tryOther=False, callback=None, data=None):
         fetchurl = SEARCH_QUERY_URL + type + "?q=" + mautils.quote(title.encode('utf8'))
         if year:
@@ -110,26 +110,26 @@ class FilmwebEngine(object):
         return self.__fetchEntries(fetchurl, type, callback, tryOther, data)
 
     def searchWallpapers(self, link_, callback):
-        if link_:  
+        if link_:
             return getPage(link_, cookies=COOKIES).addCallback(self.__fetchWallpaperOK, callback).addErrback(self.__fetchFailed)
-        return None      
-                
-    def loadPoster(self, posterUrl, callback=None, localfile = POSTER_PATH):
-        if posterUrl:                                
+        return None
+
+    def loadPoster(self, posterUrl, callback=None, localfile=POSTER_PATH):
+        if posterUrl:
             print_info("Downloading poster", posterUrl + " to " + localfile)
             return downloadPage(posterUrl, localfile).addCallback(self.__fetchPosterOK, localfile, callback).addErrback(self.__fetchFailed)
         return None
-                        
+
     def loadWallpaper(self, furl, localfile, callback):
         if not furl or not localfile:
             return None
         print_info("Loading wallpaper", 'URL: ' + furl + ', Local File:' + localfile)
-        return downloadPage(furl, localfile).addCallback(callback,localfile).addErrback(self.__fetchFailed)
+        return downloadPage(furl, localfile).addCallback(callback, localfile).addErrback(self.__fetchFailed)
 
-    def loadDescriptions(self, furl, callback):  
+    def loadDescriptions(self, furl, callback):
         if not furl:
             return None
-        print_info("LOAD DESCS - link", furl + "/descs")                  
+        print_info("LOAD DESCS - link", furl + "/descs")
         return getPage(furl + "/descs", cookies=COOKIES).addCallback(self.__fetchExtraOK, callback).addErrback(self.__fetchFailed)
 
     def applyRating(self, rating, filmId, userToken, callback):
@@ -144,11 +144,11 @@ class FilmwebEngine(object):
                        'X-GWT-Permutation':'7C0EB94ECB5DCB0BABC0AE73531FA849',
                        'X-Artuser-Token': userToken
                        }
-            return getPage(PAGE_URL + '/rpc/userFilmRemoteService', method='POST', postdata=data, 
+            return getPage(PAGE_URL + '/rpc/userFilmRemoteService', method='POST', postdata=data,
                     headers=headers,
-                    cookies=COOKIES).addCallback(callback).addErrback(callback)  
-        return None  
-        
+                    cookies=COOKIES).addCallback(callback).addErrback(callback)
+        return None
+
 
 ############################################# LOCAL METHODS ###############################
 
@@ -166,8 +166,8 @@ class FilmwebEngine(object):
                 callback(data)
         except:
             import traceback
-            traceback.print_exc()            
-            
+            traceback.print_exc()
+
     def __fetchWallpaperOK(self, txt_, callback):
         print_debug("fetchWallpaperOK ...")
         try:
@@ -179,13 +179,13 @@ class FilmwebEngine(object):
                 walls = mautils.after(txt_, '<ul class=filmWallapersList')
                 elements = walls.split('filmWallapersItem')
                 elcount = len(elements)
-                print_debug("Wallpapers count", str(elcount))                
+                print_debug("Wallpapers count", str(elcount))
                 if elcount > 0: # and self.has_key('wallpaper'):
                     furl = None
                     for elem in elements:
                         didx = elem.find('<span class=newLinkLoggedOnly>')
                         print_debug("Wallpaper idx", str(didx))
-                        if didx > -1:                            
+                        if didx > -1:
                             furl = mautils.between(elem, '<span class=newLinkLoggedOnly>', '</span>')
                             print_debug("URL", furl)
                             wallpapers.append(furl)
@@ -194,10 +194,10 @@ class FilmwebEngine(object):
         except:
             import traceback
             traceback.print_exc()
-                    
+
     def __fetchPosterOK(self, data, localfile, callback=None):
         try:
-            print_debug("Fetch Poster OK", str(COOKIES)) 
+            print_debug("Fetch Poster OK", str(COOKIES))
             #if not self.has_key('status_bar'):
             #    return
             if self.statusComponent:
@@ -213,51 +213,51 @@ class FilmwebEngine(object):
         except:
             import traceback
             traceback.print_exc()
-                
+
     def __fetchLoginRes(self, res_, callback, data):
         try:
             print_debug("RESULT COOKIE", str(COOKIES))
             if COOKIES.has_key(SESSION_KEY):
-                sessionId = COOKIES[SESSION_KEY]            
+                sessionId = COOKIES[SESSION_KEY]
             else:
                 sessionId = None
             if COOKIES.has_key(USER_TOKEN):
-                userToken = COOKIES[USER_TOKEN]            
+                userToken = COOKIES[USER_TOKEN]
             else:
-                userToken = None     
+                userToken = None
             if self.statusComponent:
-                self.statusComponent.setText(_('Login done'))   
+                self.statusComponent.setText(_('Login done'))
             print_info('Login data', str(userToken) + ', SID: ' + str(sessionId))
             if callback:
                 callback(userToken, sessionId, data)
         except:
             import traceback
-            traceback.print_exc()             
-            
+            traceback.print_exc()
+
     def __fetchDetailsOK(self, txt_, link, callback, sessionId):
         print_info("fetch details OK", str(COOKIES))
         if self.statusComponent:
             self.statusComponent.setText(_("Movie details loading completed"))
-        self.inhtml = mautils.html2utf8(txt_)   
+        self.inhtml = mautils.html2utf8(txt_)
         self.detailsData = {}
         if self.inhtml:
             try:
                 self.parseLogin()
-                self.parseFilmId()                          
-                self.parseTitle()  
-                self.parseOrgTitle() 
+                self.parseFilmId()
+                self.parseTitle()
+                self.parseOrgTitle()
                 self.parseRating()
-                self.parsePoster()                
-                self.parsePlot()                            
+                self.parsePoster()
+                self.parsePlot()
                 self.parseGenere()
                 self.parseDirector()
                 self.parseWriter()
                 self.parseCountry()
                 self.parseYear()
-                self.parseRuntime()   
+                self.parseRuntime()
                 self.parseMyVote()
-                self.parsePromoWidget(sessionId)                
-                self.parseWallpaper(link)                      
+                self.parsePromoWidget(sessionId)
+                self.parseWallpaper(link)
                 self.parseCast()
             except:
                 import traceback
@@ -267,13 +267,13 @@ class FilmwebEngine(object):
         if (callback):
             return callback(self.detailsData)
         return self.detailsData
-            
+
     def __fetchEntries(self, fetchurl, type, callback, tryOther=True, data=None):
         self.resultlist = []
-        return getPage(fetchurl, cookies=COOKIES).addCallback(self.__fetchOK, callback, tryOther, fetchurl, type, data).addErrback(self.__fetchFailed) 
-        
-    def __fetchOK(self, txt_, callback, tryOther, fetchurl, type, data):        
-        print_debug("Fetch OK", str(COOKIES))                
+        return getPage(fetchurl, cookies=COOKIES).addCallback(self.__fetchOK, callback, tryOther, fetchurl, type, data).addErrback(self.__fetchFailed)
+
+    def __fetchOK(self, txt_, callback, tryOther, fetchurl, type, data):
+        print_debug("Fetch OK", str(COOKIES))
         if self.statusComponent:
             self.statusComponent.setText(_("Filmweb Download completed"))
         self.inhtml = mautils.html2utf8(txt_)
@@ -295,22 +295,22 @@ class FilmwebEngine(object):
                     type = MT_SERIE
                 return self.__fetchEntries(fetchurl, type, callback, False, data)
         if callback:
-            return callback(self.resultlist, type, data)            
+            return callback(self.resultlist, type, data)
         return None
-        
+
     def __fetchFailed(self, txt_):
         print_info("Fetch failed", str(txt_))
         if self.failureHandler:
             self.failureHandler(txt_)
 
-    def __parseEntries(self, type):     
-        print_debug("__parseEntries", "started")   
+    def __parseEntries(self, type):
+        print_debug("__parseEntries", "started")
         if type == MT_MOVIE:
             ttx = 'Filmy ('
         else:
             ttx = 'Seriale ('
         fidx = self.inhtml.find(ttx)
-        print_debug("search idx", str(fidx))  
+        print_debug("search idx", str(fidx))
         if fidx > -1:
             counts = mautils.between(self.inhtml, ttx, ')')
             count = mautils.castInt(counts.strip())
@@ -321,7 +321,7 @@ class FilmwebEngine(object):
                 self.inhtml = None
         else:
             self.inhtml = None
-            
+
         if self.inhtml is None:
             pass
         else:
@@ -337,18 +337,18 @@ class FilmwebEngine(object):
                     element = mautils.after(element, 'searchResultTitle href="')
                     link = mautils.before(element, '"')
                     print_debug("The movie link", link)
-                    cast = mautils.after(element, 'class=searchHitCast')                    
-                    cast =  mautils.between(cast, '>', '</div>')                    
+                    cast = mautils.after(element, 'class=searchHitCast')
+                    cast = mautils.between(cast, '>', '</div>')
                     cast = mautils.strip_tags(cast)
                     cast = cast.replace('\t', '')
                     cast = cast.replace('\n', '')
                     print_debug("The movie cast", cast)
-                    rating = mautils.after(element, 'class=searchResultRating')                    
-                    rating =  mautils.between(rating, '>', '</div>')                    
+                    rating = mautils.after(element, 'class=searchResultRating')
+                    rating = mautils.between(rating, '>', '</div>')
                     rating = mautils.strip_tags(rating)
                     rating = rating.replace('\t', '')
                     rating = rating.replace('\n', '')
-                    print_debug("The movie rating", rating)                    
+                    print_debug("The movie rating", rating)
                     #self.links.append('http://www.filmweb.pl' + link)                    
                     title = mautils.between(element, '">', '</a>')
                     title = title.replace('\t', '')
@@ -368,8 +368,8 @@ class FilmwebEngine(object):
                     if year:
                         element += ' (' + year.strip() + ')'
                     if country:
-                        element += ' - ' + country.strip()    
-                    basic_data = element                
+                        element += ' - ' + country.strip()
+                    basic_data = element
                     #element = mautils.convert_entities(element)
                     element = mautils.strip_tags(element)
                     if rating:
@@ -381,42 +381,42 @@ class FilmwebEngine(object):
                     rt = rating.split()
                     # (caption, url, basic_caption, title, rating, year, country)
                     self.resultlist.append((element, PAGE_URL + link, basic_data, title, rt[0], year, country))
-        
+
     def parsePlot(self):
         print_debug("parsePlot", "started")
         plot = mautils.between(self.inhtml, '<span class=filmDescrBg property="v:summary">', '</span>')
         plot = plot.replace('  ', ' ')
         plot = mautils.strip_tags(plot)
         print_debug("PLOT", plot)
-        self.detailsData['plot'] = plot        
-        
+        self.detailsData['plot'] = plot
+
     def parseYear(self):
         print_debug("parseYear", "started")
         year = mautils.between(self.inhtml, '<span id=filmYear class=filmYear>', '</span>')
         year = mautils.strip_tags(year)
         self.detailsData['year'] = str(year)
-        
+
     def parseGenere(self):
         print_debug("parseGenere", "started")
         genre = ''
-        if mautils.between(self.inhtml, '<title>', '</title>').find('Serial TV') > -1: 
+        if mautils.between(self.inhtml, '<title>', '</title>').find('Serial TV') > -1:
             genre = mautils.between(self.inhtml, "gatunek:", '</strong>')
-        else:  
+        else:
             genre = mautils.between(self.inhtml, "gatunek:", '</tr>')
         genre = mautils.strip_tags(genre)
         self.detailsData['genre'] = genre
-                            
+
     def parseCountry(self):
         print_debug("parseCountry", "started")
         country = ''
-        if mautils.between(self.inhtml, '<title>', '</title>').find('Serial TV') > -1: 
+        if mautils.between(self.inhtml, '<title>', '</title>').find('Serial TV') > -1:
             country = mautils.between(self.inhtml, "kraj:", '</dd>')
             country = mautils.after(country, '<dd>')
-        else:  
+        else:
             country = mautils.between(self.inhtml, 'produkcja:', '</tr>')
         country = mautils.strip_tags(country)
         self.detailsData['country'] = country
-    
+
     def parseWriter(self):
         print_debug("parseWriter", "started")
         writer = mautils.between(self.inhtml, "scenariusz:", '</tr>')
@@ -424,17 +424,17 @@ class FilmwebEngine(object):
         writer = writer.replace("(więcej...)", '')
         writer = mautils.strip_tags(writer)
         self.detailsData['writer'] = writer
-        
+
     def parseDirector(self):
         print_debug("parseDirector", "started")
         director = ''
-        if mautils.between(self.inhtml, '<title>', '</title>').find('Serial TV') > -1: 
-            if self.inhtml.find("Twórcy:") > -1: 
+        if mautils.between(self.inhtml, '<title>', '</title>').find('Serial TV') > -1:
+            if self.inhtml.find("Twórcy:") > -1:
                 director = mautils.between(self.inhtml, "Twórcy:", '</dd>')
-            else:  
+            else:
                 director = mautils.between(self.inhtml, "Twórca:", '</dd>')
             director = mautils.after(director, '<dd>')
-        else: 
+        else:
             director = mautils.between(self.inhtml, "reżyseria:", '</tr>')
             print_debug("director to parse", director)
             director = mautils.after(director, '</th>')
@@ -443,7 +443,7 @@ class FilmwebEngine(object):
         director = mautils.strip_tags(director)
         print_debug("director stripped", director)
         self.detailsData['director'] = director
-        
+
     def parseRating(self):
         print_debug("parseRating", "started")
         rating = mautils.between(self.inhtml, '<div class=rates>', '</div>')
@@ -453,32 +453,32 @@ class FilmwebEngine(object):
             rating = rating.replace(',', '.')
             rate = float(rating.strip())
             print_debug("RATING", str(rate))
-            self.detailsData['rating'] = _("User Rating") + ": " + str(rate) + " / 10"            
-            ratingstars = int(10*round(rate,1))
+            self.detailsData['rating'] = _("User Rating") + ": " + str(rate) + " / 10"
+            ratingstars = int(10 * round(rate, 1))
             self.detailsData['rating_val'] = ratingstars
         else:
             self.detailsData['rating'] = _("no user rating yet")
             self.detailsData['rating_val'] = 0
-            
+
     def parseFilmId(self):
         print_debug("parseFilmId", "started")
-        fid = mautils.between(self.inhtml, '<div id=filmId style="display:none;">', '</div>') 
+        fid = mautils.between(self.inhtml, '<div id=filmId style="display:none;">', '</div>')
         if fid and len(fid) > 0:
             self.detailsData['film_id'] = fid
         else:
             self.detailsData['film_id'] = None
         print_info("FILM ID", str(self.detailsData['film_id']))
-        
+
     def parseLogin(self):
         print_debug("parseLogin", "started")
         idx = self.inhtml.find('userName')
         print_debug("Login user idx", str(idx))
         if idx > -1:
             lg = mautils.between(self.inhtml, 'userName">', '</a>')
-            self.detailsData['login'] = lg            
+            self.detailsData['login'] = lg
         else:
             self.detailsData['login'] = ''
-        
+
     def parseTitle(self):
         print_debug("parseTitle", "started")
         title = mautils.between(self.inhtml, '<title>', '</title>')
@@ -486,16 +486,16 @@ class FilmwebEngine(object):
         if title.find('(') > -1:
             title = mautils.before(title, '(')
         if title.find('/') > -1:
-            title = mautils.before(title, '/')   
-        print_debug("title last", title)             
+            title = mautils.before(title, '/')
+        print_debug("title last", title)
         self.detailsData['title'] = title
-        
+
     def parseOrgTitle(self):
         print_debug("parseOrgTitle", "started")
         title = mautils.between(self.inhtml, '<h2 class=origTitle>', '</h2>')
-        print_debug("org title first", title)          
+        print_debug("org title first", title)
         self.detailsData['org_title'] = title
-    
+
     def parsePromoWidget(self, sessionId):
         print_debug("parsePromoWidget", "started")
         if sessionId is not None:
@@ -505,7 +505,7 @@ class FilmwebEngine(object):
                 self.detailsData['promo'] = txt
                 return
         self.detailsData['promo'] = None
-        
+
     def parseMyVote(self):
         print_debug("parseMyVote", "started")
         idx = self.inhtml.find('gwt-currentVoteLabel')
@@ -514,17 +514,17 @@ class FilmwebEngine(object):
         if idx > 0:
             txt = mautils.between(self.inhtml, 'gwt-currentVoteLabel>', '</span>')
             print_debug("My VOTE", txt)
-            num = mautils.between(txt, '(',')')
-            if len(num) > 0 and num.isdigit():                
+            num = mautils.between(txt, '(', ')')
+            if len(num) > 0 and num.isdigit():
                 self.detailsData['vote_val'] = int(num)
                 self.detailsData['vote'] = txt
-    
+
     def parseRuntime(self):
         print_debug("parseRuntime", "started")
         #if mautils.between(self.inhtml, '<title>', '</title>').find('Serial TV') > -1: 
         runtime = mautils.between(self.inhtml, 'filmTime="', '";')
         print_debug('Runtime data', str(runtime))
-        runtime = runtime.replace(' ', '')        
+        runtime = runtime.replace(' ', '')
         if not runtime:
             self.detailsData['runtime'] = ''
             return
@@ -543,37 +543,37 @@ class FilmwebEngine(object):
         if str_m:
             val_runtime += int(float(str_m))
         self.detailsData['runtime'] = val_runtime
-        
+
     def parsePoster(self):
-        print_debug("parsePoster", "started")   
+        print_debug("parsePoster", "started")
         self.detailsData['poster_url'] = None
         if self.inhtml.find('<div class=posterLightbox>') > -1:
             posterUrl = mautils.between(self.inhtml, '<div class=posterLightbox>', '</div>')
             posterUrl = mautils.between(posterUrl, 'href="', '" ')
         else:
             posterUrl = ''
-        print_debug("Poster URL", posterUrl)  
+        print_debug("Poster URL", posterUrl)
         if posterUrl != '' and posterUrl.find("jpg") > 0:
             if self.statusComponent:
                 self.statusComponent.setText(_("Downloading Movie Poster: %s...") % (posterUrl))
             self.detailsData['poster_url'] = posterUrl
-        
+
     def parseWallpaper(self, link_=None):
         print_debug("parseWallpaper", "started")
         idx = self.inhtml.find('<li id="filmMenu-filmWallpapers" class=" caption">tapety</li>')
         print_debug('Wallpaper idx', str(idx))
         self.detailsData['wallpapers_link'] = None
         if idx < 0:
-            self.detailsData['wallpapers_link'] = link_ + '/wallpapers'                
-            
+            self.detailsData['wallpapers_link'] = link_ + '/wallpapers'
+
     def parseCast(self):
-        print_debug("parseCast", "started")  
-        
+        print_debug("parseCast", "started")
+
         cast_list = []
         fidx = self.inhtml.find('<div class="castListWrapper cl">')
         if fidx > -1:
             cast = mautils.between(self.inhtml[fidx:], '<ul class=list>', '</ul>')
-            
+
             elements = cast.split('<li')
             no_elems = len(elements)
             print_debug("Cast list elements count", str(no_elems))
@@ -591,11 +591,11 @@ class FilmwebEngine(object):
                     stre = mautils.strip_tags(stre)
                     stre = stre.replace('   ', '')
                     stre = stre.replace('  ', ' ')
-                    print_debug("Actor data", "IMG=" + imge + ", DATA=" + stre)  
-                    cast_list.append((imge, stre, cidx))                                        
-                    cidx += 1                        
+                    print_debug("Actor data", "IMG=" + imge + ", DATA=" + stre)
+                    cast_list.append((imge, stre, cidx))
+                    cidx += 1
         self.detailsData['cast'] = cast_list
-    
+
     def parseDescriptions(self, dhtml):
         print_debug("parseDescriptions", "started")
         descres = ''
@@ -611,58 +611,65 @@ class FilmwebEngine(object):
                 #print_debug("DESC", str(element))
                 descres = descres + element + '\n\n'
         return descres
-             
+
 class TelemagEngine(object):
     def __init__(self):
         pass
-    
-    def query(self, ref, typ, dz):       
+
+    def query(self, ref, typ, dz):
         ch = self.__getChannel(ref)
-        print_debug('channel', ch)
+        print_debug('Fetching using TELEMAGAZYN-ENGINE - channel', ch)
         if not ch:
             return None
         tp = self.__getType(typ)
         fetchurl = 'http://www.telemagazyn.pl/%s/%s/%s,3,1,dz,go,cpr.html' % (ch, tp, dz)
-        return getPage(fetchurl).addCallback(self.__fetchOK,(ref,typ,dz)).addErrback(self.__fetchFailed)
-    
+        return getPage(fetchurl).addCallback(self.__fetchOK, (ref, typ, dz)).addErrback(self.__fetchFailed)
+
     def __fetchOK(self, res, tup):
+        print_debug('-- FETCH OK for: ', str(tup[0] and tup[0].getServiceName() or '') + ', day: ' + str(tup[2]))
         result = []
         service = tup[0]
         typ = tup[1]
         dzien = tup[2]
         lastnum = 0
+        print_debug('TELEMAGAZYN - Convert result to UTF8 - ', str(service and service.getServiceName() or ''))
         inhtml = mautils.html2utf8(res, 'ISO8859-2')
         idx = inhtml.find('id="lista-programow"')
         if idx > -1:
             inhtml = inhtml[idx:]
             elements = inhtml.split('<td class="lewy')
+            print_debug('Elements count: ' + str(elements and len(elements) or 0))
+            if elements and len(elements) == 0:
+                print_debug('ELEMS 0 - res: ', str(res))
+            offset = 0
             for element in elements:
-                num = mautils.before(element, '<div class="m1"')                
+                num = mautils.before(element, '<div class="m1"')
                 if not num or len(num) == 0:
                     continue
                 num = num.strip()
                 idxm = num.find('<span>')
                 if idxm < 0:
-                    continue 
+                    continue
                 else:
                     numv = mautils.between(num, '<span>', '</span>')
                     if numv.isdigit():
                         num = int(numv)
                     else:
                         continue
-                prog =  mautils.between(element, '<td>', '</td>')
+                prog = mautils.between(element, '<td>', '</td>')
                 #print_debug('PROG', str(prog))
                 ds = None
                 hr = mautils.between(prog, '<div class="m1', '<div')
+                entryId = mautils.between(hr, 'id="chmurka-', '">')
                 #print_debug('HR', str(hr))
                 ds = mautils.between(prog, '<div class="opisProgramu">', '</div>')
                 #print_debug('DS', str(ds))
                 if not ds or len(ds) == 0:
                     ds = None
                 if not hr and len(hr) == 0:
-                    hr = None    
-                if hr and ds:         
-                    row = []       
+                    hr = None
+                if hr and ds:
+                    row = []
                     idxp = hr.find("<p")
                     #print_debug('HRP idx', str(idxp))
                     if idxp > -1:
@@ -670,13 +677,14 @@ class TelemagEngine(object):
                         hr = mautils.strip_tags(hr)
                         hr = hr.strip('"')
                         hr = hr.strip()
-                        tm = time.strptime(dzien + hr,'%Y%m%d%H:%M')
+                        tm = time.strptime(dzien + hr, '%Y%m%d%H:%M')
                         sec = time.mktime(tm)
                         if num < lastnum:
-                            sec += 86400
+                            offset = 86400
+                        sec += offset
                         row.append(sec)
                         print_debug('Godzina', str(hr) + ', sec: ' + str(sec))
-                                                
+
                     idxp = ds.find("<p")
                     #print_debug('DSP idx', str(idxp))
                     if idxp > -1:
@@ -685,112 +693,149 @@ class TelemagEngine(object):
                         dsa = dsa.strip()
                         print_debug('Opis', str(dsa))
                         row.append(dsa)
-                        
+
                         dsa = ds[:idxp]
                         dsa = mautils.strip_tags(dsa)
                         dsa = dsa.strip()
                         print_debug('Tytuł', str(dsa))
                         row.append(dsa)
-                        
+
                     # duration value - always None
+                    #self.__searchDetails(entryId, row)
                     row.append(None)
-                    
+
+                    print_debug('- ROW LENGTH: ', str(len(row)))
                     if len(row) == 4:
                         row.append(service)
                         row.append(typ)
                         result.append(row)
-                lastnum = num            
+                lastnum = num
         ''' ROW to (begin, opis, tytul, service, typ)'''
-        #print_debug('ROW', str(result))            
+        #print_debug('ROW', str(result))    
+        print_debug('-- RESULT FOR: ', str(tup[0] and tup[0].getServiceName() or '') + ', day: ' + str(tup[2]) + ', res: ' + str(result))
         return result
-    
+
+    @defer.inlineCallbacks
+    def __searchDetails(self, entryId, row):
+        print_debug('Search details for entry:', str(entryId))
+        duration = None
+        if entryId:
+            durl = "http://www.telemagazyn.pl/ajax/chmurka_programu/%s.html" % (entryId)
+            ddf = getPage(durl).addCallback(self.__fetchDetailsOK).addErrback(self.__fetchFailed)
+            duration = yield ddf
+        print_debug('DURATION:', str(duration))
+        row.append(duration)
+
+    def __fetchDetailsOK(self, res):
+        if res:
+            prog = mautils.between(res, '<span>Czas:</span>', 'min.')
+            if prog:
+                prog = mautils.strip_tags(prog)
+                prog = prog.strip()
+                if prog.isdigit():
+                    return int(prog)
+        return None
+
     def __fetchFailed(self, res):
         pass
-    
-    def __getChannel(self, ref):              
+
+    def __getChannel(self, ref):
         x = ref.getServiceName()
         #print_debug('xx', x +', map: '+ str(MAPPING))
         return MAPPING.get(x)
-        
+
     def __getType(self, typ):
         return 'film'
-    
+
 class FilmwebTvEngine(object):
     def __init__(self):
         pass
-    
+
     def query(self, ref, typ, dz):
         ch = self.__getChannel(ref)
-        print_debug('channel', ch)
+        print_debug('Fetching using FILMWEB-ENGINE - channel', ch)
         if not ch:
             return None
-        tms = time.strptime(dz,"%Y%m%d")
+        tms = time.strptime(dz, "%Y%m%d")
         local = time.localtime(time.time())
-        now =time.strptime(time.strftime("%Y%m%d", local),"%Y%m%d")
+        now = time.strptime(time.strftime("%Y%m%d", local), "%Y%m%d")
         #now = time.localtime(time.time())
-        tt = time.mktime(tms) - time.mktime(now) 
+        tt = time.mktime(tms) - time.mktime(now)
         d = datetime.timedelta(seconds=tt)
-        
+
         if local[3] < 6:
             tx = time.localtime(time.mktime(tms) - 6 * 60 * 60)
             dz = time.strftime("%Y%m%d", tx)
-        
-        params ={}
+
+        params = {}
         params['day'] = str(d.days)
-        getdata = urllib.urlencode(params)        
+        getdata = urllib.urlencode(params)
         fetchurl = 'http://www.filmweb.pl/guide/%s?%s' % (ch, getdata)
         print_info('URL', str(fetchurl))
-        return getPage(fetchurl, method='GET', cookies=COOKIES, headers={'Referer':'http://www.filmweb.pl/guide', 'X-Requested-With':'XMLHttpRequest'}).addCallback(self.__fetchOK,(ref,typ,dz)).addErrback(self.__fetchFailed)
-    
-    def __fetchOK(self, res, tup):        
+        return getPage(fetchurl, method='GET', cookies=COOKIES, headers={'Referer':'http://www.filmweb.pl/guide', 'X-Requested-With':'XMLHttpRequest'}).addCallback(self.__fetchOK, (ref, typ, dz)).addErrback(self.__fetchFailed)
+
+    def __fetchOK(self, res, tup):
+        print_debug('-- FETCH OK for: ', str(tup[0] and tup[0].getServiceName() or '') + ', day: ' + str(tup[2]))
         result = []
         service = tup[0]
         typ = tup[1]
         dzien = tup[2]
-        
-        lastsec = time.mktime(time.strptime(dzien + '05:59','%Y%m%d%H:%M'))
+
+        lastsec = time.mktime(time.strptime(dzien + '05:59', '%Y%m%d%H:%M'))
         off = 0
-        
+
+        print_debug('FILMWEBTV - Convert result to UTF8 - ', str(service and service.getServiceName() or ''))
         inhtml = mautils.html2utf8(res)
         #inhtml = mautils.between(inhtml, '<div class="channel first">', '<div class="channel">')
         #print_debug('++++++++++++ page', str(inhtml))
-        inhtml = mautils.after(inhtml,'brak programów dla wybranych filtrów')
-        inhtml = mautils.after(inhtml, '<div class=toScroll>') 
+        inhtml = mautils.after(inhtml, 'brak programów dla wybranych filtrów')
+        inhtml = mautils.after(inhtml, '<div class=toScroll>')
         #print_debug('+++++------- page', str(inhtml))
         #print_debug('------------------')
-        
+
         elements = inhtml.split('<div class="singleProg seance seance_film')
         skip = True
+        print_debug('Elements count: ' + str(elements and len(elements) or 0))
+        if elements and len(elements) == 0:
+            print_debug('ELEMS 0 - res: ', str(res))
         for element in elements:
             if skip:
                 skip = False
                 continue
             row = []
             #print_debug('----------- page', str(element))
-            if element.find('<span class="hour">') < 0:
+            if element.find('<span class="hour">') < 0 and element.find('<span class=hour>') < 0:
+                print_debug('ELEM hour not found - res: ', str(res))
                 continue
-            hr = mautils.between(element, '<span class="hour">', '</span>')
+            if element.find('<span class="hour">') > 0:
+                hr = mautils.between(element, '<span class="hour">', '</span>')
+            else:
+                hr = mautils.between(element, '<span class=hour>', '</span>')
             #print_debug('--', hr)
             hr = mautils.strip_tags(hr)
             hr = hr.strip()
             #print_debug('--', hr)
-            tm = time.strptime(dzien + hr,'%Y%m%d%H:%M')
-            sec = time.mktime(tm) + off * 86400 
+            tm = time.strptime(dzien + hr, '%Y%m%d%H:%M')
+            sec = time.mktime(tm) + off * 86400
             if sec < lastsec:
                 off += 1
                 sec += 86400
             lastsec = sec
             row.append(sec)
             print_debug('Godzina', str(hr) + ', sec: ' + str(sec))
-            
+
             duration = None
+            #print_debug('elem: ', str(element))
             hr = mautils.between(element, '<span class="duration">', '</span>')
             hr = hr and hr.strip()
-            if hr and len(hr) > 0:                
-                print_debug('Czas Trwania', str(hr))
+            if not hr or len(hr) == 0:
+                hr = mautils.between(element, '<span class=duration>', '</span>')
+                hr = hr and hr.strip()
+            if hr and len(hr) > 0:
+                print_debug('Czas Trwania: ', str(hr))
                 if hr.isdigit():
-                    duration = int(hr)            
-            
+                    duration = int(hr)
+
             hr = mautils.between(element, '<p>', '</p>')
             print_debug('HR', str(hr))
             if hr.find('title=') > -1:
@@ -798,7 +843,7 @@ class FilmwebTvEngine(object):
                 hrt = hrt.strip(')')
                 print_debug('Opis', str(hrt))
                 row.append(hrt)
-                
+
                 hrt = mautils.between(hr, '">', '</a>')
                 print_debug('Tytuł', str(hrt))
                 row.append(hrt)
@@ -808,27 +853,28 @@ class FilmwebTvEngine(object):
                     hrt = mautils.strip_tags(hrt)
                     print_debug('Opis', str(hrt))
                     row.append(hrt)
-                    
+
                     hrt = mautils.before(hr, '<br>')
                     hrt = mautils.strip_tags(hrt)
                     print_debug('Tytuł', str(hrt))
                     row.append(hrt)
 
             row.append(duration)
-                                
+
+            print_debug('- ROW LENGTH: ', str(len(row)))
             if len(row) == 4:
                 row.append(service)
                 row.append(typ)
-                result.append(row)             
+                result.append(row)
+        print_debug('-- RESULT FOR: ', str(tup[0] and tup[0].getServiceName() or '') + ', day: ' + str(tup[2]) + ', res: ' + str(result))
         return result
-           
+
     def __fetchFailed(self, res):
         print_info('----> FAILED', str(res))
-    
-    def __getChannel(self, ref):              
+
+    def __getChannel(self, ref):
         x = ref.getServiceName()
         #print_debug('xx', x +', map: '+ str(MAPPING))
         return MAPPING2.get(x)
-     
-    
-        
+
+
