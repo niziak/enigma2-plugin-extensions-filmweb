@@ -45,17 +45,17 @@ Ja osobiście zainstalowałem sobie skrót na naciśnięciu ŻÓŁTEGO klawisza 
 
 = Opis włączenia logów dla Enigma2 =
 ----
-1. Zaloguj się do BOXa uzywając Telnet lub SSH
-2. Zatrzymaj Enigmę komendą: 
+  * Zaloguj się do BOXa uzywając Telnet lub SSH
+  * Zatrzymaj Enigmę komendą: 
 {{{
 killall -9 enigma2
 }}}
-3. Wystartuj Enigmę z logowaniem do pliku:
+  * Wystartuj Enigmę z logowaniem do pliku:
 {{{
 /usr/bin/enigma2 > /tmp/enigma2_logfile.log 2>&1
 }}}
-4. Wykonaj odpowiednie akcje, aby zapisały się dane do logu
-5. Zrestartuj Enigmę w trybie usługi:
+  * Wykonaj odpowiednie akcje, aby zapisały się dane do logu
+  * Zrestartuj Enigmę w trybie usługi:
 {{{
 killall -9 enigma2
 init 4; sleep 10; init 3
