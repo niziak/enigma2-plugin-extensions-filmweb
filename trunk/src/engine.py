@@ -133,7 +133,7 @@ class FilmwebEngine(object):
         return getPage(furl + "/descs", cookies=COOKIES).addCallback(self.__fetchExtraOK, callback).addErrback(self.__fetchFailed)
 
     def applyRating(self, rating, filmId, userToken, callback):
-        if rating and filmId:
+        if rating > -2 and filmId:
             print_debug("rateEntry - user token", str(userToken) + ', rating: ' + str(rating))
             data = '5|0|6|http://2.fwcdn.pl/gwt/newFilmActivity/|CCD826B60450FCB69E9BD856EE06EAB5|filmweb.gwt.filmactivity.client.UserFilmRemoteService|setRate|J|I|1|2|3|4|2|5|6|' + str(filmId) + '|0|' + str(rating) + '|'
             print_debug("POST DATA", data)
@@ -176,17 +176,18 @@ class FilmwebEngine(object):
             if self.statusComponent:
                 self.statusComponent.setText(_("Wallpaper loading completed"))
             if txt_ and len(txt_) > 0:
-                walls = mautils.after(txt_, '<ul class=filmWallapersList')
-                elements = walls.split('filmWallapersItem')
+                walls = mautils.after(txt_, '<h2 class=inline>tapety</h2>')
+                walls = mautils.after(txt_, '<ul class="')
+                elements = walls.split('<li>')
                 elcount = len(elements)
                 print_debug("Wallpapers count", str(elcount))
                 if elcount > 0: # and self.has_key('wallpaper'):
                     furl = None
                     for elem in elements:
-                        didx = elem.find('<span class=newLinkLoggedOnly>')
+                        didx = elem.find('<span class=loggedOnlyLink>')
                         print_debug("Wallpaper idx", str(didx))
                         if didx > -1:
-                            furl = mautils.between(elem, '<span class=newLinkLoggedOnly>', '</span>')
+                            furl = mautils.between(elem, '<span class=loggedOnlyLink>', '</span>')
                             print_debug("URL", furl)
                             wallpapers.append(furl)
             if callback:
@@ -384,7 +385,7 @@ class FilmwebEngine(object):
 
     def parsePlot(self):
         print_debug("parsePlot", "started")
-        plot = mautils.between(self.inhtml, '<span class=filmDescrBg property="v:summary">', '</span>')
+        plot = mautils.between(self.inhtml, 'property="v:summary">', '</p>')
         plot = plot.replace('  ', ' ')
         plot = mautils.strip_tags(plot)
         print_debug("PLOT", plot)
@@ -392,7 +393,7 @@ class FilmwebEngine(object):
 
     def parseYear(self):
         print_debug("parseYear", "started")
-        year = mautils.between(self.inhtml, '<span id=filmYear class=filmYear>', '</span>')
+        year = mautils.between(self.inhtml, '<span id=filmYear class=halfSize>', '</span>')
         year = mautils.strip_tags(year)
         self.detailsData['year'] = str(year)
 
@@ -420,7 +421,8 @@ class FilmwebEngine(object):
     def parseWriter(self):
         print_debug("parseWriter", "started")
         writer = mautils.between(self.inhtml, "scenariusz:", '</tr>')
-        writer = mautils.after(writer, '</th>')
+        writer = mautils.between(writer, '<ul class="inline sep-comma"><li>', '</ul>')
+        writer = writer.replace('<li>', ', ')
         writer = writer.replace("(więcej...)", '')
         writer = mautils.strip_tags(writer)
         self.detailsData['writer'] = writer
@@ -437,7 +439,9 @@ class FilmwebEngine(object):
         else:
             director = mautils.between(self.inhtml, "reżyseria:", '</tr>')
             print_debug("director to parse", director)
-            director = mautils.after(director, '</th>')
+            director = mautils.between(director, '<ul class="inline sep-comma"><li>', '</ul>')
+            director = director.replace('<li>', ', ')
+            #director = mautils.after(director, '</th>')
             print_debug("director after", director)
         director = director.replace("(więcej...)", '')
         director = mautils.strip_tags(director)
@@ -446,8 +450,8 @@ class FilmwebEngine(object):
 
     def parseRating(self):
         print_debug("parseRating", "started")
-        rating = mautils.between(self.inhtml, '<div class=rates>', '</div>')
-        rating = mautils.between(rating, '<span property="v:average">', '</span>')
+        rating = mautils.between(self.inhtml, '<span class=filmRate>', '</span>')
+        rating = mautils.between(rating, 'property="v:average">', '</')
         if rating != '':
             rating = rating.replace(' ', '')
             rating = rating.replace(',', '.')
@@ -462,7 +466,7 @@ class FilmwebEngine(object):
 
     def parseFilmId(self):
         print_debug("parseFilmId", "started")
-        fid = mautils.between(self.inhtml, '<div id=filmId style="display:none;">', '</div>')
+        fid = mautils.between(self.inhtml, '<div id=filmId>', '</div>')
         if fid and len(fid) > 0:
             self.detailsData['film_id'] = fid
         else:
@@ -492,16 +496,16 @@ class FilmwebEngine(object):
 
     def parseOrgTitle(self):
         print_debug("parseOrgTitle", "started")
-        title = mautils.between(self.inhtml, '<h2 class=origTitle>', '</h2>')
+        title = mautils.between(self.inhtml, '<h2 class="text-large caption">', '</h2>')
         print_debug("org title first", title)
         self.detailsData['org_title'] = title
 
     def parsePromoWidget(self, sessionId):
         print_debug("parsePromoWidget", "started")
         if sessionId is not None:
-            idx = self.inhtml.find('<div id="svdRec" style="display:none">')
+            idx = self.inhtml.find('<div id="svdRec" style="display: none;">')
             if idx > 0:
-                txt = mautils.between(self.inhtml, '<div id="svdRec" style="display:none">', '</div>')
+                txt = mautils.between(self.inhtml, '<div id="svdRec" style="display: none;">', '</div>')
                 self.detailsData['promo'] = txt
                 return
         self.detailsData['promo'] = None
@@ -521,8 +525,9 @@ class FilmwebEngine(object):
 
     def parseRuntime(self):
         print_debug("parseRuntime", "started")
-        #if mautils.between(self.inhtml, '<title>', '</title>').find('Serial TV') > -1: 
-        runtime = mautils.between(self.inhtml, 'filmTime="', '";')
+        #if mautils.between(self.inhtml, '<title>', '</title>').find('Serial TV') > -1:         
+        runtime = mautils.between(self.inhtml, '<div class=filmTime>', '</div>')
+        runtime = mautils.strip_tags(runtime)
         print_debug('Runtime data', str(runtime))
         runtime = runtime.replace(' ', '')
         if not runtime:
@@ -560,7 +565,7 @@ class FilmwebEngine(object):
 
     def parseWallpaper(self, link_=None):
         print_debug("parseWallpaper", "started")
-        idx = self.inhtml.find('<li id="filmMenu-filmWallpapers" class=" caption">tapety</li>')
+        idx = self.inhtml.find('<li id=filmMenu-filmWallpapers class=" caption">tapety</li>')
         print_debug('Wallpaper idx', str(idx))
         self.detailsData['wallpapers_link'] = None
         if idx < 0:
@@ -570,9 +575,9 @@ class FilmwebEngine(object):
         print_debug("parseCast", "started")
 
         cast_list = []
-        fidx = self.inhtml.find('<div class="castListWrapper cl">')
+        fidx = self.inhtml.find('<ul class="vertical-list filmCast">')
         if fidx > -1:
-            cast = mautils.between(self.inhtml[fidx:], '<ul class=list>', '</ul>')
+            cast = mautils.between(self.inhtml, '<ul class="vertical-list filmCast">', '</ul>')
 
             elements = cast.split('<li')
             no_elems = len(elements)
@@ -599,7 +604,7 @@ class FilmwebEngine(object):
     def parseDescriptions(self, dhtml):
         print_debug("parseDescriptions", "started")
         descres = ''
-        descs = mautils.between(dhtml, '<ul class=descriptionsList', '<script type=')
+        descs = mautils.between(dhtml, '<ul class="sep-hr descriptionsList"', '<script type=')
         elements = descs.split('<li class=')
         if elements != '':
             for element in elements:
