@@ -401,9 +401,12 @@ class FilmwebEngine(object):
         print_debug("parseGenere", "started")
         genre = ''
         if mautils.between(self.inhtml, '<title>', '</title>').find('Serial TV') > -1:
-            genre = mautils.between(self.inhtml, "gatunek:", '</strong>')
+            genre = mautils.between(self.inhtml, "gatunek:", '<script type=')
         else:
             genre = mautils.between(self.inhtml, "gatunek:", '</tr>')
+            genre = mautils.between(genre, '<ul class="inline sep-comma"><li>', '</ul>')
+        genre = genre.replace('<li>', ', ')
+        print_debug("GENRE: ", str(genre))
         genre = mautils.strip_tags(genre)
         self.detailsData['genre'] = genre
 
@@ -412,9 +415,16 @@ class FilmwebEngine(object):
         country = ''
         if mautils.between(self.inhtml, '<title>', '</title>').find('Serial TV') > -1:
             country = mautils.between(self.inhtml, "kraj:", '</dd>')
+            print_debug("SERIAL COUNTRY: ", '--' + str(country) + '--')
+            if not country or len(country) == 0:
+                country = mautils.between(self.inhtml, "kraje:", '</dd>')
+                print_debug("SERIAL COUNTRY-2: ", country)
             country = mautils.after(country, '<dd>')
         else:
             country = mautils.between(self.inhtml, 'produkcja:', '</tr>')
+            country = mautils.between(country, '<ul class="inline sep-comma"><li>', '</ul>')
+        country = country.replace('<li>', ', ')
+        print_debug("COUNTRY: ", str(country))
         country = mautils.strip_tags(country)
         self.detailsData['country'] = country
 
@@ -588,6 +598,7 @@ class FilmwebEngine(object):
                     if element == '':
                         continue
                     element = mautils.after(element, '>')
+                    element = mautils.before(element, '<div class="rolePhoto')
                     print_debug("Actor", "EL=" + element)
                     imge = mautils.between(element, '<img', '>')
                     print_debug("Actor data", "IMG=" + imge)
