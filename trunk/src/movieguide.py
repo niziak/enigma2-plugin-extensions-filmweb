@@ -212,7 +212,7 @@ class SelectionEventInfo:
                 filmDetails = yield engine.queryDetails(link)
                 filmDetails['fullname'] = self.__createFullName(filmDetails)
                 filmDetails['event_time'] = cur[2]
-                if len(filmDetails['plot'].strip()) == 0:
+                if not filmDetails.has_key('plot') or len(filmDetails['plot'].strip()) == 0:
                     filmDetails['plot'] = event and event.getExtendedDescription() or ''
                 strr = str(filmDetails['runtime'])
                 if len(strr.strip()) > 0:
@@ -776,7 +776,7 @@ class MovieGuide(DefaultScreen, SelectionEventInfo):
             if evid and self.eventDetails.has_key(evid):
                 name = self.eventDetails[evid]['fullname']
                 desc = self.eventDetails[evid]['plot']
-            newEntry = RecordTimerEntry(service, begin, end, name, desc, evid, checkOldTimers=True, dirname=preferredTimerPath())
+            newEntry = RecordTimerEntry(service, begin, end, name, desc, None, checkOldTimers=True, dirname=preferredTimerPath())
         self.session.openWithCallback(self.__finishedAdd, TimerEntry, newEntry)
 
     def __removeTimer(self, timer):
