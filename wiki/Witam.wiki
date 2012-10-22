@@ -83,6 +83,9 @@ init 4; sleep 10; init 3
 
 = Informacja o zmianach w wersjach =
 ----
+=== ver. 1.1.3 ===
+  * Poprawki w programowaniu timera
+  * Poprawki w wyświetlaniu informacji o serialach
 === ver. 1.1.2 ===
   * Poprawki w parsowaniu informacji z Filmweb po zmianach na stronie
 === ver. 1.1.1 ===
