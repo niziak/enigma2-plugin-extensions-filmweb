@@ -25,7 +25,7 @@ ipkg install python-pyopenssl
   * Skopiuj plik IPK do katalogu /tmp 
   * Wykonaj manulaną instalację pakietu IPK z menu dreamboxa
 {{{
-ipkg install /tmp/enigma2-plugin-extensions-filmweb_1.1.0_mipsel.ipk
+ipkg install /tmp/enigma2-plugin-extensions-filmweb_1.1.3_mipsel.ipk
 }}}
   * Restart Enigmy
 {{{
@@ -83,6 +83,8 @@ init 4; sleep 10; init 3
 
 = Informacja o zmianach w wersjach =
 ----
+=== ver. DEV ===
+  * Dodanie usuwania elementów z cache po 4 dniach
 === ver. 1.1.3 ===
   * Poprawki w programowaniu timera
   * Poprawki w wyświetlaniu informacji o serialach
