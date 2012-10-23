@@ -78,7 +78,7 @@ init 4; sleep 10; init 3
   * Dodanie w Przewodniku wyświetlania opisów dla filmu
   * Dodanie w Przewodniku obsługi wyświetlania tapet
   * Dodanie w Przewodniku obsługi logowania do portalu oraz informacji związanej z rekomendacjami 
-
+  * Dodanie pobierania informacji o ocenie z portalu IMDB
 
 
 = Informacja o zmianach w wersjach =
