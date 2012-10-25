@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Filmweb 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-11 11:37+0100\n"
-"PO-Revision-Date: 2012-10-11 11:38+0100\n"
+"POT-Creation-Date: 2012-10-25 21:07+0100\n"
+"PO-Revision-Date: 2012-10-25 21:08+0100\n"
 "Last-Translator: Marcin Słowik <marcin.slowik@gmail.com>\n"
 "Language-Team:  <marcin.slowik@gmail.com>\n"
 "Language: Polski\n"
@@ -28,80 +28,84 @@ msgstr "Poziom Info"
 msgid "Error Level"
 msgstr "Poziom Error"
 
-#: config.py:48
+#: config.py:49
 msgid "Filmweb Config"
 msgstr "Konfiguracja wtyczki Filmweb"
 
-#: config.py:52
+#: config.py:53
 msgid "Cancel"
 msgstr "Anuluj"
 
-#: config.py:53
+#: config.py:54
 msgid "Save"
 msgstr "Zapisz"
 
-#: config.py:63
+#: config.py:64
 msgid "User Name"
 msgstr "Email lub nick"
 
-#: config.py:64
+#: config.py:65
 msgid "Password"
 msgstr "Hasło"
 
-#: config.py:65
+#: config.py:66
 msgid "Temporary Folder"
 msgstr "Katalog Tymczasowy"
 
-#: config.py:66
+#: config.py:67
 msgid "Logging Level"
 msgstr "Poziom Logowania"
 
-#: config.py:67
+#: config.py:68
 msgid "Number of days in movie guide search"
 msgstr "Liczba dni przy przeszukiwaniu Przewodnikiem"
 
-#: engine.py:90
+#: config.py:69
+msgid "Get IMDB data for Movie Guide entries"
+msgstr "Pobieranie danych z IMDB dla pozycji w Przewodniku"
+
+#: engine.py:92
 msgid "Logging in ..."
 msgstr "Logowanie do portalu … "
 
-#: engine.py:160
+#: engine.py:162
 msgid "Descriptions loading completed"
 msgstr "Ładowanie opisów zakończone "
 
-#: engine.py:177
+#: engine.py:179
 msgid "Wallpaper loading completed"
 msgstr "Ładowanie tapety zakończone "
 
-#: engine.py:204
+#: engine.py:207
 msgid "Poster downloading finished"
 msgstr "Pobieranie plakatu zakończone "
 
-#: engine.py:229
+#: engine.py:232
 msgid "Login done"
 msgstr "Logowanie zakończone"
 
-#: engine.py:240
+#: engine.py:243
 msgid "Movie details loading completed"
 msgstr "Pobieranie danych filmu zakończone"
 
-#: engine.py:278
+#: engine.py:281
 msgid "Filmweb Download completed"
 msgstr "Pobieranie danych z Filmweb zakończone sukcesem"
 
-#: engine.py:456
+#: engine.py:472
 msgid "User Rating"
 msgstr "Ocena"
 
-#: engine.py:460
+#: engine.py:476
 msgid "no user rating yet"
 msgstr "brak oceny społeczności"
 
-#: engine.py:558
+#: engine.py:575
 #, python-format
 msgid "Downloading Movie Poster: %s..."
 msgstr "Pobieranie plakatu: %s… "
 
-#: engine.py:590
+#: engine.py:608
 msgid " as "
 msgstr " jako "
 
@@ -303,60 +307,60 @@ msgstr "Wprowadź nazwę filmu do wyszukania"
 msgid "Enter movie title to search for"
 msgstr "Wprowadź szukany tytuł"
 
-#: movieguide.py:61
+#: movieguide.py:64
 msgid "Begin Time"
 msgstr "Czas Rozpocz."
 
-#: movieguide.py:61
+#: movieguide.py:64
 msgid "Rating"
 msgstr "Ocena"
 
-#: movieguide.py:61
+#: movieguide.py:64
 msgid "Year"
 msgstr "Rok"
 
-#: movieguide.py:62
+#: movieguide.py:65
 msgid "Title"
 msgstr "Tytuł"
 
-#: movieguide.py:62
+#: movieguide.py:65
 msgid "Service Name"
 msgstr "Nazwa Kanału"
 
-#: movieguide.py:433
+#: movieguide.py:462
 msgid "Config"
 msgstr "Konfiguracja"
 
-#: movieguide.py:434
+#: movieguide.py:463
 msgid "Refresh"
 msgstr "Odśwież"
 
-#: movieguide.py:435
+#: movieguide.py:464
 msgid "Next Period"
 msgstr "Następny Przedział"
 
-#: movieguide.py:436
+#: movieguide.py:465
 msgid "Change Sort"
 msgstr "Zmień sortowanie"
 
-#: movieguide.py:437
+#: movieguide.py:466
 msgid "Sorted by"
 msgstr "Sortowanie"
 
-#: movieguide.py:437
+#: movieguide.py:466
 msgid "DESC"
 msgstr "v"
 
-#: movieguide.py:437
+#: movieguide.py:466
 msgid "ASC"
 msgstr "^"
 
-#: movieguide.py:751
+#: movieguide.py:833
 #, python-format
 msgid "Do you really want to delete %s?"
 msgstr "Czy napewno skasować %s ?"
 
-#: movieguide.py:851 plugin.py:75
+#: movieguide.py:937 plugin.py:75
 msgid "Movie Guide"
 msgstr "Przewodnik filmowy"
 

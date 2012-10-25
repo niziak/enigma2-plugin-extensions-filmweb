@@ -32,26 +32,27 @@ from Components.ConfigList import ConfigListScreen
 from Components.config import config, configfile, getConfigListEntry, ConfigSelection, ConfigBoolean, ConfigInteger, ConfigDirectory, ConfigPassword, ConfigText, ConfigSubsection
 
 config.plugins.mfilmweb = ConfigSubsection()
-config.plugins.mfilmweb.user = ConfigText(default = "", fixed_size = False)
-config.plugins.mfilmweb.password = ConfigPassword(default="",visible_width = 50,fixed_size = False)
-config.plugins.mfilmweb.selserv = ConfigText(default = "", fixed_size = False)
+config.plugins.mfilmweb.user = ConfigText(default="", fixed_size=False)
+config.plugins.mfilmweb.password = ConfigPassword(default="", visible_width=50, fixed_size=False)
+config.plugins.mfilmweb.selserv = ConfigText(default="", fixed_size=False)
 config.plugins.mfilmweb.tmpPath = ConfigDirectory(default="/tmp/filmweb")
-config.plugins.mfilmweb.logs = ConfigSelection([('debug', _('Debug Level')),('info', _('Info Level')),('error', _('Error Level'))],default='debug')
+config.plugins.mfilmweb.logs = ConfigSelection([('debug', _('Debug Level')), ('info', _('Info Level')), ('error', _('Error Level'))], default='debug')
 config.plugins.mfilmweb.guideDays = ConfigInteger(default=1, limits=(1, 4))
 config.plugins.mfilmweb.sort = ConfigInteger(default=0)
 config.plugins.mfilmweb.sortOrder = ConfigBoolean()
+config.plugins.mfilmweb.imdbData = ConfigBoolean()
 
 class FilmwebConfig(Screen, ConfigListScreen):
     def __init__(self, session):
         Screen.__init__(self, session)
         self.skinName = ["Setup" ]
         self.setup_title = _("Filmweb Config")
-        
+
         self.list = []
         ConfigListScreen.__init__(self, self.list)
         self["key_red"] = StaticText(_("Cancel"))
         self["key_green"] = StaticText(_("Save"))
-        
+
         self["actions"] = ActionMap(["SetupActions", "ColorActions"],
         {
             "cancel": self.keyCancel,
@@ -64,19 +65,20 @@ class FilmwebConfig(Screen, ConfigListScreen):
         self.list.append(getConfigListEntry(_("Password"), config.plugins.mfilmweb.password))
         self.list.append(getConfigListEntry(_("Temporary Folder"), config.plugins.mfilmweb.tmpPath))
         self.list.append(getConfigListEntry(_("Logging Level"), config.plugins.mfilmweb.logs))
-        self.list.append(getConfigListEntry(_("Number of days in movie guide search"),config.plugins.mfilmweb.guideDays))
+        self.list.append(getConfigListEntry(_("Number of days in movie guide search"), config.plugins.mfilmweb.guideDays))
+        self.list.append(getConfigListEntry(_("Get IMDB data for Movie Guide entries"), config.plugins.mfilmweb.imdbData))
         self["config"].list = self.list
-        self["config"].l.setList(self.list)   
-        
-        self.onLayoutFinish.append(self.layoutFinished)  
-        
+        self["config"].l.setList(self.list)
+
+        self.onLayoutFinish.append(self.layoutFinished)
+
     def layoutFinished(self):
         self.setTitle(self.setup_title)
-        
-    def keySave(self):            
+
+    def keySave(self):
         config.plugins.mfilmweb.save()
         configfile.save()
         self.close(True)
 
-    def keyCancel(self):        
+    def keyCancel(self):
         self.close(False)
