@@ -29,7 +29,7 @@ from __common__ import _
 from logger import print_info, print_debug
 from mselection import FilmwebRateChannelSelection
 from comps import DefaultScreen, StarsComp, MPixmap
-from engine import TelemagEngine, FilmwebTvEngine, FilmwebEngine, MT_MOVIE, MAPPING, MAPPING2
+from engine import TelemagEngine, FilmwebTvEngine, FilmwebEngine, ImdbEngine, MT_MOVIE, MAPPING, MAPPING2
 
 from RecordTimer import RecordTimerEntry, parseEvent, AFTEREVENT
 from Tools.LoadPixmap import LoadPixmap
@@ -51,6 +51,9 @@ from Components.Label import Label
 
 sorted_data = lambda data, idx, ordx: [b for _, b in sorted(((tup[idx], tup) for tup in data), reverse=ordx)]
 sorted_data2 = lambda data, idx, idx2, ordx: [b for _, b in sorted((((tup[idx], tup[idx2]), tup) for tup in data), reverse=ordx)]
+
+# this is 1 day in seconds
+CACHE_INVALIDATE_TIME = 60 * 60 * 24
 
 SORT_BEGIN_TIME = 0
 SORT_RATING = 9
@@ -361,6 +364,22 @@ class MovieGuide(DefaultScreen, SelectionEventInfo):
     # --- Actions definition ------------------------------------------------
     def prevAction(self):
         print_debug("PREV action")
+        if self.execing and self["list"].style == 'default' and config.plugins.mfilmweb.imdbData.getValue():
+            lst = []
+            for ent in self.list:
+                ent = list(ent)
+                # rate value exchange - filmweb <-> imdb
+                x = ent[4]
+                ent[4] = ent[15]
+                ent[15] = x
+                # rate string change - filmweb <-> imdb
+                x = ent[9]
+                ent[9] = ent[14]
+                ent[14] = x
+                ent = tuple(ent)
+                lst.append(ent)
+            self.list = lst
+            self.displayEventList()
 
     def nextAction(self):
         print_debug("NEXT action")
@@ -521,7 +540,45 @@ class MovieGuide(DefaultScreen, SelectionEventInfo):
                         print_debug('Query Filmweb result', str(res) + ', service: ' + service.getServiceName())
                         while isinstance(res, defer.Deferred):
                             res = yield res
+                        imdbrate = '0.0'
                         if res:
+                            if config.plugins.mfilmweb.imdbData.getValue():
+                                title = res[13]
+                                print_debug('Movie title: ', str(title))
+                                if title:
+                                    idxo = title.find(' / ')
+                                    if idxo > -1:
+                                        title = title[idxo + 3:]
+                                    year = res[8]
+                                    title = title.strip()
+                                    title = title.replace(', A', '')
+                                    title = title.replace(', The', '')
+                                    title = title.replace(', La', '')
+                                    title = title.replace(", L'", '')
+                                    title = title.replace(", Les", '')
+                                    title = title.replace(", Das", '')
+                                    title = title.replace(", Die", '')
+                                    title = title.replace(", Der", '')
+                                    print_debug('Movie title: ', str(title) + ', YEAR: ' + str(year))
+                                    imdb = ImdbEngine()
+                                    rdf = imdb.query(title, year, MT_MOVIE)
+                                    if rdf:
+                                        print_debug('Yield imdb query: ', str(rdf))
+                                        tupimdb = yield rdf
+                                        imdbrate = tupimdb[0]
+                                        imdbid = tupimdb[1]
+                                        print_debug('IMDB rate: ', str(imdbrate) + ', ID: ' + str(imdbid))
+                                        if not imdbrate:
+                                            imdbrate = '0.0'
+                            try:
+                                rt = float(imdbrate)
+                            except:
+                                rt = 0
+                            rts = "%1.1f" % rt
+                            res = list(res)
+                            res[14] = rt
+                            res[15] = rts
+                            res = tuple(res)
                             self.list.append(res)
                 self.eventlist.modifyEntry(index, ((service.getServiceName(), (idx - 1) * rng + int(rng / 4) * 4)))
             self.eventlist.modifyEntry(index, ((service.getServiceName(), 100)))
@@ -612,20 +669,21 @@ class MovieGuide(DefaultScreen, SelectionEventInfo):
             rts = "%1.1f" % rt
             resme = (begin, lista[0][2], tms + ' - ' + tots,
                                service.getServiceName(), rts, service, evt,
-                               lista[0][1], lista[0][5], rt, duration, pixmap, state)
+                               lista[0][1], lista[0][5], rt, duration, pixmap,
+                               state, lista[0][3], 0, '0.0')
             if save:
                 self.__saveNfo(lista[0], service.getServiceName() + '___' + str(begin))
         else:
             resme = (begin, x[2], tms + ' - ' + tots,
                     service.getServiceName(), '0.0', service, evt,
-                    None, parsed_rok, 0, duration, pixmap, state)
+                    None, parsed_rok, 0, duration, pixmap, state, x[2], 0, '0.0')
         return resme
 
     # --- Private methods ------------------------------------------------
 
     # (begin_time, caption, event_duration_desc, service_name, rating_string, 
     #  ServiceReference, eServiceEvent, details_URL, movie_year, rating_value, duration_in_sec, 
-    #  pixmap, state) 
+    #  pixmap, state, title, imdb_rating_value, imdb_rating_string) 
 
     def __getStateData(self, evt, service, begin, duration):
         pixmap = None
@@ -697,6 +755,17 @@ class MovieGuide(DefaultScreen, SelectionEventInfo):
                     if beg <= begin <= end and endt <= end:
                         return x
         return None
+
+    def __cleareCache(self):
+        if os.path.exists(self.path):
+            names = os.listdir(self.path)
+            now = time()
+            for name in names:
+                pth = self.path + '/' + name
+                if os.path.exists(pth):
+                    modtime = os.path.getmtime(pth)
+                    if (now - modtime) > CACHE_INVALIDATE_TIME:
+                        os.remove(pth)
 
 # (caption, url, basic_caption, title, rating, year, country)
     def __saveNfo(self, data, evid):
@@ -868,6 +937,7 @@ class MovieGuide(DefaultScreen, SelectionEventInfo):
         self.setTitle(_("Movie Guide"))
         self.__updateServices()
         self.refreshList()
+        self.__cleareCache()
         self.__updateClock()
 
     def __finishMe(self):

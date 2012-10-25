@@ -38,11 +38,13 @@ USER_TOKEN = '_artuser_token'
 SESSION_KEY = '_artuser_sessionId'
 POSTER_PATH = "/tmp/poster.jpg"
 
+SEARCH_IMDB_URL = 'http://www.imdb.com/search/title?'
 PAGE_URL = 'http://www.filmweb.pl'
 SEARCH_QUERY_URL = PAGE_URL + "/search/"
 LOGIN_QUERY_URL = 'https://ssl.filmweb.pl/j_login'
 
 COOKIES = {}
+COOKIES_IMDB = {}
 MAPPING = {}
 MAPPING2 = {}
 
@@ -627,6 +629,49 @@ class FilmwebEngine(object):
                 #print_debug("DESC", str(element))
                 descres = descres + element + '\n\n'
         return descres
+
+class ImdbEngine(object):
+    def __init__(self):
+        pass
+
+    def query(self, title, year, typ):
+        if typ == MT_MOVIE:
+            typen = 'feature,tv_movie,mini_series,documentary'
+        else:
+            typen = 'tv_series'
+        fetchurl = SEARCH_IMDB_URL + 'title=' + urllib.quote(title.encode('utf8')) + '&title_type=' + typen
+        if year:
+            fetchurl += '&release_date=' + year + '-01-01,' + year + '-12-31'
+        print_info("IMDB Query", fetchurl)
+        headers = {"Accept":"text/html", "Accept-Charset":"utf-8", "Accept-Encoding":"deflate",
+                   "Accept-Language":"pl-PL,pl;q=0.8,en-US;q=0.6,en;q=0.4", "Connection":"keep-alive",
+                   "Host":"www.imdb.com",
+                   "User-Agent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_2) AppleWebKit/537.4 (KHTML, like Gecko) Chrome/22.0.1229.94 Safari/537.4"}
+        df = getPage(fetchurl, cookies=COOKIES_IMDB, headers=headers).addCallback(self.__fetchImdbOK).addErrback(self.__fetchFailed)
+        print_debug('IMDB query deffered: ', str(df))
+        return df
+
+    def __fetchImdbOK(self, res):
+        #print_debug('Fetch IMDB OK: ', str(res))
+        #inhtml = mautils.html2utf8(res, 'utf-8')
+        inhtml = mautils.between(res, '<table class="results">', '<div class="leftright">')
+        #print_debug('Fetch IMDB html: ', str(inhtml))
+
+        elements = inhtml.split('<td class="number">')
+        num = len(elements)
+        print_debug('IMDB Number of elements: ', str(num))
+        for element in elements:
+            #print_debug('ELEMENT: ', str(element))
+            ttle = mautils.between(element, '<a href="/title/', '/" title="')
+            idx = element.find('<span class="rating-rating"><span class="value">')
+            if idx > -1:
+                rating = mautils.between(element, '<span class="rating-rating"><span class="value">', '</span>')
+                print_debug('Rating: ', str(rating))
+                return (rating, ttle)
+        return None
+
+    def __fetchFailed(self, res):
+        print_debug('Fetch IMDB ERROR: ', str(res))
 
 class TelemagEngine(object):
     def __init__(self):

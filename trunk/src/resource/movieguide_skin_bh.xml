@@ -22,7 +22,7 @@
 	MultiContentEntryText(pos = (0, 0), size = (200, 20), font=1, flags = RT_HALIGN_LEFT | RT_VALIGN_CENTER| RT_WRAP, text = 0),
 	MultiContentEntryProgress(pos = (205, 0), size = (550, 12), percent = -1),
 	], False)},
-	"fonts": [gFont("Regular", 20),gFont("Regular", 16),gFont("Regular", 28)],
+	"fonts": [gFont("Regular", 20),gFont("Regular", 16),gFont("Regular", 28),gFont("Regular", 15)],
 	"itemHeight": 48
 	}
 	</convert>
