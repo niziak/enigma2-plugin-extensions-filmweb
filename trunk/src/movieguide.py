@@ -116,7 +116,7 @@ class MovieGuideEventConv(Converter, object):
                     print_debug('startDecode result', str(res))
                     picload.waitFinished()
                     ptr = picload.getData()
-                    return ptr #.__deref__()   
+                    return ptr  # .__deref__()
                 except:
                     import traceback
                     traceback.print_exc()
@@ -164,12 +164,12 @@ class SelectionEventInfo:
         self.timer.callback.append(self.updateEventInfo)
         self.dtimer = eTimer()
         self.dtimer.callback.append(self.updateDetails)
-        #self.onShown.append(self.__selectionChanged)
+        # self.onShown.append(self.__selectionChanged)
 
     def __selectionChanged(self):
         if self.execing:
             self.timer.start(100, True)
-            #self.updateEventInfo()
+            # self.updateEventInfo()
 
     def updateEventInfo(self):
         cur = self.getCurrentSelection()
@@ -182,7 +182,7 @@ class SelectionEventInfo:
             self["nstars"].setValue(int(rate * 10))
             self["nstars"].show()
             self["ServiceEvent"].newData(service and service.ref, event, evid)
-            #self.dtimer.stop()
+            # self.dtimer.stop()
             self.dtimer.start(200, True)
         else:
             self["ServiceEvent"].newData(None, None, None)
@@ -330,7 +330,7 @@ class MovieGuide(DefaultScreen, SelectionEventInfo):
         self.onLayoutFinish.append(self.__startMe)
         self.onClose.append(self.__finishMe)
 
-    # --- Screen Manipulation ------------------------------------------------  
+    # --- Screen Manipulation ------------------------------------------------
     def createGUI(self):
         self["list"] = List(self.list)
         self["key_red"] = StaticText('')
@@ -347,8 +347,8 @@ class MovieGuide(DefaultScreen, SelectionEventInfo):
         self["list"].style = "progress"
 
     def initActions(self):
-        #global globalActionMap
-        #globalActionMap.actions['showClock'] = self.ShowHide
+        # global globalActionMap
+        # globalActionMap.actions['showClock'] = self.ShowHide
         self["actions"] = ActionMap(["OkCancelActions", "ColorActions", "InfobarCueSheetActions"], {
             "ok": self.okAction,
             "cancel": self.cancelAction,
@@ -433,7 +433,7 @@ class MovieGuide(DefaultScreen, SelectionEventInfo):
         self.__replaceConverters()
         Screen.createGUIScreen(self, parent, desktop, updateonly)
 
-    # --- Public methods ------------------------------------------------    
+    # --- Public methods ------------------------------------------------
 
     def zapOrTimer(self, cur):
         if not cur:
@@ -445,8 +445,8 @@ class MovieGuide(DefaultScreen, SelectionEventInfo):
             return
 
         now = int(time())
-        start_time = cur[0] #event.getBeginTime()
-        duration = cur[10] #event.getDuration()
+        start_time = cur[0]  # event.getBeginTime()
+        duration = cur[10]  # event.getDuration()
         if duration and start_time <= now <= (start_time + duration) and service and service.ref:
             self.session.nav.playService(service.ref)
         elif now < start_time:
@@ -465,7 +465,7 @@ class MovieGuide(DefaultScreen, SelectionEventInfo):
             self["key_blue"].setText(_("Change Sort"))
             self["sort"].setText(_("Sorted by") + ": " + key + " " + (self.sortOrder and _("DESC") or _("ASC")))
             print_debug('SORT_VAL', str(val))
-            #print_debug('LIST', str(self.list)) 
+            # print_debug('LIST', str(self.list))
             if self.list and len(self.list) > 0:
                 self.list = sorted_data2(self.list, int(val), int(SORT_BEGIN_TIME), self.sortOrder)
             self.eventlist.style = "default"
@@ -565,9 +565,10 @@ class MovieGuide(DefaultScreen, SelectionEventInfo):
                                     if rdf:
                                         print_debug('Yield imdb query: ', str(rdf))
                                         tupimdb = yield rdf
-                                        imdbrate = tupimdb[0]
-                                        imdbid = tupimdb[1]
-                                        print_debug('IMDB rate: ', str(imdbrate) + ', ID: ' + str(imdbid))
+                                        if tupimdb:
+                                            imdbrate = tupimdb[0]
+                                            imdbid = tupimdb[1]
+                                            print_debug('IMDB rate: ', str(imdbrate) + ', ID: ' + str(imdbid))
                                         if not imdbrate:
                                             imdbrate = '0.0'
                             try:
@@ -615,7 +616,7 @@ class MovieGuide(DefaultScreen, SelectionEventInfo):
             evid = service.getServiceName() + '___' + str(begin)
             lista = self.__loadNfo(evid)
             if lista:
-                #print_debug('----> Lista', str(lista))
+                # print_debug('----> Lista', str(lista))
                 lst = [lista]
                 return self.filmwebQueryCallback(lst, MT_MOVIE, (result, tms, evt, rok, False))
             else:
@@ -681,9 +682,9 @@ class MovieGuide(DefaultScreen, SelectionEventInfo):
 
     # --- Private methods ------------------------------------------------
 
-    # (begin_time, caption, event_duration_desc, service_name, rating_string, 
-    #  ServiceReference, eServiceEvent, details_URL, movie_year, rating_value, duration_in_sec, 
-    #  pixmap, state, title, imdb_rating_value, imdb_rating_string) 
+    # (begin_time, caption, event_duration_desc, service_name, rating_string,
+    #  ServiceReference, eServiceEvent, details_URL, movie_year, rating_value, duration_in_sec,
+    #  pixmap, state, title, imdb_rating_value, imdb_rating_string)
 
     def __getStateData(self, evt, service, begin, duration):
         pixmap = None
@@ -730,9 +731,9 @@ class MovieGuide(DefaultScreen, SelectionEventInfo):
         begin = cur[0]
         pixmap, state = self.__getStateData(cur[6], cur[5], begin, duration)
         if state != cur[12]:
-            #print_debug('TUPLE', str(cur))
+            # print_debug('TUPLE', str(cur))
             lst = list(cur)
-            #print_debug('LIST', str(lst))
+            # print_debug('LIST', str(lst))
             lst[12] = state
             lst[11] = pixmap
             return tuple(lst)
@@ -745,7 +746,7 @@ class MovieGuide(DefaultScreen, SelectionEventInfo):
             if timer.eit == eventid and timer.service_ref.ref.toString() == refstr:
                 return timer
         match = begin and duration and self.session.nav.RecordTimer.isInTimer(eventid, begin, duration, refstr)
-        #print_debug('IS IN TIMER match:', str(match))
+        # print_debug('IS IN TIMER match:', str(match))
         if match:
             endt = begin + duration
             for x in self.session.nav.RecordTimer.timer_list:
@@ -833,7 +834,7 @@ class MovieGuide(DefaultScreen, SelectionEventInfo):
             self.session.openWithCallback(cb_func, MessageBox, _("Do you really want to delete %s?") % cur[1])
             return
 
-        #(begin, end, name, description, eit)
+        # (begin, end, name, description, eit)
         if event:
             newEntry = RecordTimerEntry(service, checkOldTimers=True, dirname=preferredTimerPath(), *parseEvent(event))
         else:
