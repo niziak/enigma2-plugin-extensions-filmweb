@@ -57,5 +57,6 @@ Ustaw przeszukiwane kanały na ekranie konfiguracyjnym - patrz obrazek niżej. W
 || 0 || Zmiana sortowania z rosnącego na malejące i odwrotnie || 
 || EXIT || Wyjście z Przewodnika do okna wywołującego ||
 || OK || W zależności od wybranej pozycji powoduje: przejście do oglądania danej pozycji (pozycja z zielonym znakiem), ustawienie Timera (pozycja z niebieskim znakiem), skasowanie Timera (pozycja z zegarkiem) ||
+|| < || Przełącza ocenę pomiędzy IMDB i Filmweb ||
 
 </td></tr></tbody></table>
