@@ -61,6 +61,9 @@ SORT_YEAR = 8
 SORT_TITLE = 1
 SORT_SERVICE = 3
 
+RATE_FILMWEB = 'FILMWEB'
+RATE_IMDB = 'IMDB'
+
 SortData = {_('Begin Time'):SORT_BEGIN_TIME, _('Rating'):SORT_RATING, _('Year'):SORT_YEAR,
             _('Title'):SORT_TITLE, _('Service Name'):SORT_SERVICE}
 
@@ -301,6 +304,7 @@ class MovieGuide(DefaultScreen, SelectionEventInfo):
         self.sortOrder = config.plugins.mfilmweb.sortOrder.getValue()
         self.sortIndex = config.plugins.mfilmweb.sort.getValue()
         self.timeline = time()
+        self.rating = RATE_FILMWEB
 
         self.initialized = False
         self.list = []
@@ -364,21 +368,8 @@ class MovieGuide(DefaultScreen, SelectionEventInfo):
     # --- Actions definition ------------------------------------------------
     def prevAction(self):
         print_debug("PREV action")
-        if self.execing and self["list"].style == 'default' and config.plugins.mfilmweb.imdbData.getValue():
-            lst = []
-            for ent in self.list:
-                ent = list(ent)
-                # rate value exchange - filmweb <-> imdb
-                x = ent[4]
-                ent[4] = ent[15]
-                ent[15] = x
-                # rate string change - filmweb <-> imdb
-                x = ent[9]
-                ent[9] = ent[14]
-                ent[14] = x
-                ent = tuple(ent)
-                lst.append(ent)
-            self.list = lst
+        if self.execing and self["list"].style == 'default':
+            self.switchRating()
             self.displayEventList()
 
     def nextAction(self):
@@ -411,13 +402,17 @@ class MovieGuide(DefaultScreen, SelectionEventInfo):
         if self["list"].style == 'default':
             self.list = []
             self.timeline = time()
+            self.rating = RATE_FILMWEB
             self.__updateServices()
             self.refreshList()
 
     def yellowAction(self):
         print_debug("YELLOW action")
         if self["list"].style == 'default':
-            self.refreshList()
+            rat = self.rating
+            if rat == RATE_IMDB:
+                self.switchRating()
+            self.refreshList(rat == RATE_IMDB)
 
     def blueAction(self):
         print_debug("BLUE action")
@@ -455,6 +450,27 @@ class MovieGuide(DefaultScreen, SelectionEventInfo):
     def getCurrentSelection(self):
         return self.eventlist.getCurrent()
 
+    def switchRating(self):
+        if config.plugins.mfilmweb.imdbData.getValue():
+            lst = []
+            for ent in self.list:
+                ent = list(ent)
+                # rate value exchange - filmweb <-> imdb
+                x = ent[4]
+                ent[4] = ent[15]
+                ent[15] = x
+                # rate string change - filmweb <-> imdb
+                x = ent[9]
+                ent[9] = ent[14]
+                ent[14] = x
+                ent = tuple(ent)
+                lst.append(ent)
+            self.list = lst
+            if self.rating == RATE_FILMWEB:
+                self.rating = RATE_IMDB
+            else:
+                self.rating = RATE_FILMWEB
+
     def displayEventList(self):
         print_debug('Display events - execting: ', str(self.execing))
         if self.execing:
@@ -463,7 +479,7 @@ class MovieGuide(DefaultScreen, SelectionEventInfo):
             self["key_green"].setText(_("Refresh"))
             self["key_yellow"].setText(_("Next Period"))
             self["key_blue"].setText(_("Change Sort"))
-            self["sort"].setText(_("Sorted by") + ": " + key + " " + (self.sortOrder and _("DESC") or _("ASC")))
+            self["sort"].setText(_("Sorted by") + ": " + key + " " + (self.sortOrder and _("DESC") or _("ASC")) + " " + self.rating)
             print_debug('SORT_VAL', str(val))
             # print_debug('LIST', str(self.list))
             if self.list and len(self.list) > 0:
@@ -480,7 +496,7 @@ class MovieGuide(DefaultScreen, SelectionEventInfo):
         self.eventlist.setList(progressList)
 
     @defer.inlineCallbacks
-    def refreshList(self, res=None):
+    def refreshList(self, refresh=False, res=None):
         try:
             progressList = []
             self.displayProgressList(progressList)
@@ -499,6 +515,8 @@ class MovieGuide(DefaultScreen, SelectionEventInfo):
             yield defer.DeferredList(ds, consumeErrors=True)
             print_debug('----- DeferredList finished -----')
             self.timeline += 86400 * days_count
+            if refresh:
+                self.switchRating()
             self.displayEventList()
             self.initialized = True
         except:
@@ -602,8 +620,9 @@ class MovieGuide(DefaultScreen, SelectionEventInfo):
             service = result[4]
 
             tms = strftime("%Y-%m-%d %H:%M", (localtime(begin)))
-            print_debug('EVT', '[' + tms + '] - ' + eventName + ' / ' + service.getServiceName())
+            print_info('EVT', '[' + tms + '] - ' + eventName + ' / ' + service.getServiceName())
             evt = self.epg.lookupEventTime(service.ref, begin + 30)
+            print_info('Lookup event result: ', str(evt))
             if not evt:
                 return None
             title = eventName
