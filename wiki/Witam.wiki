@@ -82,7 +82,7 @@ init 4; sleep 10; init 3
 = Informacja o zmianach w wersjach =
 ----
 === ver. DEV ===
-  * 
+  * poprawa wyświetlania opisów
 
 === ver. 1.1.4 ===
   * Dodanie usuwania elementów z cache po 1 dniu
