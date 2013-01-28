@@ -134,6 +134,12 @@ class FilmwebEngine(object):
         print_info("LOAD DESCS - link", furl + "/descs")
         return getPage(furl + "/descs", cookies=COOKIES).addCallback(self.__fetchExtraOK, callback).addErrback(self.__fetchFailed)
 
+    def loadCast(self, furl, callback):
+        if not furl:
+            return None
+        print_info("LOAD CAST - link", furl + "/cast")
+        return getPage(furl + "/cast", cookies=COOKIES).addCallback(self.__fetchCastOK, callback).addErrback(self.__fetchFailed)
+
     def applyRating(self, rating, filmId, userToken, callback):
         if rating > -2 and filmId:
             print_debug("rateEntry - user token", str(userToken) + ', rating: ' + str(rating))
@@ -154,6 +160,20 @@ class FilmwebEngine(object):
 
 ############################################# LOCAL METHODS ###############################
 
+    def __fetchCastOK(self, txt_, callback):
+        try:
+            print_debug("fetch cast OK", str(COOKIES))
+            if self.statusComponent:
+                self.statusComponent.setText(_("Cast loading completed"))
+            dhtml = mautils.html2utf8(txt_)
+            data = None
+            if dhtml:
+                data = self.parseCastDetails(dhtml)
+            if callback:
+                callback(data)
+        except:
+            import traceback
+            traceback.print_exc()
 
     def __fetchExtraOK(self, txt_, callback):
         try:
@@ -599,20 +619,41 @@ class FilmwebEngine(object):
                 for element in elements:
                     if element == '':
                         continue
-                    element = mautils.after(element, '>')
-                    element = mautils.before(element, '<div class="rolePhoto')
-                    print_debug("Actor", "EL=" + element)
-                    imge = mautils.between(element, '<img', '>')
-                    print_debug("Actor data", "IMG=" + imge)
-                    imge = mautils.between(imge, 'src="', '"')
-                    stre = element.replace('<div>', _(" as "))
-                    stre = mautils.strip_tags(stre)
-                    stre = stre.replace('   ', '')
-                    stre = stre.replace('  ', ' ')
-                    print_debug("Actor data", "IMG=" + imge + ", DATA=" + stre)
-                    cast_list.append((imge, stre, cidx))
+                    cre = self.__loadCastData(element)
+                    cast_list.append((cre[0], cre[1], cidx))
                     cidx += 1
         self.detailsData['cast'] = cast_list
+
+    def __loadCastData(self, element):
+        element = mautils.after(element, '>')
+        element = mautils.before(element, '<div class="rolePhoto')
+        print_debug("Actor", "EL=" + element)
+        imge = mautils.between(element, '<img', '>')
+        print_debug("Actor data", "IMG=" + imge)
+        imge = mautils.between(imge, 'src="', '"')
+        stre = element.replace('<div>', _(" as "))
+        stre = mautils.strip_tags(stre)
+        stre = stre.replace('   ', '')
+        stre = stre.replace('  ', ' ')
+        print_debug("Actor data", "IMG=" + imge + ", DATA=" + stre)
+        return (imge, stre)
+
+    def parseCastDetails(self, dhtml):
+        print_debug("parseCastDetails", "started")
+        descs = mautils.between(dhtml, '<dt id=role-actors>', '</dd>')
+        elements = descs.split('<li')
+        cidx = 0
+        cast_list = []
+        if elements != '':
+            for element in elements:
+                if element == '':
+                    continue
+                if cidx > 0:
+                    cre = self.__loadCastData(element)
+                    cast_list.append((cre[0], cre[1], cidx))
+                cidx += 1
+        # self.detailsData['cast'] = cast_list
+        return cast_list
 
     def parseDescriptions(self, dhtml):
         print_debug("parseDescriptions", "started")
