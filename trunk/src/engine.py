@@ -183,7 +183,7 @@ class FilmwebEngine(object):
                 elements = walls.split('<li>')
                 elcount = len(elements)
                 print_debug("Wallpapers count", str(elcount))
-                if elcount > 0: # and self.has_key('wallpaper'):
+                if elcount > 0:  # and self.has_key('wallpaper'):
                     furl = None
                     for elem in elements:
                         didx = elem.find('<span class=loggedOnlyLink>')
@@ -201,7 +201,7 @@ class FilmwebEngine(object):
     def __fetchPosterOK(self, data, localfile, callback=None):
         try:
             print_debug("Fetch Poster OK", str(COOKIES))
-            #if not self.has_key('status_bar'):
+            # if not self.has_key('status_bar'):
             #    return
             if self.statusComponent:
                 self.statusComponent.setText(_("Poster downloading finished"))
@@ -352,7 +352,7 @@ class FilmwebEngine(object):
                     rating = rating.replace('\t', '')
                     rating = rating.replace('\n', '')
                     print_debug("The movie rating", rating)
-                    #self.links.append('http://www.filmweb.pl' + link)                    
+                    # self.links.append('http://www.filmweb.pl' + link)
                     title = mautils.between(element, '">', '</a>')
                     title = title.replace('\t', '')
                     title = mautils.strip_tags(title)
@@ -373,14 +373,14 @@ class FilmwebEngine(object):
                     if country:
                         element += ' - ' + country.strip()
                     basic_data = element
-                    #element = mautils.convert_entities(element)
+                    # element = mautils.convert_entities(element)
                     element = mautils.strip_tags(element)
                     if rating:
                         element += '\n' + rating.strip()
                     if cast:
                         element += '\n' + cast.strip()
                     print_info("The movie serach title", element)
-                    #self.titles.append(element)
+                    # self.titles.append(element)
                     rt = rating.split()
                     # (caption, url, basic_caption, title, rating, year, country)
                     self.resultlist.append((element, PAGE_URL + link, basic_data, title, rt[0], year, country))
@@ -453,7 +453,7 @@ class FilmwebEngine(object):
             print_debug("director to parse", director)
             director = mautils.between(director, '<ul class="inline sep-comma"><li>', '</ul>')
             director = director.replace('<li>', ', ')
-            #director = mautils.after(director, '</th>')
+            # director = mautils.after(director, '</th>')
             print_debug("director after", director)
         director = director.replace("(więcej...)", '')
         director = mautils.strip_tags(director)
@@ -537,7 +537,7 @@ class FilmwebEngine(object):
 
     def parseRuntime(self):
         print_debug("parseRuntime", "started")
-        #if mautils.between(self.inhtml, '<title>', '</title>').find('Serial TV') > -1:         
+        # if mautils.between(self.inhtml, '<title>', '</title>').find('Serial TV') > -1:
         runtime = mautils.between(self.inhtml, '<div class=filmTime>', '</div>')
         runtime = mautils.strip_tags(runtime)
         print_debug('Runtime data', str(runtime))
@@ -618,15 +618,15 @@ class FilmwebEngine(object):
         print_debug("parseDescriptions", "started")
         descres = ''
         descs = mautils.between(dhtml, '<ul class="sep-hr descriptionsList"', '<script type=')
-        elements = descs.split('<li class=')
+        elements = descs.split('hoverOpacity"')
         if elements != '':
             for element in elements:
                 if element == '':
                     continue
-                element = mautils.between(element, '<p>', '</p>')
+                element = mautils.between(element, '<p class=text>', '</p>')
                 element = element.replace('  ', ' ')
                 element = mautils.strip_tags(element)
-                #print_debug("DESC", str(element))
+                # print_debug("DESC", str(element))
                 descres = descres + element + '\n\n'
         return descres
 
@@ -652,16 +652,16 @@ class ImdbEngine(object):
         return df
 
     def __fetchImdbOK(self, res):
-        #print_debug('Fetch IMDB OK: ', str(res))
-        #inhtml = mautils.html2utf8(res, 'utf-8')
+        # print_debug('Fetch IMDB OK: ', str(res))
+        # inhtml = mautils.html2utf8(res, 'utf-8')
         inhtml = mautils.between(res, '<table class="results">', '<div class="leftright">')
-        #print_debug('Fetch IMDB html: ', str(inhtml))
+        # print_debug('Fetch IMDB html: ', str(inhtml))
 
         elements = inhtml.split('<td class="number">')
         num = len(elements)
         print_debug('IMDB Number of elements: ', str(num))
         for element in elements:
-            #print_debug('ELEMENT: ', str(element))
+            # print_debug('ELEMENT: ', str(element))
             ttle = mautils.between(element, '<a href="/title/', '/" title="')
             idx = element.find('<span class="rating-rating"><span class="value">')
             if idx > -1:
@@ -718,13 +718,13 @@ class TelemagEngine(object):
                     else:
                         continue
                 prog = mautils.between(element, '<td>', '</td>')
-                #print_debug('PROG', str(prog))
+                # print_debug('PROG', str(prog))
                 ds = None
                 hr = mautils.between(prog, '<div class="m1', '<div')
                 entryId = mautils.between(hr, 'id="chmurka-', '">')
-                #print_debug('HR', str(hr))
+                # print_debug('HR', str(hr))
                 ds = mautils.between(prog, '<div class="opisProgramu">', '</div>')
-                #print_debug('DS', str(ds))
+                # print_debug('DS', str(ds))
                 if not ds or len(ds) == 0:
                     ds = None
                 if not hr and len(hr) == 0:
@@ -732,7 +732,7 @@ class TelemagEngine(object):
                 if hr and ds:
                     row = []
                     idxp = hr.find("<p")
-                    #print_debug('HRP idx', str(idxp))
+                    # print_debug('HRP idx', str(idxp))
                     if idxp > -1:
                         hr = hr[idxp:]
                         hr = mautils.strip_tags(hr)
@@ -747,7 +747,7 @@ class TelemagEngine(object):
                         print_debug('Godzina', str(hr) + ', sec: ' + str(sec))
 
                     idxp = ds.find("<p")
-                    #print_debug('DSP idx', str(idxp))
+                    # print_debug('DSP idx', str(idxp))
                     if idxp > -1:
                         dsa = ds[idxp:]
                         dsa = mautils.strip_tags(dsa)
@@ -762,7 +762,7 @@ class TelemagEngine(object):
                         row.append(dsa)
 
                     # duration value - always None
-                    #self.__searchDetails(entryId, row)
+                    # self.__searchDetails(entryId, row)
                     row.append(None)
 
                     print_debug('- ROW LENGTH: ', str(len(row)))
@@ -772,7 +772,7 @@ class TelemagEngine(object):
                         result.append(row)
                 lastnum = num
         ''' ROW to (begin, opis, tytul, service, typ)'''
-        #print_debug('ROW', str(result))    
+        # print_debug('ROW', str(result))
         print_debug('-- RESULT FOR: ', str(tup[0] and tup[0].getServiceName() or '') + ', day: ' + str(tup[2]) + ', res: ' + str(result))
         return result
 
@@ -802,7 +802,7 @@ class TelemagEngine(object):
 
     def __getChannel(self, ref):
         x = ref.getServiceName()
-        #print_debug('xx', x +', map: '+ str(MAPPING))
+        # print_debug('xx', x +', map: '+ str(MAPPING))
         return MAPPING.get(x)
 
     def __getType(self, typ):
@@ -820,7 +820,7 @@ class FilmwebTvEngine(object):
         tms = time.strptime(dz, "%Y%m%d")
         local = time.localtime(time.time())
         now = time.strptime(time.strftime("%Y%m%d", local), "%Y%m%d")
-        #now = time.localtime(time.time())
+        # now = time.localtime(time.time())
         tt = time.mktime(tms) - time.mktime(now)
         d = datetime.timedelta(seconds=tt)
 
@@ -847,12 +847,12 @@ class FilmwebTvEngine(object):
 
         print_debug('FILMWEBTV - Convert result to UTF8 - ', str(service and service.getServiceName() or ''))
         inhtml = mautils.html2utf8(res)
-        #inhtml = mautils.between(inhtml, '<div class="channel first">', '<div class="channel">')
-        #print_debug('++++++++++++ page', str(inhtml))
+        # inhtml = mautils.between(inhtml, '<div class="channel first">', '<div class="channel">')
+        # print_debug('++++++++++++ page', str(inhtml))
         inhtml = mautils.after(inhtml, 'brak programów dla wybranych filtrów')
         inhtml = mautils.after(inhtml, '<div class=toScroll>')
-        #print_debug('+++++------- page', str(inhtml))
-        #print_debug('------------------')
+        # print_debug('+++++------- page', str(inhtml))
+        # print_debug('------------------')
 
         elements = inhtml.split('<div class="singleProg seance seance_film')
         skip = True
@@ -864,7 +864,7 @@ class FilmwebTvEngine(object):
                 skip = False
                 continue
             row = []
-            #print_debug('----------- page', str(element))
+            # print_debug('----------- page', str(element))
             if element.find('<span class="hour">') < 0 and element.find('<span class=hour>') < 0:
                 print_debug('ELEM hour not found - res: ', str(res))
                 continue
@@ -872,10 +872,10 @@ class FilmwebTvEngine(object):
                 hr = mautils.between(element, '<span class="hour">', '</span>')
             else:
                 hr = mautils.between(element, '<span class=hour>', '</span>')
-            #print_debug('--', hr)
+            # print_debug('--', hr)
             hr = mautils.strip_tags(hr)
             hr = hr.strip()
-            #print_debug('--', hr)
+            # print_debug('--', hr)
             tm = time.strptime(dzien + hr, '%Y%m%d%H:%M')
             sec = time.mktime(tm) + off * 86400
             if sec < lastsec:
@@ -886,7 +886,7 @@ class FilmwebTvEngine(object):
             print_debug('Godzina', str(hr) + ', sec: ' + str(sec))
 
             duration = None
-            #print_debug('elem: ', str(element))
+            # print_debug('elem: ', str(element))
             hr = mautils.between(element, '<span class="duration">', '</span>')
             hr = hr and hr.strip()
             if not hr or len(hr) == 0:
@@ -935,7 +935,7 @@ class FilmwebTvEngine(object):
 
     def __getChannel(self, ref):
         x = ref.getServiceName()
-        #print_debug('xx', x +', map: '+ str(MAPPING))
+        # print_debug('xx', x +', map: '+ str(MAPPING))
         return MAPPING2.get(x)
 
 
