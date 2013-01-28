@@ -72,7 +72,6 @@ init 4; sleep 10; init 3
   * Modyfikacja skóry 
   * Dodanie wyświetlania informacji szczegółowych o aktorach
   * Dodanie listy ulubionych pozycji wybranych z Przewodnika i wyświetlanie przypomnień o tym, że na określonym kanale za określony czas będzie wyświetlana ulubiona pozycja w formie okienka notyfikacyjnego
-  * Konfiguracja i pobieranie w zależności od potrzeby pełnej listy aktorów a nie tylko 10-ciu
   * Pobieranie pełnej listy potencjalnie pasujących pozycji do zapytania do wyboru po wyszukaniu  zamiast 10-ciu 
   * Dodanie w Przewodniku informacji o obsadzie
   * Dodanie w Przewodniku wyświetlania opisów dla filmu
@@ -83,6 +82,7 @@ init 4; sleep 10; init 3
 ----
 === ver. DEV ===
   * poprawa wyświetlania opisów
+  * dodanie pobrania pełnej listy aktorów po naciśnięciu klawisza '0'
 
 === ver. 1.1.5 ===
   * Poprawa działania Przewodnika Filmowego dla wersji Blackhole 1.7.9 (poprawka związana ze zmianą domyślnego skina) 
