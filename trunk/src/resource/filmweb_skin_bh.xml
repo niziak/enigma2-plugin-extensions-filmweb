@@ -1,8 +1,8 @@
 <screen name="FilmwebData" position="90,105" size="1100,560" title="Filmweb.pl">
-  <ePixmap pixmap="skin_default/buttons/red25.png" position="20,505" size="250,40" alphatest="on" />
-  <ePixmap pixmap="skin_default/buttons/green25.png" position="290,505" size="250,40" alphatest="on" />
-  <ePixmap pixmap="skin_default/buttons/yellow25.png" position="560,505" size="250,40" alphatest="on" />
-  <ePixmap pixmap="skin_default/buttons/blue25.png" position="830,505" size="250,40" alphatest="on" />
+  <ePixmap pixmap="skin_default/buttons/red25.png" position="20,505" size="250,40" transparent="1" alphatest="on" />
+  <ePixmap pixmap="skin_default/buttons/green25.png" position="290,505" size="250,40" transparent="1" alphatest="on" />
+  <ePixmap pixmap="skin_default/buttons/yellow25.png" position="560,505" size="250,40" transparent="1" alphatest="on" />
+  <ePixmap pixmap="skin_default/buttons/blue25.png" position="830,505" size="250,40" transparent="1" alphatest="on" />
   <widget name="key_red" position="20,508" size="250,40" zPosition="2" font="Regular;24" valign="center" halign="center"
     backgroundColor="transpBlack" transparent="1" />
   <widget name="key_green" position="290,508" size="250,40" zPosition="2" font="Regular;24" valign="center" halign="center"

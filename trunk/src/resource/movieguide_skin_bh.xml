@@ -72,8 +72,8 @@
 	<ePixmap pixmap="skin_default/buttons/green25.png" position="302,650" size="250,40" alphatest="on"/>
 	<ePixmap pixmap="skin_default/buttons/yellow25.png" position="578,650" size="250,40" alphatest="on"/>
 	<ePixmap pixmap="skin_default/buttons/blue25.png" position="854,650" size="250,40" alphatest="on"/>
-	<widget source="key_red" render="Label" position="26,658" size="250,40" zPosition="1" font="Regular;24" halign="center" valign="center" foregroundColor="white" transparent="1"/>
-	<widget source="key_green" render="Label" position="302,658" size="250,40" zPosition="1" font="Regular;24" halign="center" valign="center" foregroundColor="white" transparent="1"/>
-	<widget source="key_yellow" render="Label" position="578,658" size="250,40" zPosition="1" font="Regular;24" halign="center" valign="center" foregroundColor="white" transparent="1"/>
-	<widget source="key_blue" render="Label" position="854,658" size="250,40" zPosition="1" font="Regular;24" halign="center" valign="center" foregroundColor="white" transparent="1"/>
+	<widget source="key_red" render="Label" position="26,654" size="250,40" zPosition="1" font="Regular;24" halign="center" valign="center" foregroundColor="white" transparent="1"/>
+	<widget source="key_green" render="Label" position="302,654" size="250,40" zPosition="1" font="Regular;24" halign="center" valign="center" foregroundColor="white" transparent="1"/>
+	<widget source="key_yellow" render="Label" position="578,654" size="250,40" zPosition="1" font="Regular;24" halign="center" valign="center" foregroundColor="white" transparent="1"/>
+	<widget source="key_blue" render="Label" position="854,654" size="250,40" zPosition="1" font="Regular;24" halign="center" valign="center" foregroundColor="white" transparent="1"/>
 </screen> 
