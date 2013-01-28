@@ -84,6 +84,8 @@ init 4; sleep 10; init 3
 === ver. DEV ===
   * poprawa wyświetlania opisów
 
+=== ver. 1.1.5 ===
+  * Poprawa działania Przewodnika Filmowego dla wersji Blackhole 1.7.9 (poprawka związana ze zmianą domyślnego skina) 
 === ver. 1.1.4 ===
   * Dodanie usuwania elementów z cache po 1 dniu
   * Dodanie pobierania informacji o ocenie z portalu IMDB - przełączanie w Przewodniku klawiszem "<" pomiędzy oceną Filmweb i IMDB (Żeby pobrać oceny z IMDB należy włączyć w konfiguracji pobieranie oceny IMDB)
