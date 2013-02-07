@@ -81,6 +81,8 @@ init 4; sleep 10; init 3
 = Informacja o zmianach w wersjach =
 ----
 === ver. DEV ===
+
+=== ver. 1.1.6 ===
   * poprawa wyświetlania opisów
   * dodanie pobrania pełnej listy aktorów po naciśnięciu klawisza '0'
 
