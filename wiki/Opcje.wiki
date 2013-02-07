@@ -39,6 +39,7 @@ Ustaw przeszukiwane kanały na ekranie konfiguracyjnym - patrz obrazek niżej. W
 || EPG || W tym momencie to samo co YELLOW ||
 || MENU || Pokazuje menu kontekstowe pluginu ||
 || MOVIE || Uruchamia okno Przewodnika Filmowego || 
+|| 0 || Pobranie pełnej listy aktorów || 
 
 </td></tr></tbody></table>
 
