@@ -1,5 +1,5 @@
 ######################################################################
-# Copyright (c) 2012 Marcin Slowik
+# Copyright (c) 2012 - 2013 Marcin Slowik
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@
 
 from Plugins.Plugin import PluginDescriptor
 from __common__ import  _
-import logger 
+import logger
 import mselection
 import mainlib
 import config
@@ -29,17 +29,17 @@ import mautils
 import comps
 import engine
 import movieguide
-    
+
 def reloadlibs():
-    reload(logger)   
-    reload(mautils)    
+    reload(logger)
+    reload(mautils)
     reload(comps)
     reload(config)
     reload(engine)
-    reload(mselection)  
-    reload(movieguide)      
+    reload(mselection)
+    reload(movieguide)
     reload(mainlib)
-        
+
 def guide(session, **kwargs):
     reloadlibs()
     try:
@@ -47,7 +47,7 @@ def guide(session, **kwargs):
     except:
         import traceback
         traceback.print_exc()
-        
+
 def main(session, eventName="", **kwargs):
     reloadlibs()
     try:
@@ -55,17 +55,17 @@ def main(session, eventName="", **kwargs):
     except:
         import traceback
         traceback.print_exc()
-        
+
 def eventinfo(session, servicelist, **kwargs):
-    reloadlibs()  
+    reloadlibs()
     try:
         ref = session.nav.getCurrentlyPlayingServiceReference()
         print "Current Service ref", str(ref)
         session.open(mselection.FilmwebEPGSelection, ref, mainlib.Filmweb)
     except:
         import traceback
-        traceback.print_exc()      
-        
+        traceback.print_exc()
+
 def Plugins(path, **kwargs):
     p = [PluginDescriptor(name=_("Filmweb Details"),
                            description=_("Query details from the Filmweb.pl Database"),

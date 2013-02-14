@@ -1,7 +1,7 @@
 # -*- coding: UTF-8 -*-
 
 ######################################################################
-# Copyright (c) 2012 Marcin Slowik
+# Copyright (c) 2012 - 2013 Marcin Slowik
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -41,6 +41,7 @@ config.plugins.mfilmweb.guideDays = ConfigInteger(default=1, limits=(1, 4))
 config.plugins.mfilmweb.sort = ConfigInteger(default=0)
 config.plugins.mfilmweb.sortOrder = ConfigBoolean()
 config.plugins.mfilmweb.imdbData = ConfigBoolean()
+config.plugins.mfilmweb.engine = ConfigSelection([('FILMWEB', _('Filmweb Engine')), ('IMDB', _('IMDB Engine'))], default='FILMWEB')
 
 class FilmwebConfig(Screen, ConfigListScreen):
     def __init__(self, session):
@@ -65,6 +66,7 @@ class FilmwebConfig(Screen, ConfigListScreen):
         self.list.append(getConfigListEntry(_("Password"), config.plugins.mfilmweb.password))
         self.list.append(getConfigListEntry(_("Temporary Folder"), config.plugins.mfilmweb.tmpPath))
         self.list.append(getConfigListEntry(_("Logging Level"), config.plugins.mfilmweb.logs))
+        self.list.append(getConfigListEntry(_("Select Engine"), config.plugins.mfilmweb.engine))
         self.list.append(getConfigListEntry(_("Number of days in movie guide search"), config.plugins.mfilmweb.guideDays))
         self.list.append(getConfigListEntry(_("Get IMDB data for Movie Guide entries"), config.plugins.mfilmweb.imdbData))
         self["config"].list = self.list
