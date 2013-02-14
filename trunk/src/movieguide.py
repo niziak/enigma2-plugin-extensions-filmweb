@@ -1,5 +1,5 @@
 ######################################################################
-# Copyright (c) 2012 Marcin Slowik
+# Copyright (c) 2012 - 2013 Marcin Slowik
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -29,7 +29,7 @@ from __common__ import _
 from logger import print_info, print_debug
 from mselection import FilmwebRateChannelSelection
 from comps import DefaultScreen, StarsComp, MPixmap
-from engine import TelemagEngine, FilmwebTvEngine, FilmwebEngine, ImdbEngine, MT_MOVIE, MAPPING, MAPPING2
+from engine import TelemagEngine, FilmwebTvEngine, FilmwebEngine, ImdbRateEngine, MT_MOVIE, MAPPING, MAPPING2
 
 from RecordTimer import RecordTimerEntry, parseEvent, AFTEREVENT
 from Tools.LoadPixmap import LoadPixmap
@@ -578,7 +578,7 @@ class MovieGuide(DefaultScreen, SelectionEventInfo):
                                     title = title.replace(", Die", '')
                                     title = title.replace(", Der", '')
                                     print_debug('Movie title: ', str(title) + ', YEAR: ' + str(year))
-                                    imdb = ImdbEngine()
+                                    imdb = ImdbRateEngine()
                                     rdf = imdb.query(title, year, MT_MOVIE)
                                     if rdf:
                                         print_debug('Yield imdb query: ', str(rdf))

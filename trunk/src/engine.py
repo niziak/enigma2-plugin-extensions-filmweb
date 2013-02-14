@@ -1,7 +1,7 @@
 # -*- coding: UTF-8 -*-
 
 ######################################################################
-# Copyright (c) 2012 Marcin Slowik
+# Copyright (c) 2012 - 2013 Marcin Slowik
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -76,6 +76,122 @@ def loadMappings():
             sfile.close()
 
 loadMappings()
+
+class ImdbEngine(object):
+    def __init__(self, failureHandler=None, statusComponent=None):
+        self.inhtml = None
+        self.resultlist = []
+        self.detailsData = {}
+        self.failureHandler = failureHandler
+        self.statusComponent = statusComponent
+
+    def login(self, username, password, callback=None, resdata=None):
+        print_debug("LoginPage", "started")
+        return None
+
+    def query(self, typ, title, year=None, tryOther=False, callback=None, data=None):
+        if typ == MT_MOVIE:
+            typen = 'feature,tv_movie,mini_series,documentary'
+        else:
+            typen = 'tv_series'
+        tit = urllib.quote(title.encode('utf8'))
+        fetchurl = SEARCH_IMDB_URL + 'title=' + tit + '&title_type=' + typen
+        if year:
+            fetchurl += '&release_date=' + year + '-01-01,' + year + '-12-31'
+        print_info("IMDB Query", fetchurl)
+        return self.__fetchEntries(fetchurl, type, callback, tryOther, data)
+
+    def __fetchEntries(self, fetchurl, typ, callback, tryOther=True, data=None):
+        self.resultlist = []
+        headers = {"Accept":"text/html", "Accept-Charset":"utf-8", "Accept-Encoding":"deflate",
+                   "Accept-Language":"pl-PL,pl;q=0.8,en-US;q=0.6,en;q=0.4", "Connection":"keep-alive",
+                   "Host":"www.imdb.com",
+                   "User-Agent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_2) AppleWebKit/537.4 (KHTML, like Gecko) Chrome/22.0.1229.94 Safari/537.4"}
+        df = getPage(fetchurl, cookies=COOKIES_IMDB, headers=headers).addCallback(self.__fetchOK, callback, tryOther, fetchurl, typ, data).addErrback(self.__fetchFailed)
+        print_debug('IMDB query deffered: ', str(df))
+        return df
+
+    def __fetchOK(self, txt_, callback, tryOther, fetchurl, typ, data):
+        print_debug("Fetch OK", str(COOKIES_IMDB))
+        if self.statusComponent:
+            self.statusComponent.setText(_("IMDB Download completed"))
+        self.inhtml = mautils.html2utf8(txt_)
+        if self.inhtml:
+            self.__parseEntries(typ)
+        if len(self.resultlist) == 0:
+            if tryOther:
+                if typ == MT_SERIE:
+                    typ = MT_MOVIE
+                else:
+                    typ = MT_SERIE
+                return self.__fetchEntries(fetchurl, type, callback, False, data)
+        if callback:
+            return callback(self.resultlist, type, data)
+        return None
+
+    def __fetchFailed(self, txt_):
+        print_info("Fetch failed", str(txt_))
+        if self.failureHandler:
+            self.failureHandler(txt_)
+
+    def __parseEntries(self, typ):
+        print_debug("__parseEntries", "started")
+        fidx = self.inhtml.find('<table class="results">')
+        print_debug("search idx", str(fidx))
+        if fidx > -1:
+            self.inhtml = mautils.after(self.inhtml, '<table class="results">')
+        else:
+            self.inhtml = None
+
+        if self.inhtml is None:
+            pass
+        else:
+            # print_debug("---", str(self.inhtml))
+            elements = self.inhtml.split('<tr class="')
+            number_results = len(elements)
+            print_info("Serach results count", str(number_results))
+            if elements == '':
+                number_results = 0
+            else:
+                for element in elements:
+                    if element == '':
+                        continue
+                    tt = mautils.after(element, '<td class="title">')
+                    link = mautils.between(tt, '<a href="/title/', '">')
+                    if (link != ''):
+                        print_debug("The movie link", link)
+                        title = mautils.after(tt, '<a href="/title/')
+                        title = mautils.between(title, '">', '</a>')
+                        print_debug("The movie title", title)
+                        year = mautils.between(tt, '<span class="year_type">', '</span>')
+                        print_debug("The movie year", year)
+                        rating = mautils.after(tt, 'data-ga-identifier="advsearch"')
+                        rating = mautils.between(rating, 'title="', '- click stars to rate"')
+                        cast = mautils.between(tt, 'With:', '</span>')
+                        if (cast != ''):
+                            cast = mautils.strip_tags(cast)
+
+                        element = title.strip()
+                        if year:
+                            element += ' ' + year.strip()
+                        # if country:
+                        #    element += ' - ' + country.strip()
+                        basic_data = element
+                        element = mautils.strip_tags(element)
+                        if rating:
+                            element += '\n' + rating.strip()
+                        if cast:
+                            element += '\n' + cast.strip()
+                        print_info("The movie serach title", element)
+                        if (rating and rating.find('Users rated this') > -1):
+                            rt = mautils.between(rating, 'Users rated this ', '/10')
+                        else:
+                            rt = '0.0'
+
+                        # (caption, url, basic_caption, title, rating, year, country)
+                        self.resultlist.append((element, 'http://www.imdb.com/title/' + link, basic_data, title, rt, year, ''))
+
+
 
 class FilmwebEngine(object):
     def __init__(self, failureHandler=None, statusComponent=None):
@@ -671,7 +787,7 @@ class FilmwebEngine(object):
                 descres = descres + element + '\n\n'
         return descres
 
-class ImdbEngine(object):
+class ImdbRateEngine(object):
     def __init__(self):
         pass
 

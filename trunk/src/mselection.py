@@ -1,5 +1,5 @@
 ######################################################################
-# Copyright (c) 2012 Marcin Slowik
+# Copyright (c) 2012 - 2013 Marcin Slowik
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -23,11 +23,11 @@ from __common__ import  _
 from logger import print_info, print_debug
 from enigma import eServiceReference, gRGB, eListboxServiceContent
 from Components.config import config, configfile
-#from Tools.LoadPixmap import LoadPixmap
-#from Tools.Directories import resolveFilename, SCOPE_CURRENT_SKIN
+# from Tools.LoadPixmap import LoadPixmap
+# from Tools.Directories import resolveFilename, SCOPE_CURRENT_SKIN
 
 from Screens.EpgSelection import EPGSelection
-#from Screens.InfoBarGenerics import InfoBarEPG
+# from Screens.InfoBarGenerics import InfoBarEPG
 from Screens.ChannelSelection import SimpleChannelSelection
 
 from Components.ActionMap import ActionMap
@@ -36,10 +36,10 @@ class FilmwebRateChannelSelection(SimpleChannelSelection):
     def __init__(self, session):
         SimpleChannelSelection.__init__(self, session, _("Channel Selection"))
         self.skinName = "SimpleChannelSelection"
-        
+
         self.onLayoutFinish.append(self.__layoutFinished)
         self.onClose.append(self.__onClose)
-        
+
     def channelSelected(self):
         ref = self.getCurrentSelection()
         print_debug("Channel selected", str(ref) + ", flags: " + str(ref.flags))
@@ -52,20 +52,20 @@ class FilmwebRateChannelSelection(SimpleChannelSelection):
                 self.servicelist.removeMarked(refx)
             else:
                 self.servicelist.addMarked(refx)
-                
-    def __layoutFinished(self):    
+
+    def __layoutFinished(self):
         try:
             self.__load()
             self.servicelist.l.setColor(eListboxServiceContent.markedForeground, gRGB(0x58BCFF))
             self.servicelist.l.setColor(eListboxServiceContent.markedForegroundSelected, gRGB(0xF0B400))
-            #self.servicelist.instance.setForegroundColorSelected(gRGB(0xF0B400))
+            # self.servicelist.instance.setForegroundColorSelected(gRGB(0xF0B400))
         except:
             import traceback
-            traceback.print_exc()         
-        
+            traceback.print_exc()
+
     def setModeRadio(self):
         pass
-    
+
     def __load(self):
         txt = config.plugins.mfilmweb.selserv.getText()
         print_debug("config", str(txt))
@@ -73,18 +73,18 @@ class FilmwebRateChannelSelection(SimpleChannelSelection):
             entries = txt.split('|')
             for x in entries:
                 self.servicelist.addMarked(eServiceReference(x))
-        
+
     def __onClose(self):
         marked = self.servicelist.getMarked()
         txt = ''
         for x in marked:
-            print_debug("marked", str(x)) 
-            txt += str(x) + '|'   
+            print_debug("marked", str(x))
+            txt += str(x) + '|'
         txt = txt.strip('|')
         config.plugins.mfilmweb.selserv.setValue(txt)
         config.plugins.mfilmweb.save()
         configfile.save()
-        
+
         '''
         try:
             from ServiceReference import ServiceReference
@@ -101,8 +101,8 @@ class FilmwebRateChannelSelection(SimpleChannelSelection):
         finally:
             if sfile is not None:
                 sfile.close()
-        '''                
-    
+        '''
+
 class FilmwebChannelSelection(SimpleChannelSelection):
     def __init__(self, session):
         SimpleChannelSelection.__init__(self, session, _("Channel Selection"))
@@ -125,11 +125,11 @@ class FilmwebChannelSelection(SimpleChannelSelection):
                 ref
             )
 
-    def onClosed(self, ret = None):
-        print_debug("Closed", str(ret)) 
+    def onClosed(self, ret=None):
+        print_debug("Closed", str(ret))
         if ret:
             self.close(ret)
-    
+
 class FilmwebEPGSelection(EPGSelection):
     def __init__(self, session, ref, screen=None):
         EPGSelection.__init__(self, session, ref)
@@ -140,30 +140,30 @@ class FilmwebEPGSelection(EPGSelection):
     def infoKeyPressed(self):
         print_info("Info Key pressed", "")
         self.lookup()
-        
+
     def zapTo(self):
         self.lookup()
-        
-    #def onSelectionChanged(self):
+
+    # def onSelectionChanged(self):
     #    cur = self["list"].getCurrent()
     #    evt = cur[0]
-    #    print_debug("Selection Changed Event", str(evt))        
-    
+    #    print_debug("Selection Changed Event", str(evt))
+
     def lookup(self):
         cur = self["list"].getCurrent()
         evt = cur[0]
-        sref = cur[1]        
+        sref = cur[1]
         print_debug("Lookup EVT", str(evt))
-        print_debug("Lookup SREF", str(sref)) 
-        if not evt: 
+        print_debug("Lookup SREF", str(sref))
+        if not evt:
             return
-        
+
         # when openPlugin is TRUE - open filmweb data window
-        # otherwise only return the selected event name           
+        # otherwise only return the selected event name
         if self.screen is not None:
             print_debug("EVT short desc", str(evt.getShortDescription()))
             print_debug("EVT ext desc", str(evt.getExtendedDescription()))
             print_debug("EVT ptr", str(evt.getPtrString()))
             self.session.open(self.screen, evt.getEventName())
         else:
-            self.close(evt.getEventName())              
+            self.close(evt.getEventName())

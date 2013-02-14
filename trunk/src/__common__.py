@@ -1,5 +1,5 @@
 ######################################################################
-# Copyright (c) 2012 Marcin Slowik
+# Copyright (c) 2012 - 2013 Marcin Slowik
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -36,8 +36,8 @@ def _(txt):
     return t
 
 def localeInit():
-    lang = language.getLanguage()[:2] 
-    os.environ["LANGUAGE"] = lang 
+    lang = language.getLanguage()[:2]
+    os.environ["LANGUAGE"] = lang
     print "Language: " + lang
     gettext.bindtextdomain("Filmweb", resolveFilename(SCOPE_PLUGINS, "Extensions/Filmweb/locale"))
 

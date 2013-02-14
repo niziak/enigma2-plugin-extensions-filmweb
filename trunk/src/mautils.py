@@ -1,7 +1,7 @@
 # -*- coding: UTF-8 -*-
 
 ######################################################################
-# Copyright (c) 2012 Marcin Slowik
+# Copyright (c) 2012 - 2013 Marcin Slowik
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -39,36 +39,36 @@ from enigma import ePicLoad
 from Components.Pixmap import Pixmap
 from Components.AVSwitch import AVSwitch
 
-    
+
 class PixLoader(Pixmap):
-    def __init__(self, callback = None):
+    def __init__(self, callback=None):
         Pixmap.__init__(self)
         self.picload = ePicLoad()
         self.picload.PictureData.get().append(self.paintMe)
         self.callback = callback
         self.filename = None
- 
+
     def onShow(self):
         Pixmap.onShow(self)
         sc = AVSwitch().getFramebufferScale()
         self.picload.setPara((self.instance.size().width(), self.instance.size().height(), sc[0], sc[1], False, 1, "#00000000"))
- 
+
     def paintMe(self, picInfo=None):
         ptr = self.picload.getData()
         if ptr != None:
             self.instance.setPixmap(ptr.__deref__())
         if self.callback is not None:
             self.callback(self.filename)
- 
+
     def updateIcon(self, filename):
         self.filename = filename
         self.picload.startDecode(filename)
-        
+
 def getPluginPath():
     return os.path.dirname(os.path.realpath(__file__))
-  
+
 def quote(txt):
-    return quote_plus(txt) 
+    return quote_plus(txt)
 
 def castInt(x):
     if x is None:
@@ -76,7 +76,7 @@ def castInt(x):
     try:
         return int(x)
     except:
-        return None; 
+        return None;
 
 def strip_tags(text):
     if text is None:
@@ -88,34 +88,34 @@ def strip_tags(text):
         if start >= 0:
             stop = text[start:].find(">")
             if stop >= 0:
-                text = text[:start] + text[start+stop+1:]
+                text = text[:start] + text[start + stop + 1:]
                 process = 1
     return text
 
-def between(text,key1,key2):
-    p1 = string.find(text,key1)
+def between(text, key1, key2):
+    p1 = string.find(text, key1)
     if p1 == -1:
         return ""
     else:
-        p1 = p1+len(key1)
-    p2 = string.find(text[p1:],key2)
+        p1 = p1 + len(key1)
+    p2 = string.find(text[p1:], key2)
     if p2 == -1:
         return ""
     else:
-        p2 = p1+p2
+        p2 = p1 + p2
     return text[p1:p2]
-    
-def after(text,key):
-    p1 = string.find(text,key)
-    return text[p1+len(key):]
 
-def before(text,key):
-    p1 = string.find(text,key)
+def after(text, key):
+    p1 = string.find(text, key)
+    return text[p1 + len(key):]
+
+def before(text, key):
+    p1 = string.find(text, key)
     return text[:p1]
-    
+
 def getKey(val, repo):
-    for key, value in iteritems(repo):    
-        if value == val: 
+    for key, value in iteritems(repo):
+        if value == val:
             return key
     return None
 
@@ -128,29 +128,28 @@ def html2utf8(in_html, code='utf8'):
         if key not in entitydict:
             elem = x.group(1)
             entitydict[key] = htmlentitydefs.name2codepoint[elem]
-            #print_info("Dictionary-1", str(key) + "->" + str(elem) + "->" + str(entitydict[key]))
+            # print_info("Dictionary-1", str(key) + "->" + str(elem) + "->" + str(entitydict[key]))
 
     entities = re.finditer('&#x([0-9A-Fa-f]{2,2}?);', in_html)
     for x in entities:
         key = x.group(0)
         if key not in entitydict:
             entitydict[key] = "%d" % int(key[3:5], 16)
-            #print_info("Dictionary-2", str(key) + "->" + str(int(key[3:5], 16)) + "->" + str(entitydict[key]))
+            # print_info("Dictionary-2", str(key) + "->" + str(int(key[3:5], 16)) + "->" + str(entitydict[key]))
 
     entities = re.finditer('&#(\d{1,5}?);', in_html)
     for x in entities:
         key = x.group(0)
         if key not in entitydict:
             entitydict[key] = x.group(1)
-            #print_info("Dictionary-3", str(key) + "->" + str(entitydict[key]))
+            # print_info("Dictionary-3", str(key) + "->" + str(entitydict[key]))
 
     for key, codepoint in iteritems(entitydict):
         utfchar = unichr(int(codepoint)).encode(code, 'ignore')
-        #print_info("KEY-CODEPOINT-UTF", str(key) + "->" + str(codepoint) + "->" + utfchar)            
+        # print_info("KEY-CODEPOINT-UTF", str(key) + "->" + str(codepoint) + "->" + utfchar)
         in_html = in_html.replace(key, utfchar)
-        
-    #print_info("MAUTILS","result", in_html)
+
+    # print_info("MAUTILS","result", in_html)
     return in_html.decode(code).encode('utf8')
-    
-    
-    
+
+

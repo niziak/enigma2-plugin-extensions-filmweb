@@ -1,5 +1,5 @@
 ######################################################################
-# Copyright (c) 2012 Marcin Slowik
+# Copyright (c) 2012 - 2013 Marcin Slowik
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -28,17 +28,16 @@ def print_error(nfo, data=None):
     val = config.plugins.mfilmweb.logs.value
     if val == 'error' or val == 'info' or val == 'debug':
         cmn.print_info_(APP_PREFIX, 'ERROR', nfo, data)
-    
+
 def print_debug(nfo, data=None):
     val = config.plugins.mfilmweb.logs.value
     if val == 'debug':
         cmn.print_info_(APP_PREFIX, 'DEBUG', nfo, data)
-    
+
 def print_info(nfo, data=None):
     val = config.plugins.mfilmweb.logs.value
     if val == 'info' or val == 'debug':
         cmn.print_info_(APP_PREFIX, 'INFO', nfo, data)
-    
-    
-    
-    
+
+
+

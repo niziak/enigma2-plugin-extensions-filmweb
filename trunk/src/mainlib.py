@@ -1,7 +1,7 @@
 # -*- coding: UTF-8 -*-
 
 ######################################################################
-# Copyright (c) 2012 Marcin Slowik
+# Copyright (c) 2012 - 2013 Marcin Slowik
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@ import mautils
 import os
 
 from config import FilmwebConfig
-from engine import FilmwebEngine, MT_MOVIE, MT_SERIE, POSTER_PATH
+from engine import ImdbEngine, FilmwebEngine, MT_MOVIE, MT_SERIE, POSTER_PATH
 from mselection import FilmwebChannelSelection
 from movieguide import MovieGuide
 from __common__ import  _
@@ -75,7 +75,11 @@ class Filmweb(DefaultScreen):
         self.initVars()
         self.createGUI()
 
-        self.engine = FilmwebEngine(self.failureHandler, self["status_bar"])
+        self.engineType = config.plugins.mfilmweb.engine.value
+        if self.engineType == 'IMDB':
+            self.engine = ImdbEngine(self.failureHandler, self["status_bar"])
+        else:
+            self.engine = FilmwebEngine(self.failureHandler, self["status_bar"])
 
         self.initActions()
         self.switchView(to_mode=VT_NONE)
@@ -84,7 +88,7 @@ class Filmweb(DefaultScreen):
         self.wallpapertimer.callback.append(self.changeWallpaper)
         self.wallpapertimer.start(WALLPAPER_REFRESH_TIME)
 
-        if config.plugins.mfilmweb.user.getText() == '':
+        if self.engineType == 'IMDB' or config.plugins.mfilmweb.user.getText() == '':
             self.getData()
         else:
             self.loginPage(self.getData)
