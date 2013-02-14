@@ -81,6 +81,8 @@ init 4; sleep 10; init 3
 = Informacja o zmianach w wersjach =
 ----
 === ver. DEV ===
+  * Dodanie konfiguracji wyboru silnika wyszukiwania (Filmweb lub IMDB)
+  * Dodanie wyszukiwania informacji z IMDB
 
 === ver. 1.1.6 ===
   * poprawa wyświetlania opisów
