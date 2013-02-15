@@ -65,12 +65,13 @@ class Filmweb(DefaultScreen):
         self.session = session
         self.eventName = eventName
         self.mode = ''
-        self.searchType = MT_MOVIE
         self.detailDir = 0
         self.resultlist = []
         self.initialize = True
         self.sessionId = None
         self.userToken = None
+        self.regtitle = ''
+        self.orgtitle = ''
 
         self.initVars()
         self.createGUI()
@@ -82,12 +83,16 @@ class Filmweb(DefaultScreen):
             self.engine = FilmwebEngine(self.failureHandler, self["status_bar"])
 
         self.initActions()
-        self.switchView(to_mode=VT_NONE)
 
         self.wallpapertimer = eTimer()
         self.wallpapertimer.callback.append(self.changeWallpaper)
         self.wallpapertimer.start(WALLPAPER_REFRESH_TIME)
 
+        self.reload()
+
+    def reload(self):
+        self.searchType = MT_MOVIE
+        self.switchView(to_mode=VT_NONE)
         if self.engineType == 'IMDB' or config.plugins.mfilmweb.user.getText() == '':
             self.getData()
         else:
@@ -126,7 +131,16 @@ class Filmweb(DefaultScreen):
         pass
 
     def nextAction(self):
-        pass
+        if self.engineType == 'IMDB':
+            self.engineType = 'Filmweb'
+            self.eventName = self.regtitle
+            self.engine = FilmwebEngine(self.failureHandler, self["status_bar"])
+        else:
+            self.engineType = 'IMDB'
+            self.eventName = self.orgtitle
+            self.engine = ImdbEngine(self.failureHandler, self["status_bar"])
+        self.reload()
+
 
     def toggleAction(self):
         if self.mode == VT_DETAILS:
@@ -473,7 +487,9 @@ class Filmweb(DefaultScreen):
                 self.engine.searchWallpapers(detailsData['wallpapers_link'], self.searchWallpapersCallback)
 
             self["title_label"].setText(detailsData['title'])
+            self.regtitle = detailsData['title']
             title = detailsData['org_title']
+            self.orgtitle = title
             if title != '':
                 ls = len(self["title_label"].getText())
                 if ls < TITLE_MAX_SIZE:

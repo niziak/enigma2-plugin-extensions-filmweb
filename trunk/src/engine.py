@@ -37,6 +37,7 @@ MT_SERIE = 'serial'
 USER_TOKEN = '_artuser_token'
 SESSION_KEY = '_artuser_sessionId'
 POSTER_PATH = "/tmp/poster.jpg"
+POSTER_IMDB_PATH = "/tmp/poster_imdb.jpg"
 
 SEARCH_IMDB_URL = 'http://www.imdb.com/search/title?'
 PAGE_URL = 'http://www.filmweb.pl'
@@ -100,6 +101,258 @@ class ImdbEngine(object):
             fetchurl += '&release_date=' + year + '-01-01,' + year + '-12-31'
         print_info("IMDB Query", fetchurl)
         return self.__fetchEntries(fetchurl, type, callback, tryOther, data)
+
+    def queryDetails(self, link, callback=None, sessionId=None):
+        headers = {"Accept":"text/html", "Accept-Charset":"utf-8", "Accept-Encoding":"deflate",
+           "Accept-Language":"pl-PL,pl;q=0.8,en-US;q=0.6,en;q=0.4", "Connection":"keep-alive",
+           "Host":"www.imdb.com",
+           "User-Agent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_2) AppleWebKit/537.4 (KHTML, like Gecko) Chrome/22.0.1229.94 Safari/537.4"}
+        return getPage(link, cookies=COOKIES_IMDB, headers=headers).addCallback(self.__fetchDetailsOK, link, callback, sessionId).addErrback(self.__fetchFailed)
+
+    def __fetchDetailsOK(self, txt_, link, callback, sessionId):
+        print_info("fetch details OK", str(COOKIES_IMDB))
+        if self.statusComponent:
+            self.statusComponent.setText(_("Movie details loading completed"))
+        self.inhtml = mautils.html2utf8(txt_)
+        self.detailsData = {}
+        if self.inhtml:
+            try:
+                self.detailsData['login'] = ''
+                self.detailsData['plot'] = ''
+                self.detailsData['year'] = ''
+                self.detailsData['genre'] = ''
+                self.detailsData['country'] = ''
+                self.detailsData['director'] = ''
+                self.detailsData['writer'] = ''
+                self.detailsData['promo'] = None
+                self.detailsData['runtime'] = ''
+                self.detailsData['wallpapers_link'] = None
+
+                self.parseFilmId()
+                self.parseTitle()
+                self.parseOrgTitle()
+                self.parseRating()
+                self.parsePoster()
+                self.parsePlot()
+                self.parseGenere()
+                # self.parseDirector()
+                # self.parseWriter()
+                # self.parseCountry()
+                self.parseYear()
+                self.parseRuntime()
+                self.parseMyVote()
+                # self.parsePromoWidget(sessionId)
+                # self.parseWallpaper(link)
+                self.parseCast()
+            except:
+                import traceback
+                traceback.print_exc()
+        else:
+            self.detailsData = None
+        if (callback):
+            return callback(self.detailsData)
+        return self.detailsData
+
+    def parseGenere(self):
+        print_debug("parseGenere", "started")
+        genre = ''
+        elem = mautils.between(self.inhtml, '<div class="infobar">', '</div>')
+        elements = elem.split('<a href="/genre')
+        no_elems = len(elements)
+        print_debug("Genre list elements count", str(no_elems))
+        if elements != '':
+            for element in elements:
+                if element.find('tt_ov_inf') > 0:
+                    ex = mautils.between(element, '" >', '</a>')
+                    genre = genre + ' ' + ex
+        print_debug("GENRE: ", str(genre))
+        genre = mautils.strip_tags(genre)
+        self.detailsData['genre'] = genre
+
+    def parseRuntime(self):
+        print_debug("parseRuntime", "started")
+        runtime = mautils.between(self.inhtml, '<time itemprop="duration"', '</time>')
+        runtime = mautils.after(runtime, '>')
+        runtime = mautils.strip_tags(runtime).strip()
+        print_debug('Runtime data: ', str(runtime))
+        runtime = runtime.replace(' ', '')
+        if not runtime:
+            self.detailsData['runtime'] = ''
+            return
+        print_debug("Runtime parsed", runtime)
+        str_m = ''
+        str_h = ''
+        if runtime.find('godz.') > -1:
+            str_h = mautils.before(runtime, 'godz.')
+            runtime = mautils.after(runtime, 'godz.')
+        if runtime.find('min') > -1:
+            str_m = mautils.before(runtime, 'min')
+        print_debug("Runtime", "godz: " + str_h + ", min: " + str_m)
+        val_runtime = 0
+        if str_h:
+            val_runtime = 60 * int(float(str_h))
+        if str_m:
+            val_runtime += int(float(str_m))
+        self.detailsData['runtime'] = val_runtime
+
+    def parseFilmId(self):
+        print_debug("parseFilmId", "started")
+        fid = mautils.between(self.inhtml, '<link rel="canonical" href="http://www.imdb.com/title/', '/" />')
+        if fid and len(fid) > 0:
+            self.detailsData['film_id'] = fid
+        else:
+            self.detailsData['film_id'] = None
+        print_info("FILM ID", str(self.detailsData['film_id']))
+
+    def parseTitle(self):
+        print_debug("parseTitle", "started")
+        title = mautils.between(self.inhtml, '<title>', '</title>')
+        print_debug("title first", title)
+        if title.find('(') > -1:
+            title = mautils.before(title, '(')
+        if title.find('/') > -1:
+            title = mautils.before(title, '/')
+        print_debug("title last", title)
+        self.detailsData['title'] = title
+
+    def parseOrgTitle(self):
+        print_debug("parseOrgTitle", "started")
+        title = mautils.between(self.inhtml, '<span class="title-extra">', '<i>(original title)')
+        print_debug("org title first: ", title)
+        title = title.strip();
+        self.detailsData['org_title'] = title
+
+    def parseYear(self):
+        print_debug("parseYear", "started")
+        year = mautils.between(self.inhtml, 'tt_ov_inf" >', '</a>')
+        year = mautils.strip_tags(year)
+        self.detailsData['year'] = str(year)
+
+    def parsePoster(self):
+        print_debug("parsePoster", "started")
+        self.detailsData['poster_url'] = None
+        if self.inhtml.find('<a href="/media/') > -1:
+            posterUrl = mautils.between(self.inhtml, '<a href="/media/', 'itemprop="image" />')
+            posterUrl = mautils.between(posterUrl, 'src="', '"')
+        else:
+            posterUrl = ''
+        print_debug("Poster URL", posterUrl)
+        if posterUrl != '' and posterUrl.find("jpg") > 0:
+            if self.statusComponent:
+                self.statusComponent.setText(_("Downloading Movie Poster: %s...") % (posterUrl))
+            self.detailsData['poster_url'] = posterUrl
+
+    def parseCast(self):
+        print_debug("parseCast", "started")
+        cast_list = []
+        fidx = self.inhtml.find('<table class="cast_list">')
+        if fidx > -1:
+            cast = mautils.between(self.inhtml, '<table class="cast_list">', '</table>')
+            elements = cast.split('<tr class="')
+            no_elems = len(elements)
+            print_debug("Cast list elements count", str(no_elems))
+            cidx = 0
+            if elements != '':
+                for element in elements:
+                    if element == '' or element.find('<td class="primary_photo">') < 0:
+                        continue
+                    cre = self.__loadCastData(element)
+                    cast_list.append((cre[0], cre[1], cidx))
+                    cidx += 1
+        self.detailsData['cast'] = cast_list
+
+    def parseMyVote(self):
+        print_debug("parseMyVote", "started")
+        self.detailsData['vote'] = ''
+        self.detailsData['vote_val'] = 0
+
+    def parsePlot(self):
+        print_debug("parsePlot", "started")
+        plot = mautils.between(self.inhtml, '<div class="inline canwrap" itemprop="description">', '</div>')
+        plot = plot.replace('  ', ' ')
+        plot = mautils.strip_tags(plot).strip()
+        print_debug("PLOT", plot)
+        self.detailsData['plot'] = plot
+
+    def parseRating(self):
+        print_debug("parseRating", "started")
+        rating = mautils.between(self.inhtml, '<div class="titlePageSprite star-box-giga-star">', '</div>')
+        if rating != '':
+            rating = rating.replace(' ', '')
+            rating = rating.replace(',', '.')
+            rate = float(rating.strip())
+            print_debug("RATING", str(rate))
+            self.detailsData['rating'] = _("User Rating") + ": " + str(rate) + " / 10"
+            ratingstars = int(10 * round(rate, 1))
+            self.detailsData['rating_val'] = ratingstars
+        else:
+            self.detailsData['rating'] = _("no user rating yet")
+            self.detailsData['rating_val'] = 0
+
+    def loadPoster(self, posterUrl, callback=None, localfile=POSTER_IMDB_PATH):
+        if posterUrl:
+            print_info("Downloading poster", posterUrl + " to " + localfile)
+            return downloadPage(posterUrl, localfile).addCallback(self.__fetchPosterOK, localfile, callback).addErrback(self.__fetchFailed)
+        return None
+
+    def loadWallpaper(self, furl, localfile, callback):
+        if not furl or not localfile:
+            return None
+        print_info("Loading wallpaper", 'URL: ' + furl + ', Local File:' + localfile)
+        # return downloadPage(furl, localfile).addCallback(callback, localfile).addErrback(self.__fetchFailed)
+        return None
+
+    def loadDescriptions(self, furl, callback):
+        if not furl:
+            return None
+        print_info("LOAD DESCS - link", furl + "/descs")
+        # return getPage(furl + "/descs", cookies=COOKIES).addCallback(self.__fetchExtraOK, callback).addErrback(self.__fetchFailed)
+        return None
+
+    def loadCast(self, furl, callback):
+        if not furl:
+            return None
+        print_info("LOAD CAST - link", furl + "/cast")
+        # return getPage(furl + "/cast", cookies=COOKIES).addCallback(self.__fetchCastOK, callback).addErrback(self.__fetchFailed)
+        return None
+
+
+    def __loadCastData(self, element):
+        element = mautils.after(element, '<td class="primary_photo">')
+        imge = mautils.between(element, 'loadlate="', '"')
+        print_debug("Actor data", "IMG=" + imge)
+
+        element = mautils.between(element, "itemprop='name'>", '</tr>')
+        stre = mautils.before(element, '</a>');
+        stre = stre.strip()
+        if element.find('<td class="character">') > -1:
+            element = mautils.between(element, '<td class="character">', '</td>')
+            element = mautils.strip_tags(element)
+            element = element.strip()
+            if len(element) > 0:
+                stre = stre + ' jako ' + element
+
+        print_debug("Actor data", "IMG=" + imge + ", DATA=" + stre)
+        return (imge, stre)
+
+    def __fetchPosterOK(self, data, localfile, callback=None):
+        try:
+            print_debug("Fetch Poster OK", str(COOKIES_IMDB))
+            # if not self.has_key('status_bar'):
+            #    return
+            if self.statusComponent:
+                self.statusComponent.setText(_("Poster downloading finished"))
+            rpath = os.path.realpath(localfile)
+            print_debug("Poster local real path", rpath)
+            if os.path.exists(rpath):
+                if callback:
+                    return callback(rpath)
+                else:
+                    return rpath
+            return None
+        except:
+            import traceback
+            traceback.print_exc()
 
     def __fetchEntries(self, fetchurl, typ, callback, tryOther=True, data=None):
         self.resultlist = []
@@ -220,12 +473,12 @@ class FilmwebEngine(object):
     def queryDetails(self, link, callback=None, sessionId=None):
         return getPage(link, cookies=COOKIES).addCallback(self.__fetchDetailsOK, link, callback, sessionId).addErrback(self.__fetchFailed)
 
-    def query(self, type, title, year=None, tryOther=False, callback=None, data=None):
-        fetchurl = SEARCH_QUERY_URL + type + "?q=" + mautils.quote(title.encode('utf8'))
+    def query(self, typ, title, year=None, tryOther=False, callback=None, data=None):
+        fetchurl = SEARCH_QUERY_URL + str(typ) + "?q=" + mautils.quote(title.encode('utf8'))
         if year:
             fetchurl += '&startYear=' + year + '&endYear=' + year
         print_info("Filmweb Query", fetchurl)
-        return self.__fetchEntries(fetchurl, type, callback, tryOther, data)
+        return self.__fetchEntries(fetchurl, typ, callback, tryOther, data)
 
     def searchWallpapers(self, link_, callback):
         if link_:
