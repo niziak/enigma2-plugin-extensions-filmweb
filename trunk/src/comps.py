@@ -106,8 +106,13 @@ def MovieSearchEntryComponent(text=["--"]):
             offset = offset + 25
     return res
 
-def ActorEntryComponent(inst, img_url="", text=["--"], index=0):
+def ActorEntryComponent(inst, img_url="", text=["--"], index=0, ext='jpg'):
     res = [ text ]
+
+    if len(img_url) > 4:
+        ex = img_url[:-4]
+        if ex[0] == '.':
+            ext = ex[1:]
 
     def paintImage(idx=None, picInfo=None):
         print_info("Paint Actor Image", str(idx))
@@ -120,7 +125,7 @@ def ActorEntryComponent(inst, img_url="", text=["--"], index=0):
 
     def fetchImgOK(data, idx):
         print_debug("fetchImgOK", str(idx))
-        rpath = os.path.realpath(ACTOR_IMG_PREFIX + str(idx) + ".jpg")
+        rpath = os.path.realpath(ACTOR_IMG_PREFIX + str(idx) + "." + ext)
         if os.path.exists(rpath):
             sc = AVSwitch().getFramebufferScale()
             actorPicload[idx].setPara((40, 45, sc[0], sc[1], False, 1, "#00000000"))
@@ -130,13 +135,13 @@ def ActorEntryComponent(inst, img_url="", text=["--"], index=0):
     def fetchImgFailed(data, idx):
         pass
 
-    if text[0] == "--" or img_url == '' or img_url.find("jpg") < 0:
+    if text[0] == "--" or img_url == '' or img_url.find(ext) < 0:
         res.append((eListboxPythonMultiContent.TYPE_TEXT, 0, 0, 800, 45, 0, RT_HALIGN_LEFT, "-"*200))
     else:
         actorPicload[index] = ePicLoad()
         actorPicload[index].PictureData.get().append(boundFunction(paintImage, index))
         res.append((eListboxPythonMultiContent.TYPE_TEXT, 45, 0, 750, 45, 0, RT_HALIGN_LEFT, text[0]))
-        localfile = ACTOR_IMG_PREFIX + str(index) + ".jpg"
+        localfile = ACTOR_IMG_PREFIX + str(index) + "." + ext
         print_debug("Downloading actor img", img_url + " to " + localfile)
         downloadPage(img_url, localfile).addCallback(fetchImgOK, index).addErrback(fetchImgFailed, index)
     return res
@@ -233,8 +238,8 @@ class ActorChoiceList(ChoiceListExt):
         ChoiceListExt.GUIcreate(self, parent)
         self.l.setItemHeight(50)
 
-    def createEntry(self, imge, stre, cidx):
-        return ActorEntryComponent(self, img_url=imge, text=[stre], index=cidx)
+    def createEntry(self, imge, stre, cidx, ext='jpg'):
+        return ActorEntryComponent(self, img_url=imge, text=[stre], index=cidx, ext=ext)
 
 class ScrollLabelExt(ScrollLabel, Scroller):
     def __init__(self, text=""):
