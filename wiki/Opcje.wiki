@@ -23,6 +23,7 @@ Ustaw przeszukiwane kanały na ekranie konfiguracyjnym - patrz obrazek niżej. W
 || Poziom Logowania || Poziom logowania w logu Enigmy - debug: najbardziej szczegółowe, error: najmniej szczegółów ||
 || Liczba dni przy przeszukiwaniu Przewodnikiem || Określa wielkość paczki informacji pobieranych przez Przewodnik Filmowy. Jako paczkę należy rozumieć informacje o programach TV na określoną liczbę dni ||
 || Pobieranie danych z IMDB dla pozycji w Przewodniku || W przypadku ustawienia wartości logicznej na TRUE w trakcie pobierania informacji w Przewodniku pobierana jest również informacja o ocenie IMDB, którą można zobaczyć po przełaczniu klawiszem '<' ||
+|| Domyślny silnik wyszukiwania || Możliwość wyboru domyślnego silnika wyszukiwania - opcje Filmweb lub IMDB ||
 
 == Opcje pluginu Filmweb ==
 
@@ -40,6 +41,7 @@ Ustaw przeszukiwane kanały na ekranie konfiguracyjnym - patrz obrazek niżej. W
 || MENU || Pokazuje menu kontekstowe pluginu ||
 || MOVIE || Uruchamia okno Przewodnika Filmowego || 
 || 0 || Pobranie pełnej listy aktorów || 
+|| > || Przełączenie wyszukiwania innym silnikiem wyszukiwania niż obecny || 
 
 </td></tr></tbody></table>
 
