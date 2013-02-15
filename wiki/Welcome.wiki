@@ -38,3 +38,14 @@ You could run plugin from two places:
  
 I've assigned function registered in the Extension Manager on the YELLOW key button using Multiquick plugin, so when I press the YELLOW button I get the information about currently watched event.
 
+= KEYS DESCRIPTION =
+|| KEY || Function ||
+|| RED || Exit from plugin ||
+|| GREEN || Show the list of movies to select right one - ambigous search results ||
+|| YELLOW || Show the basic data of movie - switch between TVserie and Movie modes ||
+|| BLUE || Show the descriptions for the current movie ||
+|| EPG || The same as YELLOW ||
+|| MENU || Show the context menu for the plugin ||
+|| MOVIE || Show the Movie Guide window || 
+|| 0 || Show the full actors list - only for Filmweb || 
+|| > || Switch between Filmweb and IMDB search engine || 
