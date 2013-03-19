@@ -708,7 +708,8 @@ class FilmwebEngine(object):
             count = mautils.castInt(counts.strip())
             print_info("Movie/Serie count", str(count))
             if count > 0:
-                self.inhtml = mautils.between(self.inhtml[fidx:], '<ul id=searchFixCheck>', '</ul>')
+                self.inhtml = mautils.between(self.inhtml[fidx:], 'Wyniki:', '</form>')
+                print_debug("Serach data: ", str(self.inhtml))
             else:
                 self.inhtml = None
         else:
@@ -717,7 +718,7 @@ class FilmwebEngine(object):
         if self.inhtml is None:
             pass
         else:
-            elements = self.inhtml.split('<li class=searchResult>')
+            elements = self.inhtml.split('<div class=hitDesc>')
             number_results = len(elements)
             print_info("Serach results count", str(number_results))
             if elements == '':
@@ -726,28 +727,33 @@ class FilmwebEngine(object):
                 for element in elements:
                     if element == '':
                         continue
-                    element = mautils.after(element, 'searchResultTitle href="')
+                    if (element.find('class="hdr hdr-medium" href="') < 0):
+                        continue
+                    element = mautils.after(element, 'class="hdr hdr-medium" href="')
                     link = mautils.before(element, '"')
                     print_debug("The movie link", link)
-                    cast = mautils.after(element, 'class=searchHitCast')
-                    cast = mautils.between(cast, '>', '</div>')
+                    cast = mautils.after(element, '<div class="text">')
+                    cast = mautils.between(cast, '"filmInfo inline">', '</dl>')
+                    cast = cast.replace('</ul></dd>', '   ')
+                    cast = cast.replace('</li><li>', ', ')
                     cast = mautils.strip_tags(cast)
                     cast = cast.replace('\t', '')
                     cast = cast.replace('\n', '')
                     print_debug("The movie cast", cast)
-                    rating = mautils.after(element, 'class=searchResultRating')
-                    rating = mautils.between(rating, '>', '</div>')
+                    rating = mautils.after(element, '<i class=icon-small-voteOn>')
+                    rating = mautils.between(rating, '<strong>', '<div class="box box-half">')
                     rating = mautils.strip_tags(rating)
                     rating = rating.replace('\t', '')
                     rating = rating.replace('\n', '')
                     print_debug("The movie rating", rating)
                     # self.links.append('http://www.filmweb.pl' + link)
                     title = mautils.between(element, '">', '</a>')
+                    title = mautils.before(title, ' (')
                     title = title.replace('\t', '')
                     title = mautils.strip_tags(title)
                     print_debug("The movie title", title)
-                    element = mautils.after(element, 'class=searchResultDetails')
-                    year = mautils.between(element, '>', '|')
+                    # element = mautils.after(element, 'class=searchResultDetails')
+                    year = mautils.between(element, ' (', ') </a>')
                     year = year.replace(" ", '')
                     year = mautils.strip_tags(year)
                     print_debug("The movie year", year)
@@ -770,9 +776,13 @@ class FilmwebEngine(object):
                         element += '\n' + cast.strip()
                     print_info("The movie serach title", element)
                     # self.titles.append(element)
-                    rt = rating.split()
+                    if rating:
+                        rt = mautils.before(rating, '/')
+                        rt = rt.strip()
+                    else:
+                        rt = '0.0'
                     # (caption, url, basic_caption, title, rating, year, country)
-                    self.resultlist.append((element, PAGE_URL + link, basic_data, title, rt[0], year, country))
+                    self.resultlist.append((element, PAGE_URL + link, basic_data, title, rt, year, country))
 
     def parsePlot(self):
         print_debug("parsePlot", "started")

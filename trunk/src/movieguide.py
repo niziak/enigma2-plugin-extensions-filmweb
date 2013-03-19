@@ -374,6 +374,10 @@ class MovieGuide(DefaultScreen, SelectionEventInfo):
 
     def nextAction(self):
         print_debug("NEXT action")
+        if self.execing:
+            cur = self.getCurrentSelection()
+            print_debug('Current selection: ', str(cur))
+            # self.showInfo(cur)
 
     def toggleAction(self):
         print_debug("TOGGLE action")
@@ -429,6 +433,8 @@ class MovieGuide(DefaultScreen, SelectionEventInfo):
         Screen.createGUIScreen(self, parent, desktop, updateonly)
 
     # --- Public methods ------------------------------------------------
+
+
 
     def zapOrTimer(self, cur):
         if not cur:
