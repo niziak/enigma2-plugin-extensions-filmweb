@@ -41,7 +41,7 @@ Ustaw przeszukiwane kanały na ekranie konfiguracyjnym - patrz obrazek niżej. W
 || MENU || Pokazuje menu kontekstowe pluginu ||
 || MOVIE || Uruchamia okno Przewodnika Filmowego || 
 || 0 || Pobranie pełnej listy aktorów || 
-|| > || Przełączenie wyszukiwania innym silnikiem wyszukiwania niż obecny || 
+|| > || Przełączenie wyszukiwania innym silnikiem wyszukiwania niż obecny (dostępne Filmweb i IMDB) || 
 
 </td></tr></tbody></table>
 
