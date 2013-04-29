@@ -110,7 +110,8 @@ def ActorEntryComponent(inst, img_url="", text=["--"], index=0, ext='jpg'):
     res = [ text ]
 
     if len(img_url) > 4:
-        ex = img_url[:-4]
+        ex = img_url[-4:]
+        # print_debug("--- EXT", ex)
         if ex[0] == '.':
             ext = ex[1:]
 
@@ -125,6 +126,7 @@ def ActorEntryComponent(inst, img_url="", text=["--"], index=0, ext='jpg'):
 
     def fetchImgOK(data, idx):
         print_debug("fetchImgOK", str(idx))
+        # print_debug("IMAGE EXT", ext)
         rpath = os.path.realpath(ACTOR_IMG_PREFIX + str(idx) + "." + ext)
         if os.path.exists(rpath):
             sc = AVSwitch().getFramebufferScale()
@@ -135,6 +137,7 @@ def ActorEntryComponent(inst, img_url="", text=["--"], index=0, ext='jpg'):
     def fetchImgFailed(data, idx):
         pass
 
+    print_debug("IMAGE EXT", ext)
     if text[0] == "--" or img_url == '' or img_url.find(ext) < 0:
         res.append((eListboxPythonMultiContent.TYPE_TEXT, 0, 0, 800, 45, 0, RT_HALIGN_LEFT, "-"*200))
     else:
@@ -239,6 +242,7 @@ class ActorChoiceList(ChoiceListExt):
         self.l.setItemHeight(50)
 
     def createEntry(self, imge, stre, cidx, ext='jpg'):
+        print_debug('---createEntry---', imge)
         return ActorEntryComponent(self, img_url=imge, text=[stre], index=cidx, ext=ext)
 
 class ScrollLabelExt(ScrollLabel, Scroller):

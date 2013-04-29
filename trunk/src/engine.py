@@ -264,19 +264,25 @@ class ImdbEngine(object):
     def parseDirector(self):
         print_debug("parseDirector", "started")
         director = ''
-        fidx = self.inhtml.find('<h4 class="inline">Director:</h4>')
+        fidx = self.inhtml.find('<h4 class="inline">Director')
         if fidx > -1:
             txtc = mautils.between_inc(self.inhtml[fidx:], '<a href=', '</a>')
             director = mautils.strip_tags(txtc).strip()
+            director = director.replace('\n', '')
+            director = director.replace('  ', '')
+        print_debug("DIRECTOR: ", director)
         self.detailsData['director'] = director
 
     def parseWriter(self):
         print_debug("parseWriter", "started")
         writer = ''
-        fidx = self.inhtml.find('<h4 class="inline">Writers:</h4>')
+        fidx = self.inhtml.find('<h4 class="inline">Writer')
         if fidx > -1:
-            txtc = mautils.between_inc(self.inhtml[fidx:], '<a href=', '</a>')
+            txtc = mautils.between_inc(self.inhtml[fidx:], '<a href=', '</div>')
             writer = mautils.strip_tags(txtc).strip()
+            writer = writer.replace('\n', '')
+            writer = writer.replace('  ', '')
+        print_debug("WRITER: ", writer)
         self.detailsData['writer'] = writer
 
     def parseCountry(self):
@@ -286,6 +292,9 @@ class ImdbEngine(object):
         if fidx > -1:
             txtc = mautils.between_inc(self.inhtml[fidx:], '<a href=', '</div>')
             country = mautils.strip_tags(txtc).strip()
+            country = country.replace('\n', '')
+            country = country.replace('  ', '')
+        print_debug("COUNTRY: ", country)
         self.detailsData['country'] = country
 
     def parseMyVote(self):
@@ -346,16 +355,22 @@ class ImdbEngine(object):
 
     def __loadCastData(self, element):
         element = mautils.after(element, '<td class="primary_photo">')
-        imge = mautils.between(element, 'loadlate="', '"')
+        # print_debug("Actor data source", element)
+        if element.find('loadlate="') > -1:
+            imge = mautils.between(element, 'loadlate="', '"')
+        else:
+            imge = mautils.between(element, 'src="', '"')
         print_debug("Actor data", "IMG=" + imge)
 
-        element = mautils.between(element, "itemprop='name'>", '</tr>')
+        element = mautils.between(element, 'itemprop="name">', '</tr>')
         stre = mautils.before(element, '</a>');
-        stre = stre.strip()
+        stre = mautils.strip_tags(stre).strip()
+        print_debug('STRE: ', stre)
         if element.find('<td class="character">') > -1:
             element = mautils.between(element, '<td class="character">', '</td>')
-            element = mautils.strip_tags(element)
-            element = element.strip()
+            element = mautils.strip_tags(element).strip()
+            element = element.replace('\n', '')
+            element = element.replace('  ', '')
             if len(element) > 0:
                 stre = stre + ' jako ' + element
 
@@ -890,10 +905,16 @@ class FilmwebEngine(object):
         print_debug("parseRating", "started")
         rating = mautils.between(self.inhtml, '<span class=filmRate>', '</span>')
         rating = mautils.between(rating, 'property="v:average">', '</')
+        print_debug("RATING: ", rating)
         if rating != '':
             rating = rating.replace(' ', '')
             rating = rating.replace(',', '.')
-            rate = float(rating.strip())
+            rating = rating.strip()
+            print_debug("RATING before cast to float: ", rating)
+            try:
+                rate = float(rating)
+            except:
+                rate = 0
             print_debug("RATING", str(rate))
             self.detailsData['rating'] = _("User Rating") + ": " + str(rate) + " / 10"
             ratingstars = int(10 * round(rate, 1))
