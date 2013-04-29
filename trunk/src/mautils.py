@@ -105,6 +105,17 @@ def between(text, key1, key2):
         p2 = p1 + p2
     return text[p1:p2]
 
+def between_inc(text, key1, key2):
+    p1 = string.find(text, key1)
+    if p1 == -1:
+        return ""
+    p2 = string.find(text[p1 + len(key1):], key2)
+    if p2 == -1:
+        return ""
+    else:
+        p2 = p1 + len(key1) + p2
+    return text[p1:p2]
+
 def after(text, key):
     p1 = string.find(text, key)
     return text[p1 + len(key):]
