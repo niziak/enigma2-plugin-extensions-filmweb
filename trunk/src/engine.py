@@ -135,9 +135,9 @@ class ImdbEngine(object):
                 self.parsePoster()
                 self.parsePlot()
                 self.parseGenere()
-                # self.parseDirector()
-                # self.parseWriter()
-                # self.parseCountry()
+                self.parseDirector()
+                self.parseWriter()
+                self.parseCountry()
                 self.parseYear()
                 self.parseRuntime()
                 self.parseMyVote()
@@ -260,6 +260,33 @@ class ImdbEngine(object):
                     cast_list.append((cre[0], cre[1], cidx))
                     cidx += 1
         self.detailsData['cast'] = cast_list
+
+    def parseDirector(self):
+        print_debug("parseDirector", "started")
+        director = ''
+        fidx = self.inhtml.find('<h4 class="inline">Director:</h4>')
+        if fidx > -1:
+            txtc = mautils.between_inc(self.inhtml[fidx:], '<a href=', '</a>')
+            director = mautils.strip_tags(txtc).strip()
+        self.detailsData['director'] = director
+
+    def parseWriter(self):
+        print_debug("parseWriter", "started")
+        writer = ''
+        fidx = self.inhtml.find('<h4 class="inline">Writers:</h4>')
+        if fidx > -1:
+            txtc = mautils.between_inc(self.inhtml[fidx:], '<a href=', '</a>')
+            writer = mautils.strip_tags(txtc).strip()
+        self.detailsData['writer'] = writer
+
+    def parseCountry(self):
+        print_debug("parseCountry", "started")
+        country = ''
+        fidx = self.inhtml.find('<h4 class="inline">Country:</h4>')
+        if fidx > -1:
+            txtc = mautils.between_inc(self.inhtml[fidx:], '<a href=', '</div>')
+            country = mautils.strip_tags(txtc).strip()
+        self.detailsData['country'] = country
 
     def parseMyVote(self):
         print_debug("parseMyVote", "started")
