@@ -72,20 +72,33 @@ class FilmwebRateChannelSelection(SimpleChannelSelection):
         if txt:
             entries = txt.split('|')
             for x in entries:
-                self.servicelist.addMarked(eServiceReference(x))
+                try:
+                    print_debug('procesing service', str(x))
+                    from ServiceReference import ServiceReference
+                    ref = eServiceReference(x)
+                    ser = ServiceReference(ref)
+                    print_debug('saving service', str(ser) + ", name: " + ser.getServiceName())
+                    self.servicelist.addMarked(ref)
+                except Exception:
+                    import traceback
+                    traceback.print_exc()
 
     def __onClose(self):
         marked = self.servicelist.getMarked()
         txt = ''
         for x in marked:
-            print_debug("marked", str(x))
-            txt += str(x) + '|'
+            from ServiceReference import ServiceReference
+            ref = eServiceReference(x)
+            ser = ServiceReference(ref)
+            print_debug('marked service', str(ser) + ", name: " + ser.getServiceName())
+            txt += str(ser) + '|'
         txt = txt.strip('|')
         config.plugins.mfilmweb.selserv.setValue(txt)
         config.plugins.mfilmweb.save()
         configfile.save()
+
         # save service data to file
-        self.__saveServices()
+        # --- self.__saveServices()
 
     def __saveServices(self):
         try:

@@ -919,11 +919,13 @@ class MovieGuide(DefaultScreen, SelectionEventInfo):
 
     def __query(self, service, tms):
         sname = service.getServiceName();
-        print_debug('Query service: ', str(sname))
-        if sname:
-            if MAPPING2.get(sname):
+        sref = str(service)
+        print_debug('Query service: ', str(sname) + ', reference: ' + sref)
+        if sname and sref:
+            sref = sref[:25]
+            if MAPPING2.get(sref):
                 return FilmwebTvEngine().query(service, MT_MOVIE, tms)
-            if MAPPING.get(sname):
+            if MAPPING.get(sref):
                 return TelemagEngine().query(service, MT_MOVIE, tms)
         return None
 
