@@ -62,13 +62,15 @@ def loadMappings():
             for x in lines:
                 dt = x.strip().split(',')
                 if dt and len(dt) > 2:
+                    sref = dt[0]  # service reference
+                    sref = sref[:25]
                     srv = dt[2]
                     if len(srv.strip()) > 0:
-                        MAPPING[dt[1]] = srv
+                        MAPPING[sref] = srv
                     if len(dt) > 3:
                         srv = dt[3]
                         if len(srv.strip()) > 0:
-                            MAPPING2[dt[1]] = srv
+                            MAPPING2[sref] = srv
     except:
         import traceback
         traceback.print_exc()
@@ -1269,8 +1271,11 @@ class TelemagEngine(object):
         pass
 
     def __getChannel(self, ref):
-        x = ref.getServiceName()
+        # x = ref.getServiceName()
         # print_debug('xx', x +', map: '+ str(MAPPING))
+        x = str(ref)
+        x = x[:25]
+        print_debug('__getChannel REF', str(ref))
         return MAPPING.get(x)
 
     def __getType(self, typ):
@@ -1402,8 +1407,11 @@ class FilmwebTvEngine(object):
         print_info('----> FAILED', str(res))
 
     def __getChannel(self, ref):
-        x = ref.getServiceName()
+        # x = ref.getServiceName()
         # print_debug('xx', x +', map: '+ str(MAPPING))
+        x = str(ref)
+        x = x[:25]
+        print_debug('__getChannel REF', str(ref))
         return MAPPING2.get(x)
 
 
