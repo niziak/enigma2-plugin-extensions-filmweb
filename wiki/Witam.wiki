@@ -80,6 +80,9 @@ init 4; sleep 10; init 3
 
 = Informacja o zmianach w wersjach =
 ----
+=== ver. 1.2.3 ===
+  * Poprawa działania na OpenPLI 3.0 ze skinem MetrixHD (problem zgłoszony przez JK32)
+
 === ver. 1.2.2 ===
   * Dodanie parsowania Reżysera, Scenarzysty i Kraju dla informacji z IMDB
   * Poprawa listy serwisów dla Przewodnika Filmowego po wejściu NC+
