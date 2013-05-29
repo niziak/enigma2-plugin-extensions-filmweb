@@ -138,6 +138,9 @@ class Filmweb(DefaultScreen):
         else:
             self.engineType = 'IMDB'
             self.eventName = self.orgtitle
+            if not self.eventName:
+                self.eventName = self.regtitle
+            print_info('Loading date for ', str(self.eventName) + ' using engine: ' + str(self.engineType))
             self.engine = ImdbEngine(self.failureHandler, self["status_bar"])
         self.reload()
 

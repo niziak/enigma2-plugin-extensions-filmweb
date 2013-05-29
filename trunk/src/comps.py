@@ -182,8 +182,12 @@ class Scroller(object):
             attrmap = {}
             attribs = self.component and self.component.skinAttributes or self.skinAttributes
             for (attrib, value) in attribs:
-                print_debug('ATTRIB', attrib + ": " + value)
-                attrmap[attrib] = value
+                try:
+                    print_debug('ATTRIB', attrib + ": " + str(value))
+                    attrmap[attrib] = value
+                except:
+                    import traceback
+                    traceback.print_exc()
 
             self.scroller.skinAttributes = []
 
@@ -326,11 +330,15 @@ class StarsComp(ProgressBar):
         idx = 0
         pixmap_path = None
         for (attrib, value) in self.skinAttributes:
-            print_debug('ATTRIB - stars', attrib + ": " + value)
-            attrmap[attrib] = value
-            if attrib == 'pixmap_bg':
-                pixmap_path = "%s%s" % (self.ppath, value)
-                self.skinAttributes.pop(idx)
+            try:
+                print_debug('ATTRIB - stars', attrib + ": " + str(value))
+                attrmap[attrib] = value
+                if attrib == 'pixmap_bg':
+                    pixmap_path = "%s%s" % (self.ppath, value)
+                    self.skinAttributes.pop(idx)
+            except:
+                import traceback
+                traceback.print_exc()
             idx += 1
 
         self.bg.skinAttributes = []
