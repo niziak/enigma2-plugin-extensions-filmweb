@@ -82,6 +82,7 @@ init 4; sleep 10; init 3
 ----
 === ver. 1.2.3 ===
   * Poprawa działania na OpenPLI 3.0 ze skinem MetrixHD (problem zgłoszony przez JK32)
+  * Poprawa mapowania serwisów na podstawie pliku konfiguracyjnego dla wyszukiwania informacji w Przewodniku Filmowym (problem zgłoszony przez JK32)
 
 === ver. 1.2.2 ===
   * Dodanie parsowania Reżysera, Scenarzysty i Kraju dla informacji z IMDB
