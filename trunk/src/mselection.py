@@ -84,8 +84,8 @@ class FilmwebRateChannelSelection(SimpleChannelSelection):
         config.plugins.mfilmweb.selserv.setValue(txt)
         config.plugins.mfilmweb.save()
         configfile.save()
-
-        # self.__saveServices()
+        # save service data to file
+        self.__saveServices()
 
     def __saveServices(self):
         try:

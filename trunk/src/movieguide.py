@@ -208,7 +208,7 @@ class SelectionEventInfo:
                 self["ServiceEvent"].updateDetails(None, None)
                 return
             event = cur[6]
-            link = cur[7]
+            link = cur[7]  # link do strony ze szczegolami filmu
             filmDetails = None
             evid = self.getEventId(cur)
             engine = FilmwebEngine()
@@ -216,6 +216,9 @@ class SelectionEventInfo:
             self.loadNfo(evid)
             if link and not self.eventDetails.has_key(evid):
                 filmDetails = yield engine.queryDetails(link)
+
+                # filmDetails['cast'] - informacja o obsadzie w formie listy tupli (link, opis, index)
+
                 filmDetails['fullname'] = self.__createFullName(filmDetails)
                 filmDetails['event_time'] = cur[2]
                 if not filmDetails.has_key('plot') or len(filmDetails['plot'].strip()) == 0:
@@ -439,8 +442,8 @@ class MovieGuide(DefaultScreen, SelectionEventInfo):
     def zapOrTimer(self, cur):
         if not cur:
             return
-        service = cur[5]
-        event = cur[6]
+        service = cur[5]  # service reference
+        event = cur[6]  # event reference
 
         if not service:
             return
@@ -538,6 +541,7 @@ class MovieGuide(DefaultScreen, SelectionEventInfo):
             tim = self.timeline
             rng = int(100 / count)
             for idx in range(1, count + 1):
+                # -- aktualizacja progresu
                 self.eventlist.modifyEntry(index, ((service.getServiceName(), (idx - 1) * rng + int(rng / 4))))
                 tms = strftime("%Y%m%d", (localtime(tim)))
                 print_debug('----->> Query date', tms + ', service: ' + service.getServiceName())
@@ -547,6 +551,7 @@ class MovieGuide(DefaultScreen, SelectionEventInfo):
                 if not df:
                     continue
                 result = yield df
+                # -- aktualizacja progresu
                 self.eventlist.modifyEntry(index, ((service.getServiceName(), (idx - 1) * rng + int(rng / 4) * 2)))
                 print_debug('Query result', str(result) + ', service: ' + service.getServiceName())
                 if not result:
@@ -560,6 +565,7 @@ class MovieGuide(DefaultScreen, SelectionEventInfo):
                         else:
                             res = df
                     if res:
+                        # -- aktualizacja progresu
                         self.eventlist.modifyEntry(index, ((service.getServiceName(), (idx - 1) * rng + int(rng / 4) * 3)))
                         print_debug('Query Filmweb result', str(res) + ', service: ' + service.getServiceName())
                         while isinstance(res, defer.Deferred):
@@ -605,7 +611,9 @@ class MovieGuide(DefaultScreen, SelectionEventInfo):
                             res[15] = rts
                             res = tuple(res)
                             self.list.append(res)
+                # -- aktualizacja progresu
                 self.eventlist.modifyEntry(index, ((service.getServiceName(), (idx - 1) * rng + int(rng / 4) * 4)))
+            # -- aktualizacja progresu - ustawienie na 100%
             self.eventlist.modifyEntry(index, ((service.getServiceName(), 100)))
         except:
             import traceback
@@ -693,6 +701,22 @@ class MovieGuide(DefaultScreen, SelectionEventInfo):
             except:
                 rt = 0
             rts = "%1.1f" % rt
+            # 0 - czas startu,
+            # 1 - podsumowanie informacji o filmie,
+            # 2 - podsumowanie czasu trwania: "(godz start - godz konca)",
+            # 3 - nazwa serwisu,
+            # 4 - rating Filmweb string,
+            # 5 - referencja do serwisu,
+            # 6 - referencja do eventu,
+            # 7 - link do strony z danymi filmu,
+            # 8 - rok filmu,
+            # 9 - rating Filmweb w postaci liczby,
+            # 10 - czas trwania w sekundach,
+            # 11 - obrazek statusu,
+            # 12 - status (1-timer, 2-przeszly, 3-aktualny, 4-przyszly)
+            # 13 - tytul filmu,
+            # 14 - rating IMDB liczba
+            # 15 - rating IMDB string
             resme = (begin, lista[0][2], tms + ' - ' + tots,
                                service.getServiceName(), rts, service, evt,
                                lista[0][1], lista[0][5], rt, duration, pixmap,
