@@ -80,6 +80,10 @@ init 4; sleep 10; init 3
 
 = Informacja o zmianach w wersjach =
 ----
+=== ver. 1.2.4 ===
+  * Poprawka obsługi cache-a - poprawka zmienia zapis całości plików w miejsce określone konfiguracją
+  * Poprawa wyświetlania godziny na zegarku w Przewodniku
+
 === ver. 1.2.3 ===
   * Poprawa działania na OpenPLI 3.0 ze skinem MetrixHD (problem zgłoszony przez JK32)
   * Poprawa mapowania serwisów na podstawie pliku konfiguracyjnego dla wyszukiwania informacji w Przewodniku Filmowym (problem zgłoszony przez JK32)
