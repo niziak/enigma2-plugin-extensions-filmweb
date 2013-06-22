@@ -3,10 +3,10 @@
 	<ePixmap pixmap="skin_default/buttons/green.png" position="220,0" size="140,40" alphatest="on" />
 	<ePixmap pixmap="skin_default/buttons/yellow.png" position="400,0" size="140,40" alphatest="on" />
 	<ePixmap pixmap="skin_default/buttons/blue.png" position="580,0" size="140,40" alphatest="on" />
-	<widget source="key_red" render="Label" position="40,0" zPosition="1" size="140,40" font="Regular;18" halign="center" valign="center" backgroundColor="#9f1313" transparent="1" />
-	<widget source="key_green" render="Label" position="220,0" zPosition="1" size="140,40" font="Regular;18" halign="center" valign="center" backgroundColor="#1f771f" transparent="1" />
-	<widget source="key_yellow" render="Label" position="400,0" zPosition="1" size="140,40" font="Regular;18" halign="center" valign="center" backgroundColor="#a08500" transparent="1" />
-	<widget source="key_blue" render="Label" position="580,0" zPosition="1" size="140,40" font="Regular;18" halign="center" valign="center" backgroundColor="#18188b" transparent="1" />
+	<widget source="key_red" render="Label" position="80,0" zPosition="1" size="140,40" font="Regular;16" halign="left" valign="center" backgroundColor="#9f1313" transparent="1" />
+	<widget source="key_green" render="Label" position="260,0" zPosition="1" size="140,40" font="Regular;16" halign="left" valign="center" backgroundColor="#1f771f" transparent="1" />
+	<widget source="key_yellow" render="Label" position="440,0" zPosition="1" size="140,40" font="Regular;16" halign="left" valign="center" backgroundColor="#a08500" transparent="1" />
+	<widget source="key_blue" render="Label" position="620,0" zPosition="1" size="120,40" font="Regular;16" halign="left" valign="center" backgroundColor="#18188b" transparent="1" />
 	<widget name="clock-str" position="760,23" size="250,40" zPosition="5" font="Regular;18" halign="right" valign="center" foregroundColor="#58bcff" transparent="1" />
 	<widget name="clock" position="1040,0" zPosition="5" size="60,51" pixmap="/resource/clock_panel.png" alphatest="blend" transparent="1" />
 	<widget name="clock-min" position="1040,0" zPosition="7" size="60,51" pixmap="/resource/clock_panel.png" alphatest="blend" transparent="1" />
@@ -25,7 +25,7 @@
 	MultiContentEntryText(pos = (0, 0), size = (200, 20), font=1, flags = RT_HALIGN_LEFT | RT_VALIGN_CENTER| RT_WRAP, text = 0),
 	MultiContentEntryProgress(pos = (205, 0), size = (540, 12), percent = -1),
 	], False)},
-	"fonts": [gFont("Regular", 18),gFont("Regular", 16),gFont("Regular", 24)],
+	"fonts": [gFont("Regular", 17),gFont("Regular", 14),gFont("Regular", 24)],
 	"itemHeight": 40
 	}
 	</convert> 

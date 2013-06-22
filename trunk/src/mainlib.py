@@ -26,7 +26,7 @@ import mautils
 import os
 
 from config import FilmwebConfig
-from engine import ImdbEngine, FilmwebEngine, MT_MOVIE, MT_SERIE, POSTER_PATH
+from engine import ImdbEngine, FilmwebEngine, MT_MOVIE, MT_SERIE, IMDB_POSTER_FILE, FILMWEB_POSTER_FILE
 from mselection import FilmwebChannelSelection
 from movieguide import MovieGuide
 from __common__ import  _
@@ -73,13 +73,20 @@ class Filmweb(DefaultScreen):
         self.regtitle = ''
         self.orgtitle = ''
 
+        self.tmppath = config.plugins.mfilmweb.tmpPath.getValue()
+        if not os.path.exists(self.tmppath):
+            os.mkdir(self.tmppath)
+        self.posterpath = self.tmppath + '/'
+
         self.initVars()
         self.createGUI()
 
         self.engineType = config.plugins.mfilmweb.engine.value
         if self.engineType == 'IMDB':
+            self.posterpath = self.posterpath + IMDB_POSTER_FILE
             self.engine = ImdbEngine(self.failureHandler, self["status_bar"])
         else:
+            self.posterpath = self.posterpath + FILMWEB_POSTER_FILE
             self.engine = FilmwebEngine(self.failureHandler, self["status_bar"])
 
         self.initActions()
@@ -290,7 +297,7 @@ class Filmweb(DefaultScreen):
             self["wallpaper"].show()
             self["title_label"].show()
 
-            if os.path.exists(POSTER_PATH):
+            if os.path.exists(self.posterpath):
                 self["poster"].show()
             else:
                 self["poster"].hide()
@@ -474,7 +481,7 @@ class Filmweb(DefaultScreen):
         if not detailsData:
             self["status_bar"].setText(_("Movie details parsing error"))
         else:
-            self.engine.loadPoster(detailsData['poster_url'], self.loadPosterCallback)
+            self.engine.loadPoster(detailsData['poster_url'], self.loadPosterCallback, localfile=self.tmppath)
 
             self.filmId = detailsData['film_id']
 
@@ -572,9 +579,9 @@ class Filmweb(DefaultScreen):
     def getData(self, tryOther=True):
         try:
             self.initialize = False
-            if os.path.exists(POSTER_PATH):
-                os.remove(POSTER_PATH)
-            self.picload.startDecode(POSTER_PATH)
+            if os.path.exists(self.posterpath):
+                os.remove(self.posterpath)
+            self.picload.startDecode(self.posterpath)
             self.initVars()
             self["cast_label"].l.setList(self.cast_list)
             self.resultlist = []
@@ -614,7 +621,7 @@ class Filmweb(DefaultScreen):
         print_debug("Change wallpaper", str(self.wallpaperidx) + ", filmId: " + str(self.filmId))
         if self.filmId is None:
             return
-        localfile = '/tmp/' + self.filmId + '.jpg'
+        localfile = self.tmppath + '/' + self.filmId + '.jpg'
         if len(self.wallpapers) > 0:
             indx = self.wallpaperidx
             if self.wallpaperidx < 0:

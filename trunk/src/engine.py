@@ -36,8 +36,10 @@ MT_SERIE = 'serial'
 
 USER_TOKEN = '_artuser_token'
 SESSION_KEY = '_artuser_sessionId'
-POSTER_PATH = "/tmp/poster.jpg"
-POSTER_IMDB_PATH = "/tmp/poster_imdb.jpg"
+
+POSTER_PATH = "/tmp"
+IMDB_POSTER_FILE = 'poster_imdb.jpg'
+FILMWEB_POSTER_FILE = 'poster_filmweb.jpg'
 
 SEARCH_IMDB_URL = 'http://www.imdb.com/search/title?'
 PAGE_URL = 'http://www.filmweb.pl'
@@ -327,10 +329,17 @@ class ImdbEngine(object):
             self.detailsData['rating'] = _("no user rating yet")
             self.detailsData['rating_val'] = 0
 
-    def loadPoster(self, posterUrl, callback=None, localfile=POSTER_IMDB_PATH):
+    def loadPoster(self, posterUrl, callback=None, localfile=POSTER_PATH):
+        locf = localfile
+
+        if len(localfile) > 4:
+            ex = localfile[-4:]
+            if ex[0] != '.':
+                locf = locf + "/" + IMDB_POSTER_FILE
+
         if posterUrl:
-            print_info("Downloading poster", posterUrl + " to " + localfile)
-            return downloadPage(posterUrl, localfile).addCallback(self.__fetchPosterOK, localfile, callback).addErrback(self.__fetchFailed)
+            print_info("Downloading poster", posterUrl + " to " + locf)
+            return downloadPage(posterUrl, locf).addCallback(self.__fetchPosterOK, locf, callback).addErrback(self.__fetchFailed)
         return None
 
     def loadWallpaper(self, furl, localfile, callback):
@@ -530,9 +539,16 @@ class FilmwebEngine(object):
         return None
 
     def loadPoster(self, posterUrl, callback=None, localfile=POSTER_PATH):
+        locf = localfile
+
+        if len(localfile) > 4:
+            ex = localfile[-4:]
+            if ex[0] != '.':
+                locf = locf + "/" + FILMWEB_POSTER_FILE
+
         if posterUrl:
-            print_info("Downloading poster", posterUrl + " to " + localfile)
-            return downloadPage(posterUrl, localfile).addCallback(self.__fetchPosterOK, localfile, callback).addErrback(self.__fetchFailed)
+            print_info("Downloading poster", posterUrl + " to " + locf)
+            return downloadPage(posterUrl, locf).addCallback(self.__fetchPosterOK, locf, callback).addErrback(self.__fetchFailed)
         return None
 
     def loadWallpaper(self, furl, localfile, callback):
