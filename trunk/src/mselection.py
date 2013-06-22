@@ -98,7 +98,7 @@ class FilmwebRateChannelSelection(SimpleChannelSelection):
         configfile.save()
 
         # save service data to file
-        # --- self.__saveServices()
+        self.__saveServices()
 
     def __saveServices(self):
         try:

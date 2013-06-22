@@ -27,6 +27,8 @@ from logger import print_info, print_debug
 import os
 import sys
 
+from config import config
+
 from Screens.Screen import Screen
 from Tools.BoundFunction import boundFunction
 from Tools.Directories import resolveFilename, SCOPE_CURRENT_SKIN
@@ -38,8 +40,7 @@ from Components.ChoiceList import ChoiceList
 from Components.MultiContent import MultiContentEntryText
 from Components.ProgressBar import ProgressBar
 
-
-ACTOR_IMG_PREFIX = "/tmp/actor_img_"
+ACTOR_IMG_PREFIX = "/actor_img_"
 
 actorPicload = {}
 
@@ -127,7 +128,8 @@ def ActorEntryComponent(inst, img_url="", text=["--"], index=0, ext='jpg'):
     def fetchImgOK(data, idx):
         print_debug("fetchImgOK", str(idx))
         # print_debug("IMAGE EXT", ext)
-        rpath = os.path.realpath(ACTOR_IMG_PREFIX + str(idx) + "." + ext)
+        tmppath = config.plugins.mfilmweb.tmpPath.getValue()
+        rpath = os.path.realpath(tmppath + ACTOR_IMG_PREFIX + str(idx) + "." + ext)
         if os.path.exists(rpath):
             sc = AVSwitch().getFramebufferScale()
             actorPicload[idx].setPara((40, 45, sc[0], sc[1], False, 1, "#00000000"))
@@ -144,7 +146,8 @@ def ActorEntryComponent(inst, img_url="", text=["--"], index=0, ext='jpg'):
         actorPicload[index] = ePicLoad()
         actorPicload[index].PictureData.get().append(boundFunction(paintImage, index))
         res.append((eListboxPythonMultiContent.TYPE_TEXT, 45, 0, 750, 45, 0, RT_HALIGN_LEFT, text[0]))
-        localfile = ACTOR_IMG_PREFIX + str(index) + "." + ext
+        tmppath = config.plugins.mfilmweb.tmpPath.getValue()
+        localfile = tmppath + ACTOR_IMG_PREFIX + str(index) + "." + ext
         print_debug("Downloading actor img", img_url + " to " + localfile)
         downloadPage(img_url, localfile).addCallback(fetchImgOK, index).addErrback(fetchImgFailed, index)
     return res

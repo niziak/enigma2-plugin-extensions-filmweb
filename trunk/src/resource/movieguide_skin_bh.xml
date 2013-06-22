@@ -2,20 +2,20 @@
     <ePixmap position="0,0" zPosition="-1" size="1280,720" pixmap="skin_default/frame_base-fs8.png" />
     <ePixmap position="878,98" zPosition="1" size="380,520" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/Filmweb/resource/r380x520.png" alphatest="blend" transparent="1" /> 
 	<eLabel text="Movie Guide" position="80,30" size="800,44" font="Regular;36" halign="left" foregroundColor="#58bcff" backgroundColor="transpBlack" transparent="1"/>
-	<ePixmap position="798,118" zPosition="5" size="22,486" pixmap="skin_default/scroll.png" alphatest="blend" transparent="1" /> 
+	<ePixmap position="838,118" zPosition="5" size="22,486" pixmap="skin_default/scroll.png" alphatest="blend" transparent="1" /> 
 	<ePixmap position="450,16" zPosition="2" size="811,78" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/Filmweb/resource/r1130x78.png" alphatest="blend" transparent="1" />
 	<widget name="clock-str" position="940,16" size="250,78" zPosition="5" font="Regular;20" halign="right" valign="center" foregroundColor="#58bcff" transparent="1" />
 	<widget name="clock" position="1200,27" zPosition="5" size="60,51" pixmap="/resource/clock_panel.png" alphatest="blend" transparent="1" />
 	<widget name="clock-min" position="1200,27" zPosition="7" size="60,51" pixmap="/resource/clock_panel.png" alphatest="blend" transparent="1" />
 	<widget name="clock-hr" position="1200,27" zPosition="6" size="60,51" pixmap="/resource/clock_panel.png" alphatest="blend" transparent="1" />
-	<widget source="list" render="Listbox" position="60,120" size="760,484" zPosition="3" scrollbarMode="showOnDemand" transparent="1">
+	<widget source="list" render="Listbox" position="60,120" size="800,484" zPosition="3" scrollbarMode="showOnDemand" transparent="1">
 	<convert type="TemplatedMultiContent"> 
 	{"templates": 
 	{"default": (48,[ 
 	MultiContentEntryText(pos = (30, 0), size = (60, 48), font=2, flags = RT_HALIGN_CENTER|RT_VALIGN_CENTER, text = 4),
 	MultiContentEntryText(pos = (95, 0), size = (660, 25), font=0, flags = RT_HALIGN_LEFT|RT_VALIGN_TOP, text = 1, color=0x00F0B400, color_sel=0x00F0B400),
-	MultiContentEntryText(pos = (300, 25), size = (460, 22), font=1, flags = RT_HALIGN_LEFT|RT_VALIGN_BOTTOM, text = 3, color=0x0058bcff, color_sel=0x0058bcff), 
-	MultiContentEntryText(pos = (95, 25), size = (200, 22), font=1, flags = RT_HALIGN_LEFT|RT_VALIGN_BOTTOM, text = 2), 
+	MultiContentEntryText(pos = (340, 25), size = (460, 22), font=1, flags = RT_HALIGN_LEFT|RT_VALIGN_BOTTOM, text = 3, color=0x0058bcff, color_sel=0x0058bcff), 
+	MultiContentEntryText(pos = (95, 25), size = (240, 22), font=1, flags = RT_HALIGN_LEFT|RT_VALIGN_BOTTOM, text = 2), 
 	MultiContentEntryPixmapAlphaTest(pos = (0, 9), size = (30, 30), png = 11)
 	]),
 	"progress": (20,[

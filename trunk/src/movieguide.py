@@ -1024,7 +1024,16 @@ class MovieGuide(DefaultScreen, SelectionEventInfo):
         self["clock-str"].setText(txt)
         hrs = strftime('%I', now)
         mns = strftime('%M', now)
-        pathe = "%s/resource/hours/%s-nq8.png" % (self.ppath, hrs)
+
+        mnsi = int(mns)
+        hrsi = int(hrs)
+
+        if mnsi > 29:
+            hrsi = hrsi + 1
+            if hrsi > 23:
+                hrsi = 0
+
+        pathe = "%s/resource/hours/%d-nq8.png" % (self.ppath, hrsi)
         print_debug('clock path hours', pathe)
         pixmap = LoadPixmap(cached=True, path=pathe)
         self["clock-hr"].instance.setPixmap(pixmap)
