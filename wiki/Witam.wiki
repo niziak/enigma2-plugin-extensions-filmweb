@@ -66,7 +66,6 @@ init 4; sleep 10; init 3
 ----
   * Dodanie obsługi miniseriali w Przewodniku Filmowym
   * Poprawa wyszukiwania w Przewodniku polegająca na wyszukiwaniu po tytule oryginalnym w przypadku gdy nie trafiono po tytule polskim
-  * Dodanie obsługi związanej z informacją o tym, że chciałbym oglądnąć jakąś pozycję
   * Poprawa trafności wyszukiwania bezpośredniego oraz rozróżniania seriali od filmów
   * Modyfikacja standardowego panelu informacyjnego tak by wyświetlana była na nim informacja z Filmweb o aktualnie oglądanej pozycji
   * Modyfikacja skóry 
@@ -84,6 +83,8 @@ init 4; sleep 10; init 3
   * Poprawka obsługi cache-a - poprawka zmienia zapis całości plików w miejsce określone konfiguracją
   * Poprawa wyświetlania godziny na zegarku w Przewodniku
   * Poprawki w działaniu zmiany silnika wyszukiwania
+  * Poprawa wyświetlania informacji o własnej ocenie dla filmu dla silnika Filmweb 
+  * Poprawa pobierania fotosów dla filmu dla silnika Filmweb
 
 === ver. 1.2.3 ===
   * Poprawa działania na OpenPLI 3.0 ze skinem MetrixHD (problem zgłoszony przez JK32)
