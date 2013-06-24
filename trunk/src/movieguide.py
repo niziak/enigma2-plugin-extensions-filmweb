@@ -1030,10 +1030,10 @@ class MovieGuide(DefaultScreen, SelectionEventInfo):
 
         if mnsi > 29:
             hrsi = hrsi + 1
-            if hrsi > 23:
-                hrsi = 0
+            if hrsi > 12:
+                hrsi = 1
 
-        pathe = "%s/resource/hours/%d-nq8.png" % (self.ppath, hrsi)
+        pathe = "%s/resource/hours/%s-nq8.png" % (self.ppath, "%02d" % hrsi)
         print_debug('clock path hours', pathe)
         pixmap = LoadPixmap(cached=True, path=pathe)
         self["clock-hr"].instance.setPixmap(pixmap)

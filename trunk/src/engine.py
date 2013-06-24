@@ -95,6 +95,7 @@ class ImdbEngine(object):
         return None
 
     def query(self, typ, title, year=None, tryOther=False, callback=None, data=None):
+        print_debug("[query] type:", str(typ))
         if typ == MT_MOVIE:
             typen = 'feature,tv_movie,mini_series,documentary'
         else:
@@ -104,7 +105,7 @@ class ImdbEngine(object):
         if year:
             fetchurl += '&release_date=' + year + '-01-01,' + year + '-12-31'
         print_info("IMDB Query", fetchurl)
-        return self.__fetchEntries(fetchurl, type, callback, tryOther, data)
+        return self.__fetchEntries(fetchurl, typ, callback, tryOther, data)
 
     def queryDetails(self, link, callback=None, sessionId=None):
         headers = {"Accept":"text/html", "Accept-Charset":"utf-8", "Accept-Encoding":"deflate",
@@ -131,6 +132,7 @@ class ImdbEngine(object):
                 self.detailsData['promo'] = None
                 self.detailsData['runtime'] = ''
                 self.detailsData['wallpapers_link'] = None
+                self.detailsData['photos_link'] = None
 
                 self.parseFilmId()
                 self.parseTitle()
@@ -408,6 +410,7 @@ class ImdbEngine(object):
             traceback.print_exc()
 
     def __fetchEntries(self, fetchurl, typ, callback, tryOther=True, data=None):
+        print_debug("[__fetchEntries] type:", str(typ))
         self.resultlist = []
         headers = {"Accept":"text/html", "Accept-Charset":"utf-8", "Accept-Encoding":"deflate",
                    "Accept-Language":"pl-PL,pl;q=0.8,en-US;q=0.6,en;q=0.4", "Connection":"keep-alive",
@@ -425,14 +428,15 @@ class ImdbEngine(object):
         if self.inhtml:
             self.__parseEntries(typ)
         if len(self.resultlist) == 0:
+            print_debug("Fetch OK result list count = 0, try other:", str(tryOther) + ", type: " + str(typ))
             if tryOther:
                 if typ == MT_SERIE:
                     typ = MT_MOVIE
                 else:
                     typ = MT_SERIE
-                return self.__fetchEntries(fetchurl, type, callback, False, data)
+                return self.__fetchEntries(fetchurl, typ, callback, False, data)
         if callback:
-            return callback(self.resultlist, type, data)
+            return callback(self.resultlist, typ, data)
         return None
 
     def __fetchFailed(self, txt_):
@@ -535,6 +539,7 @@ class FilmwebEngine(object):
 
     def searchWallpapers(self, link_, callback):
         if link_:
+            print_info("searchWallpapers", 'link: ' + link_)
             return getPage(link_, cookies=COOKIES).addCallback(self.__fetchWallpaperOK, callback).addErrback(self.__fetchFailed)
         return None
 
@@ -627,20 +632,37 @@ class FilmwebEngine(object):
             if self.statusComponent:
                 self.statusComponent.setText(_("Wallpaper loading completed"))
             if txt_ and len(txt_) > 0:
-                walls = mautils.after(txt_, '<h2 class=inline>tapety</h2>')
-                walls = mautils.after(txt_, '<ul class="')
-                elements = walls.split('<li>')
-                elcount = len(elements)
-                print_debug("Wallpapers count", str(elcount))
-                if elcount > 0:  # and self.has_key('wallpaper'):
-                    furl = None
-                    for elem in elements:
-                        didx = elem.find('<span class=loggedOnlyLink>')
-                        print_debug("Wallpaper idx", str(didx))
-                        if didx > -1:
-                            furl = mautils.between(elem, '<span class=loggedOnlyLink>', '</span>')
-                            print_debug("URL", furl)
-                            wallpapers.append(furl)
+                if txt_.find('<h2 class=inline>zdjęcia</h2>') > -1:
+                    walls = mautils.after(txt_, '<h2 class=inline>zdjęcia</h2>')
+                    walls = mautils.after(txt_, '<ul class="')
+                    elements = walls.split('<li>')
+                    elcount = len(elements)
+                    print_debug("Photos count", str(elcount))
+                    if elcount > 0:  # and self.has_key('wallpaper'):
+                        furl = None
+                        for elem in elements:
+                            didx = elem.find('<a href=')
+                            print_debug("Photo idx", str(didx))
+                            if didx > -1:
+                                furl = mautils.between(elem, '<a href=', '</a>')
+                                print_debug("URL", furl)
+                                # wallpapers.append(furl)
+
+                if txt_.find('<h2 class=inline>tapety</h2>') > -1:
+                    walls = mautils.after(txt_, '<h2 class=inline>tapety</h2>')
+                    walls = mautils.after(txt_, '<ul class="')
+                    elements = walls.split('<li>')
+                    elcount = len(elements)
+                    print_debug("Wallpapers count", str(elcount))
+                    if elcount > 0:  # and self.has_key('wallpaper'):
+                        furl = None
+                        for elem in elements:
+                            didx = elem.find('<span class=loggedOnlyLink>')
+                            print_debug("Wallpaper idx", str(didx))
+                            if didx > -1:
+                                furl = mautils.between(elem, '<span class=loggedOnlyLink>', '</span>')
+                                print_debug("URL", furl)
+                                wallpapers.append(furl)
             if callback:
                 callback(wallpapers)
         except:
@@ -1047,6 +1069,12 @@ class FilmwebEngine(object):
         self.detailsData['wallpapers_link'] = None
         if idx < 0:
             self.detailsData['wallpapers_link'] = link_ + '/wallpapers'
+
+        idx = self.inhtml.find('<li id="filmMenu-filmPhotos" class=" caption">zdjęcia</li>')
+        print_debug('Photos idx', str(idx))
+        self.detailsData['photos_link'] = None
+        if idx < 0:
+            self.detailsData['photos_link'] = link_ + '/photos'
 
     def parseCast(self):
         print_debug("parseCast", "started")

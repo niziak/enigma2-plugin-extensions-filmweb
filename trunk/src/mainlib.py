@@ -97,11 +97,13 @@ class Filmweb(DefaultScreen):
 
         self.reload()
 
-    def reload(self):
-        self.searchType = MT_MOVIE
+    def reload(self, refx=True):
+        if refx:
+            self.searchType = MT_MOVIE
+        print_debug("[reload] search type:", str(self.searchType) + ", refx: " + str(refx))
         self.switchView(to_mode=VT_NONE)
         if self.engineType == 'IMDB' or config.plugins.mfilmweb.user.getText() == '':
-            self.getData()
+            self.getData(refx)
         else:
             self.loginPage(self.getData)
 
@@ -147,9 +149,10 @@ class Filmweb(DefaultScreen):
             self.eventName = self.orgtitle
             if not self.eventName:
                 self.eventName = self.regtitle
+            self.eventName = self.eventName.replace(', The', '')
             print_info('Loading date for ', str(self.eventName) + ' using engine: ' + str(self.engineType))
             self.engine = ImdbEngine(self.failureHandler, self["status_bar"])
-        self.reload()
+        self.reload(False)
 
 
     def toggleAction(self):
@@ -198,6 +201,7 @@ class Filmweb(DefaultScreen):
 
     def showDetails(self):
         if self.mode == VT_DETAILS or self.mode == VT_NONE:
+            print_debug("Show details - search type:", str(self.searchType))
             if self.searchType == MT_MOVIE:
                 self.searchType = MT_SERIE
             else:
@@ -412,6 +416,7 @@ class Filmweb(DefaultScreen):
                 print_debug("The movies list size", str(size))
                 self["title_label"].setText('')
                 if size == 0:
+                    print_debug('Search type:', str(self.searchType))
                     if self.searchType == MT_MOVIE:
                         self.inputMovieName()
                     else:
@@ -492,9 +497,14 @@ class Filmweb(DefaultScreen):
             self["cast_label"].l.setList(self.cast_list)
 
             self.wallpapers = []
-            if self.sessionId and self.filmId and detailsData['wallpapers_link']:
-                print_info("Parse wallpapers for link_" + str(detailsData['wallpapers_link']) + ', SID: ' + str(self.sessionId) + ', FID: ' + str(self.filmId))
-                self.engine.searchWallpapers(detailsData['wallpapers_link'], self.searchWallpapersCallback)
+            if self.sessionId and self.filmId:
+                if detailsData['wallpapers_link']:
+                    print_info("Parse wallpapers for link_" + str(detailsData['wallpapers_link']) + ', SID: ' + str(self.sessionId) + ', FID: ' + str(self.filmId))
+                    self.engine.searchWallpapers(detailsData['wallpapers_link'], self.searchWallpapersCallback)
+                if detailsData['photos_link']:
+                    print_info("Parse photos for link_" + str(detailsData['photos_link']) + ', SID: ' + str(self.sessionId) + ', FID: ' + str(self.filmId))
+                    self.engine.searchWallpapers(detailsData['photos_link'], self.searchWallpapersCallback)
+
 
             self["title_label"].setText(detailsData['title'])
             self.regtitle = detailsData['title']
@@ -564,6 +574,7 @@ class Filmweb(DefaultScreen):
 
     def queryCallback(self, rlista, type, data=None):
         self.resultlist = rlista
+        print_debug("[queryCallback] search type:", str(type))
         self.searchType = type
         lista = []
         for entry in self.resultlist:
@@ -585,7 +596,7 @@ class Filmweb(DefaultScreen):
             self.initVars()
             self["cast_label"].l.setList(self.cast_list)
             self.resultlist = []
-            print_info("Getting data for event", str(self.eventName))
+            print_info("Getting data for event", "'" + str(self.eventName) + "'")
             if not self.eventName or len(self.eventName.strip()) == 0:
                 s = self.session.nav.getCurrentService()
                 print_debug("Current Service", str(s))
@@ -598,10 +609,11 @@ class Filmweb(DefaultScreen):
                 evt = info and info.getEvent(ref)
                 print_info("Event", str(evt))
                 self.eventName = evt and evt.getEventName()
-            print_info("Getting data for event with name", str(self.eventName))
+            print_info("Getting data for event with name", "'" + str(self.eventName) + "'")
             if self.eventName:
                 if tryOther and (self.eventName.find('odc.') > -1 or self.eventName.find('serial') > -1):
                     self.searchType = MT_SERIE
+                print_debug("Search type", str(self.searchType) + ", try other: " + str(tryOther));
                 idx = self.eventName.find(' - ')
                 if idx > 0:
                     self.eventName = self.eventName[:idx]
@@ -621,7 +633,7 @@ class Filmweb(DefaultScreen):
         print_debug("Change wallpaper", str(self.wallpaperidx) + ", filmId: " + str(self.filmId))
         if self.filmId is None:
             return
-        localfile = self.tmppath + '/' + self.filmId + '.jpg'
+        localfile = self.tmppath + '/wal_' + self.filmId + '.jpg'
         if len(self.wallpapers) > 0:
             indx = self.wallpaperidx
             if self.wallpaperidx < 0:
