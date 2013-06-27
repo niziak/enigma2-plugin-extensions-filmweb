@@ -61,5 +61,6 @@ Ustaw przeszukiwane kanały na ekranie konfiguracyjnym - patrz obrazek niżej. W
 || EXIT || Wyjście z Przewodnika do okna wywołującego ||
 || OK || W zależności od wybranej pozycji powoduje: przejście do oglądania danej pozycji (pozycja z zielonym znakiem), ustawienie Timera (pozycja z niebieskim znakiem), skasowanie Timera (pozycja z zegarkiem) ||
 || < || Przełącza ocenę pomiędzy IMDB i Filmweb ||
+|| > || Przełącza wyświetlanie informacji o serialach lub filmach ||
 
 </td></tr></tbody></table>
