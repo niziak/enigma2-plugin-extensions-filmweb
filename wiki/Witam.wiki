@@ -86,6 +86,7 @@ init 4; sleep 10; init 3
   * Poprawa pobierania fotosów dla filmu dla silnika Filmweb
   * Dodanie czyszczenia cache na wyjściu z okna wyszukiwarki
   * Poprawa trafności wyszukiwania bezpośredniego oraz rozróżniania seriali od filmów
+  * Dodanie obsługi seriali w Przewodniku Filmowym
 
 === ver. 1.2.3 ===
   * Poprawa działania na OpenPLI 3.0 ze skinem MetrixHD (problem zgłoszony przez JK32)
