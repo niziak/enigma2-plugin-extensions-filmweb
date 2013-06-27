@@ -22,14 +22,15 @@
 import twisted.internet.defer as defer
 import os
 import xml.etree.ElementTree as xml
-from enigma import eEPGCache, eServiceReference, eTimer
+from enigma import eServiceReference, eTimer
 from time import localtime, strftime, time
 
 from __common__ import _
 from logger import print_info, print_debug
 from mselection import FilmwebRateChannelSelection
 from comps import DefaultScreen, StarsComp, MPixmap
-from engine import TelemagEngine, FilmwebTvEngine, FilmwebEngine, ImdbRateEngine, MT_MOVIE, MAPPING, MAPPING2
+from tvsearch import TvSearcher
+from engine import FilmwebEngine, ImdbRateEngine, MT_MOVIE, MT_SERIE
 
 from RecordTimer import RecordTimerEntry, parseEvent, AFTEREVENT
 from Tools.LoadPixmap import LoadPixmap
@@ -313,7 +314,9 @@ class MovieGuide(DefaultScreen, SelectionEventInfo):
         self.list = []
         self.services = []
         self.mapping = {}
-        self.epg = eEPGCache.getInstance()
+
+        self.tvsearcher = TvSearcher()
+        self.searchType = MT_MOVIE
 
         self.createGUI()
         self.initActions()
@@ -378,9 +381,14 @@ class MovieGuide(DefaultScreen, SelectionEventInfo):
     def nextAction(self):
         print_debug("NEXT action")
         if self.execing:
-            cur = self.getCurrentSelection()
-            print_debug('Current selection: ', str(cur))
-            # self.showInfo(cur)
+            if self["list"].style == 'default':
+                if self.searchType == MT_MOVIE:
+                    self.searchType = MT_SERIE
+                else:
+                    self.searchType = MT_MOVIE
+                self.list = []
+                self.timeline = time()
+                self.refreshList()
 
     def toggleAction(self):
         print_debug("TOGGLE action")
@@ -436,8 +444,6 @@ class MovieGuide(DefaultScreen, SelectionEventInfo):
         Screen.createGUIScreen(self, parent, desktop, updateonly)
 
     # --- Public methods ------------------------------------------------
-
-
 
     def zapOrTimer(self, cur):
         if not cur:
@@ -543,17 +549,12 @@ class MovieGuide(DefaultScreen, SelectionEventInfo):
             for idx in range(1, count + 1):
                 # -- aktualizacja progresu
                 self.eventlist.modifyEntry(index, ((service.getServiceName(), (idx - 1) * rng + int(rng / 4))))
-                tms = strftime("%Y%m%d", (localtime(tim)))
-                print_debug('----->> Query date', tms + ', service: ' + service.getServiceName())
+
+                result = yield self.tvsearcher.searchForTime(service, tim, self.searchType)
                 tim += 86400
-                df = self.__query(service, tms)
-                print_debug('QUERY DEFERED: ', str(df))
-                if not df:
-                    continue
-                result = yield df
+
                 # -- aktualizacja progresu
                 self.eventlist.modifyEntry(index, ((service.getServiceName(), (idx - 1) * rng + int(rng / 4) * 2)))
-                print_debug('Query result', str(result) + ', service: ' + service.getServiceName())
                 if not result:
                     continue
                 for x in result:
@@ -591,7 +592,7 @@ class MovieGuide(DefaultScreen, SelectionEventInfo):
                                     title = title.replace(", Der", '')
                                     print_debug('Movie title: ', str(title) + ', YEAR: ' + str(year))
                                     imdb = ImdbRateEngine()
-                                    rdf = imdb.query(title, year, MT_MOVIE)
+                                    rdf = imdb.query(title, year, self.searchType)
                                     if rdf:
                                         print_debug('Yield imdb query: ', str(rdf))
                                         tupimdb = yield rdf
@@ -619,41 +620,26 @@ class MovieGuide(DefaultScreen, SelectionEventInfo):
             import traceback
             traceback.print_exc()
 
-    def parseYear(self, description):
-        opis = description.strip()
-        rok = opis[-4:]
-        if not rok.isdigit():
-            return None
-        return rok
-
     def processRes(self, result, engine):
         try:
-            begin = int(result[0])
-            description = result[1]
-            eventName = result[2]
-            service = result[4]
+            res = self.tvsearcher.processSearchForTimeResult(result)
+            if not res:
+                return None
 
-            tms = strftime("%Y-%m-%d %H:%M", (localtime(begin)))
-            print_info('EVT', '[' + tms + '] - ' + eventName + ' / ' + service.getServiceName())
-            evt = self.epg.lookupEventTime(service.ref, begin + 30)
-            print_info('Lookup event result: ', str(evt))
-            if not evt:
-                return None
-            title = eventName
-            if not title or len(title) == 0:
-                return None
-            rok = self.parseYear(description)
-            if evt and title == 'Film fabularny':
-                title = evt.getEventName()
-            title = self.__replaceTitle(title)
-            evid = service.getServiceName() + '___' + str(begin)
+            result = res[0]
+            tms = res[1]
+            evt = res[2]
+            rok = res[3]
+            evid = res[4]
+            title = res[5]
+
             lista = self.__loadNfo(evid)
             if lista:
                 # print_debug('----> Lista', str(lista))
                 lst = [lista]
-                return self.filmwebQueryCallback(lst, MT_MOVIE, (result, tms, evt, rok, False))
+                return self.filmwebQueryCallback(lst, self.searchType, (result, tms, evt, rok, False))
             else:
-                df = engine.query(MT_MOVIE, title, rok, False, self.filmwebQueryCallback, (result, tms, evt, rok, True))
+                df = engine.query(self.searchType, title, rok, False, self.filmwebQueryCallback, (result, tms, evt, rok, True))
                 evn = evt and evt.getEventName() or '???'
                 print_debug('EVT EPG 1', 'rok:' + str(rok) + ", name: " + evn)
                 return df
@@ -916,31 +902,6 @@ class MovieGuide(DefaultScreen, SelectionEventInfo):
                 if simulTimerList is not None:
                     self.session.openWithCallback(self.__finishedAdd, TimerSanityConflict, simulTimerList)
             self.__updateListData()
-
-    def __query(self, service, tms):
-        sname = service.getServiceName();
-        sref = str(service)
-        print_debug('Query service: ', str(sname) + ', reference: ' + sref)
-        if sname and sref:
-            sref = sref[:25]
-            if MAPPING2.get(sref):
-                return FilmwebTvEngine().query(service, MT_MOVIE, tms)
-            if MAPPING.get(sref):
-                return TelemagEngine().query(service, MT_MOVIE, tms)
-        return None
-
-    def __replaceTitle(self, title):
-        title = title.replace('IV', '4')
-        title = title.replace('IX', '9')
-        title = title.replace(' X ', ' 10 ')
-        title = title.replace('VIII', '8')
-        title = title.replace('VII', '7')
-        title = title.replace('VI', '6')
-        title = title.replace('III', '3')
-        title = title.replace('II', '2')
-        title = title.replace(' I ', ' 1 ')
-        title = title.replace(' V ', ' 5 ')
-        return title
 
     def __replaceConverter(self, data):
         source = None

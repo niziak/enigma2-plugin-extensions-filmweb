@@ -133,6 +133,7 @@ class FilmwebChannelSelection(SimpleChannelSelection):
         if (ref.flags & eServiceReference.flagDirectory) == eServiceReference.flagDirectory:
             self.enterPath(ref)
         elif not (ref.flags & eServiceReference.isMarker):
+            print_debug("processSelected", str(ref))
             self.session.openWithCallback(
                 self.onClosed,
                 FilmwebEPGSelection,
@@ -178,6 +179,6 @@ class FilmwebEPGSelection(EPGSelection):
             print_debug("EVT short desc", str(evt.getShortDescription()))
             print_debug("EVT ext desc", str(evt.getExtendedDescription()))
             print_debug("EVT ptr", str(evt.getPtrString()))
-            self.session.open(self.screen, evt.getEventName())
+            self.session.open(self.screen, (evt, sref))
         else:
-            self.close(evt.getEventName())
+            self.close((evt, sref))
