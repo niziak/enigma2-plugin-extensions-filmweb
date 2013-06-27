@@ -32,6 +32,9 @@ from movieguide import MovieGuide
 from __common__ import  _
 from logger import print_info, print_debug
 from comps import ActorChoiceList, ScrollLabelExt, MenuChoiceList, StarsComp, DefaultScreen
+from tvsearch import TvSearcher
+
+from ServiceReference import ServiceReference
 
 from Screens.InputBox import InputBox
 from Screens.ChoiceBox import ChoiceBox
@@ -58,12 +61,11 @@ VT_DETAILS = 'DETAILS'
 VT_EXTRAS = 'EXTRAS'
 
 class Filmweb(DefaultScreen):
-    def __init__(self, session, eventName):
+    def __init__(self, session, data):
         DefaultScreen.__init__(self, session, "filmweb")
-        print_info("Filmweb Screen - event", eventName)
+        print_info("Filmweb Screen - data", str(data))
 
         self.session = session
-        self.eventName = eventName
         self.mode = ''
         self.detailDir = 0
         self.resultlist = []
@@ -73,21 +75,27 @@ class Filmweb(DefaultScreen):
         self.regtitle = ''
         self.orgtitle = ''
 
+        self.user = None
+        self.passwd = None
+
+        self.tvsearcher = TvSearcher()
+
+        self.__clearSearch()
+        if data:
+            self.event = data[0]
+            self.service = data[1]
+
         self.tmppath = config.plugins.mfilmweb.tmpPath.getValue()
         if not os.path.exists(self.tmppath):
             os.mkdir(self.tmppath)
         self.posterpath = self.tmppath + '/'
 
+        self.onClose.append(self.__clearCache)
+
         self.initVars()
         self.createGUI()
 
-        self.engineType = config.plugins.mfilmweb.engine.value
-        if self.engineType == 'IMDB':
-            self.posterpath = self.posterpath + IMDB_POSTER_FILE
-            self.engine = ImdbEngine(self.failureHandler, self["status_bar"])
-        else:
-            self.posterpath = self.posterpath + FILMWEB_POSTER_FILE
-            self.engine = FilmwebEngine(self.failureHandler, self["status_bar"])
+        self.__changeEngine(config.plugins.mfilmweb.engine.value)
 
         self.initActions()
 
@@ -97,15 +105,48 @@ class Filmweb(DefaultScreen):
 
         self.reload()
 
+    def __clearSearch(self):
+        self.searchTitle = None
+        self.searchYear = None
+        self.event = None
+        self.service = None
+
+    def __clearCache(self):
+        if os.path.exists(self.tmppath):
+            names = os.listdir(self.tmppath)
+            for name in names:
+                if name.startswith('poster_') or name.startswith('actor_'):
+                    pth = self.tmppath + '/' + name
+                    if os.path.exists(pth):
+                        os.remove(pth)
+
+    def __changeEngine(self, engine):
+        if not engine:
+            return
+
+        self.engineType = engine
+        if self.engineType == 'IMDB':
+            self.user = config.plugins.mfilmweb.imdbUser.getText()
+            self.passwd = config.plugins.mfilmweb.imdbPassword.getText()
+            self.posterpath = self.posterpath + IMDB_POSTER_FILE
+            self.engine = ImdbEngine(self.failureHandler, self["status_bar"])
+        else:
+            self.user = config.plugins.mfilmweb.user.getText()
+            self.passwd = config.plugins.mfilmweb.password.getText()
+            self.posterpath = self.posterpath + FILMWEB_POSTER_FILE
+            self.engine = FilmwebEngine(self.failureHandler, self["status_bar"])
+
     def reload(self, refx=True):
         if refx:
             self.searchType = MT_MOVIE
         print_debug("[reload] search type:", str(self.searchType) + ", refx: " + str(refx))
         self.switchView(to_mode=VT_NONE)
-        if self.engineType == 'IMDB' or config.plugins.mfilmweb.user.getText() == '':
-            self.getData(refx)
+        self.sessionId = None
+        self.userToken = None
+        if self.user is None or self.user == '' or self.engineType == 'IMDB':
+            self.processData(refx)
         else:
-            self.loginPage(self.getData)
+            self.loginPage(self.processData, refx)
 
     def initVars(self):
         self.filmId = None
@@ -140,18 +181,18 @@ class Filmweb(DefaultScreen):
         pass
 
     def nextAction(self):
+        engine = None
         if self.engineType == 'IMDB':
-            self.engineType = 'Filmweb'
-            self.eventName = self.regtitle
-            self.engine = FilmwebEngine(self.failureHandler, self["status_bar"])
+            engine = 'Filmweb'
+            self.searchTitle = self.regtitle
         else:
-            self.engineType = 'IMDB'
-            self.eventName = self.orgtitle
-            if not self.eventName:
-                self.eventName = self.regtitle
-            self.eventName = self.eventName.replace(', The', '')
-            print_info('Loading date for ', str(self.eventName) + ' using engine: ' + str(self.engineType))
-            self.engine = ImdbEngine(self.failureHandler, self["status_bar"])
+            engine = 'IMDB'
+            self.searchTitle = self.orgtitle
+            if not self.searchTitle:
+                self.searchTitle = self.regtitle
+            self.searchTitle = self.searchTitle.replace(', The', '')
+        self.__changeEngine(engine)
+        print_info('Loading data for ', str(self.searchTitle) + ' using engine: ' + str(self.engineType))
         self.reload(False)
 
 
@@ -207,7 +248,7 @@ class Filmweb(DefaultScreen):
             else:
                 self.searchType = MT_MOVIE
             self.switchView(to_mode=VT_NONE)
-            self.getData(False)
+            self.processData(False)
         else:
             self.switchView(to_mode=VT_DETAILS)
 
@@ -248,23 +289,25 @@ class Filmweb(DefaultScreen):
         )
 
     def serachSelectedChannel(self, ret=None):
-        print_info("Serach Selected Channel", str(ret))
+        print_info("Search Selected Channel", str(ret))
         if ret:
+            self.__clearSearch()
             # sr = ServiceReference(ret)
             # self.switchView(to_mode=VT_MENU)
             serviceHandler = eServiceCenter.getInstance()
             info = serviceHandler.info(ret)
-            print_debug("Service info", str(info))
+            print_debug("Service info: ", str(info))
             # sname = info and info.getName(ret) or ""
             # print_debug("Service name", str(sname))
-            evt = info and info.getEvent(ret)
-            print_debug("Event", str(evt))
+            self.event = info and info.getEvent(ret)
+            print_debug("Event: ", str(self.event))
+            self.service = ServiceReference(ret)
             # evtname = evt and evt.getEventName()
             # print_debug("Event name", str(evtname))
-            self.eventName = evt and evt.getEventName()
+            # self.eventName = evt and evt.getEventName()
             self.resultlist = []
             self.switchView(to_mode=VT_NONE)
-            self.getData()
+            self.processData()
 
     def switchGUI(self, to_mode=VT_MENU):
         print_info("Switching GUI", "old mode=" + self.mode + ", new mode=" + to_mode)
@@ -393,6 +436,7 @@ class Filmweb(DefaultScreen):
 
         self["extra_label"] = ScrollLabelExt("")
         self["status_bar"] = Label("")
+        self["copyright"] = Label("Powered By Marcin Slowik")
         self["rating_label"] = Label("")
         self["menu"] = MenuChoiceList(self.resultlist)
 
@@ -402,7 +446,7 @@ class Filmweb(DefaultScreen):
         self["key_blue"] = Button()
 
     def __str__(self):
-        return "FILMWEB {Session: " + str(self.session) + ", EventName:" + str(self.eventName) + "}"
+        return "FILMWEB {Session: " + str(self.session) + ", Search Text:" + str(self.searchTitle) + "}"
 
     def switchView(self, to_mode=VT_MENU):
         print_info("Switching view", "old mode=" + self.mode + ", new mode=" + to_mode)
@@ -546,22 +590,25 @@ class Filmweb(DefaultScreen):
             import traceback
             traceback.print_exc()
 
-    def loginPage(self, callback=None):
+    def loginPage(self, callback=None, param=None):
         try:
             self.userToken = None
             self.sessionId = None
-            self.engine.login(config.plugins.mfilmweb.user.getText(),
-                              config.plugins.mfilmweb.password.getText(),
-                              self.loginCallback, callback)
+            self.engine.login(self.user,
+                              self.passwd,
+                              self.loginCallback,
+                              callback,
+                              param)
         except:
             import traceback
             traceback.print_exc()
 
-    def loginCallback(self, userToken, sessionId, callback):
+    def loginCallback(self, userToken, sessionId, callback, param):
+        print_debug('Login callback - userToken:', userToken + ', SID: ' + sessionId)
         self.userToken = userToken
         self.sessionId = sessionId
         if callback:
-            callback()
+            callback(param)
 
     def fetchRateRes(self, res_):
         if res_ and res_.startswith('//OK'):
@@ -572,10 +619,10 @@ class Filmweb(DefaultScreen):
         if self.has_key('status_bar'):
             self["status_bar"].setText(_("Filmweb Download failed"))
 
-    def queryCallback(self, rlista, type, data=None):
+    def queryCallback(self, rlista, typ, data=None):
         self.resultlist = rlista
-        print_debug("[queryCallback] search type:", str(type))
-        self.searchType = type
+        print_debug("[queryCallback] search type:", str(typ))
+        self.searchType = typ
         lista = []
         for entry in self.resultlist:
             caption = entry[0]
@@ -587,7 +634,7 @@ class Filmweb(DefaultScreen):
         self["menu"].l.setList(lista)
         self.switchView(to_mode='MENU')
 
-    def getData(self, tryOther=True):
+    def processData(self, tryOther=True):
         try:
             self.initialize = False
             if os.path.exists(self.posterpath):
@@ -596,29 +643,11 @@ class Filmweb(DefaultScreen):
             self.initVars()
             self["cast_label"].l.setList(self.cast_list)
             self.resultlist = []
-            print_info("Getting data for event", "'" + str(self.eventName) + "'")
-            if not self.eventName or len(self.eventName.strip()) == 0:
-                s = self.session.nav.getCurrentService()
-                print_debug("Current Service", str(s))
-                ref = self.session.nav.getCurrentlyPlayingServiceReference()
-                print_debug("Current Service ref", str(ref))
 
-                serviceHandler = eServiceCenter.getInstance()
-                info = serviceHandler.info(ref)
-                print_info("Service info", str(info))
-                evt = info and info.getEvent(ref)
-                print_info("Event", str(evt))
-                self.eventName = evt and evt.getEventName()
-            print_info("Getting data for event with name", "'" + str(self.eventName) + "'")
-            if self.eventName:
-                if tryOther and (self.eventName.find('odc.') > -1 or self.eventName.find('serial') > -1):
-                    self.searchType = MT_SERIE
-                print_debug("Search type", str(self.searchType) + ", try other: " + str(tryOther));
-                idx = self.eventName.find(' - ')
-                if idx > 0:
-                    self.eventName = self.eventName[:idx]
-                self["status_bar"].setText(_("Query Filmweb: %s...") % (self.eventName))
-                self.engine.query(self.searchType, self.eventName, None, tryOther, self.queryCallback)
+            self.beforeProcessData()
+            print_info("Getting data for event: ", str(self.event))
+            if self.event or self.searchTitle:
+                self.tvsearcher.dataForEvent(self.service, self.event, self.searchType, self.queryDataCallback, tryOther)
             else:
                 self["status_bar"].setText(_("Unknown Eventname"))
                 self["title_label"].setText(_("Unknown Eventname"))
@@ -626,6 +655,51 @@ class Filmweb(DefaultScreen):
         except:
             import traceback
             traceback.print_exc()
+
+    def beforeProcessData(self):
+        if not self.event and not self.searchTitle:
+            s = self.session.nav.getCurrentService()
+            print_debug("Current Service", str(s))
+            ref = self.session.nav.getCurrentlyPlayingServiceReference()
+            print_debug("Current Service ref", str(ref))
+            self.service = ServiceReference(ref)
+
+            serviceHandler = eServiceCenter.getInstance()
+            info = serviceHandler.info(ref)
+            print_info("Service info", str(info))
+            self.event = info and info.getEvent(ref)
+            print_info("Event", str(self.event))
+            # self.eventName = evt and evt.getEventName()
+
+    def queryDataCallback(self, service, event, ret, tryOther):
+        if event:
+            self.searchTitle = event.getEventName()
+        elif self.event:
+            self.searchTitle = self.event.getEventName()
+
+        if ret:
+            self.searchTitle = ret[5]
+            self.searchYear = ret[3]
+            print_debug("Search data:", "title:%s, year:%s, type:%s" % (self.searchTitle, self.searchYear, self.searchType))
+        elif event and tryOther:
+            if self.searchType == MT_MOVIE:
+                self.searchType = MT_SERIE
+            else:
+                self.searchType = MT_MOVIE
+            self.tvsearcher.dataForEvent(service, event, self.searchType, self.queryDataCallback, False)
+            return
+
+        if not self.searchTitle:
+            return
+
+        if tryOther and (self.searchTitle.find('odc.') > -1 or self.searchTitle.find('serial') > -1):
+            self.searchType = MT_SERIE
+        print_debug("Search type", str(self.searchType) + ", try other: " + str(tryOther));
+        idx = self.searchTitle.find(' - ')
+        if idx > 0:
+            self.searchTitle = self.searchTitle[:idx]
+        self["status_bar"].setText(_("Query Filmweb: %s...") % (self.searchTitle))
+        self.engine.query(self.searchType, self.searchTitle, self.searchYear, tryOther, self.queryCallback)
 
     def changeWallpaper(self):
         if self.mode != VT_DETAILS:
@@ -682,7 +756,7 @@ class Filmweb(DefaultScreen):
         dlg = self.session.openWithCallback(self.askForName, InputBox,
                                       windowTitle=_("Input the name of serie to search"),
                                        title=_("Enter serie title to search for"),
-                                       text=self.eventName + " ",
+                                       text=self.searchTitle + " ",
                                        maxSize=55,
                                        type=Input.TEXT)
         dlg["input"].end()
@@ -728,7 +802,7 @@ class Filmweb(DefaultScreen):
         dlg = self.session.openWithCallback(self.askForName, InputBox,
                                       windowTitle=_("Input the name of movie to search"),
                                        title=_("Enter movie title to search for"),
-                                       text=self.eventName + " ",
+                                       text=self.searchTitle + " ",
                                        maxSize=55,
                                        type=Input.TEXT)
         dlg["input"].end()
@@ -737,8 +811,9 @@ class Filmweb(DefaultScreen):
         if word is None:
             pass
         else:
-            self.eventName = word.strip()
-            self.getData(False)
+            self.__clearSearch()
+            self.searchTitle = word.strip()
+            self.processData(False)
             # self.session.open(MessageBox,_(word.strip()), MessageBox.TYPE_INFO)
 
 

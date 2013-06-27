@@ -21,7 +21,9 @@
     foregroundColor="#f0b400" transparent="1" />
   <widget name="login_label" position="870,5" size="210,20" zPosition="5" halign="center" font="Regular;18"
     foregroundColor="#58bcff" transparent="1" />
-  <widget name="status_bar" position="10,545" size="1070,20" zPosition="2" font="Regular;14" foregroundColor="#cccccc"
+  <widget name="status_bar" position="10,545" size="840,20" zPosition="2" font="Regular;14" foregroundColor="#cccccc"
+    transparent="1" />
+  <widget name="copyright" position="850,545" size="230,20" zPosition="5" font="Regular;14" foregroundColor="#f0b400"
     transparent="1" />
   <widget name="poster" position="20,26" size="140,216" zPosition="5" alphatest="blend" />
   <widget name="wallpaper" position="870,81" size="210,170" zPosition="0" alphatest="on" />

@@ -34,6 +34,8 @@ from Components.config import config, configfile, getConfigListEntry, ConfigSele
 config.plugins.mfilmweb = ConfigSubsection()
 config.plugins.mfilmweb.user = ConfigText(default="", fixed_size=False)
 config.plugins.mfilmweb.password = ConfigPassword(default="", visible_width=50, fixed_size=False)
+config.plugins.mfilmweb.imdbUser = ConfigText(default="test", fixed_size=False)
+config.plugins.mfilmweb.imdbPassword = ConfigPassword(default="test", visible_width=50, fixed_size=False)
 config.plugins.mfilmweb.selserv = ConfigText(default="", fixed_size=False)
 config.plugins.mfilmweb.tmpPath = ConfigText(default="/tmp/filmweb", fixed_size=False)
 config.plugins.mfilmweb.logs = ConfigSelection([('debug', _('Debug Level')), ('info', _('Info Level')), ('error', _('Error Level'))], default='debug')
@@ -64,6 +66,8 @@ class FilmwebConfig(Screen, ConfigListScreen):
         self.list = []
         self.list.append(getConfigListEntry(_("User Name"), config.plugins.mfilmweb.user))
         self.list.append(getConfigListEntry(_("Password"), config.plugins.mfilmweb.password))
+        # self.list.append(getConfigListEntry(_("IMDB User Name"), config.plugins.mfilmweb.imdbUser))
+        # self.list.append(getConfigListEntry(_("IMDB Password"), config.plugins.mfilmweb.imdbPassword))
         self.list.append(getConfigListEntry(_("Temporary Folder"), config.plugins.mfilmweb.tmpPath))
         self.list.append(getConfigListEntry(_("Logging Level"), config.plugins.mfilmweb.logs))
         self.list.append(getConfigListEntry(_("Select Engine"), config.plugins.mfilmweb.engine))

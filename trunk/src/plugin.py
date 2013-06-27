@@ -29,6 +29,7 @@ import mautils
 import comps
 import engine
 import movieguide
+import tvsearch
 
 def reloadlibs():
     reload(logger)
@@ -37,6 +38,7 @@ def reloadlibs():
     reload(config)
     reload(engine)
     reload(mselection)
+    reload(tvsearch)
     reload(movieguide)
     reload(mainlib)
 
@@ -51,7 +53,7 @@ def guide(session, **kwargs):
 def main(session, eventName="", **kwargs):
     reloadlibs()
     try:
-        session.open(mainlib.Filmweb, eventName)
+        session.open(mainlib.Filmweb, None)
     except:
         import traceback
         traceback.print_exc()
