@@ -78,6 +78,9 @@ init 4; sleep 10; init 3
 
 = Informacja o zmianach w wersjach =
 ----
+=== ver. 1.2.5 ===
+  * Poprawki działania przełączenia pomiędzy silnikami w aplikacji
+
 === ver. 1.2.4 ===
   * Poprawka obsługi cache-a - poprawka zmienia zapis całości plików w miejsce określone konfiguracją
   * Poprawa wyświetlania godziny na zegarku w Przewodniku
