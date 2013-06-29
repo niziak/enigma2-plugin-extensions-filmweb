@@ -80,6 +80,7 @@ init 4; sleep 10; init 3
 ----
 === ver. 1.2.5 ===
   * Poprawki działania przełączenia pomiędzy silnikami w aplikacji
+  * Poprawa pobierania tytułu oryginalnego dla silnika IMDB
 
 === ver. 1.2.4 ===
   * Poprawka obsługi cache-a - poprawka zmienia zapis całości plików w miejsce określone konfiguracją
