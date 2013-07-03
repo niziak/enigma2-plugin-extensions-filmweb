@@ -69,8 +69,6 @@ init 4; sleep 10; init 3
   * Modyfikacja standardowego panelu informacyjnego tak by wyświetlana była na nim informacja z Filmweb o aktualnie oglądanej pozycji
   * Modyfikacja skóry 
   * Dodanie wyświetlania informacji szczegółowych o aktorach
-  * Dodanie listy ulubionych pozycji wybranych z Przewodnika i wyświetlanie przypomnień o tym, że na określonym kanale za określony czas będzie wyświetlana ulubiona pozycja w formie okienka notyfikacyjnego
-  * Pobieranie pełnej listy potencjalnie pasujących pozycji do zapytania do wyboru po wyszukaniu  zamiast 10-ciu 
   * Dodanie w Przewodniku informacji o obsadzie
   * Dodanie w Przewodniku wyświetlania opisów dla filmu
   * Dodanie w Przewodniku obsługi wyświetlania tapet
@@ -81,6 +79,7 @@ init 4; sleep 10; init 3
 === ver. 1.2.5 ===
   * Poprawki działania przełączenia pomiędzy silnikami w aplikacji
   * Poprawa pobierania tytułu oryginalnego dla silnika IMDB
+  * Dodanie prezentacji informacji w formie okienka o tym, że na jednym z wybranych w Przewodniku kanałów będzie do 10 min. lub jest obecnie wyświetlany film oznaczony na portalu Filmweb jako "chcę obejrzeć" (opcja dostępna jedynie dla zalogowanych użytkowników - podany login i hasło w konfiguracji)
 
 === ver. 1.2.4 ===
   * Poprawka obsługi cache-a - poprawka zmienia zapis całości plików w miejsce określone konfiguracją
