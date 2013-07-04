@@ -19,7 +19,7 @@ Nowy plugin wyświetla liste aktualnych pozycji filmowych na wybranych w przewod
 
 
 <table cellpadding=2 cellspacing=2 border=0>
-<tbody><tr valign="top"><td>http://enigma2-plugin-extensions-filmweb.googlecode.com/svn/wiki/SHOW-INFO.png</td></tr></tbody></table>
+<tbody><tr valign="top"><td>http://enigma2-plugin-extensions-filmweb.googlecode.com/svn/wiki/SHORT-INFO.png</td></tr></tbody></table>
 
 == Opcje Konfiguracyjne ==
 
