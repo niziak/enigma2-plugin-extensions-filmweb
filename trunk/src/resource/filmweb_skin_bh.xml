@@ -1,4 +1,4 @@
-<screen name="FilmwebData" position="90,105" size="1100,560" title="Filmweb.pl">
+<screen name="FilmwebData" position="90,105" size="1100,560" title="Film Web 2013">
   <ePixmap pixmap="skin_default/buttons/red25.png" position="20,505" size="250,40" transparent="1" alphatest="on" />
   <ePixmap pixmap="skin_default/buttons/green25.png" position="290,505" size="250,40" transparent="1" alphatest="on" />
   <ePixmap pixmap="skin_default/buttons/yellow25.png" position="560,505" size="250,40" transparent="1" alphatest="on" />

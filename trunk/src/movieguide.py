@@ -22,19 +22,18 @@
 import twisted.internet.defer as defer
 import os
 import xml.etree.ElementTree as xml
-from enigma import eServiceReference, eTimer
+from enigma import eTimer
 from time import localtime, strftime, time
 
 from __common__ import _
 from logger import print_info, print_debug
 from mselection import FilmwebRateChannelSelection
-from comps import DefaultScreen, StarsComp, MPixmap
+from comps import DefaultScreen, StarsComp, MPixmap, sorted_data2
 from tvsearch import TvSearcher
 from engine import FilmwebEngine, ImdbRateEngine, MT_MOVIE, MT_SERIE
 
 from RecordTimer import RecordTimerEntry, parseEvent, AFTEREVENT
 from Tools.LoadPixmap import LoadPixmap
-from ServiceReference import ServiceReference
 
 from Screens.Screen import Screen
 from Screens.TimerEntry import TimerEntry
@@ -49,9 +48,8 @@ from Components.Sources.StaticText import StaticText
 from Components.Sources.ServiceEvent import ServiceEvent
 from Components.Converter.Converter import Converter
 from Components.Label import Label
-
-sorted_data = lambda data, idx, ordx: [b for _, b in sorted(((tup[idx], tup) for tup in data), reverse=ordx)]
-sorted_data2 = lambda data, idx, idx2, ordx: [b for _, b in sorted((((tup[idx], tup[idx2]), tup) for tup in data), reverse=ordx)]
+from comps import getRescalledPixmap
+from Screens.ChannelSelection import ChannelSelection
 
 # this is 1 day in seconds
 CACHE_INVALIDATE_TIME = 60 * 60 * 24
@@ -96,8 +94,6 @@ class MovieGuideEventConv(Converter, object):
     text = property(getText)
 
     def __getRescalledPixmap(self):
-        from Components.AVSwitch import AVSwitch
-        from enigma import ePicLoad
         details = self.source.details
         if details:
             path = None
@@ -111,19 +107,7 @@ class MovieGuideEventConv(Converter, object):
             if details and details.has_key(self.type):
                 path = details.get(self.type)
             if path:
-                try:
-                    picload = ePicLoad()
-                    sc = AVSwitch().getFramebufferScale()
-                    picload.setPara((width, height,
-                                      sc[0], sc[1], False, 1, "#00000000"))
-                    res = picload.startDecode(path)
-                    print_debug('startDecode result', str(res))
-                    picload.waitFinished()
-                    ptr = picload.getData()
-                    return ptr  # .__deref__()
-                except:
-                    import traceback
-                    traceback.print_exc()
+                return getRescalledPixmap(width, height, path)
         return None
 
 class MovieGuideEvent(ServiceEvent, object):
@@ -315,6 +299,7 @@ class MovieGuide(DefaultScreen, SelectionEventInfo):
         self.services = []
         self.mapping = {}
 
+        self.selector = self.session.instantiateDialog(ChannelSelection)
         self.tvsearcher = TvSearcher()
         self.searchType = MT_MOVIE
 
@@ -325,7 +310,6 @@ class MovieGuide(DefaultScreen, SelectionEventInfo):
         if not os.path.exists(self.path):
             os.mkdir(self.path)
 
-        self.eventlist = self["list"]
         SelectionEventInfo.__init__(self)
 
         self.clocktimer = eTimer()
@@ -343,6 +327,8 @@ class MovieGuide(DefaultScreen, SelectionEventInfo):
     # --- Screen Manipulation ------------------------------------------------
     def createGUI(self):
         self["list"] = List(self.list)
+        self.eventlist = self["list"]
+
         self["key_red"] = StaticText('')
         self["key_green"] = StaticText('')
         self["key_yellow"] = StaticText('')
@@ -354,11 +340,9 @@ class MovieGuide(DefaultScreen, SelectionEventInfo):
         self["clock-hr"] = MPixmap()
         self["clock-str"] = Label('')
 
-        self["list"].style = "progress"
+        self.eventlist.style = "progress"
 
     def initActions(self):
-        # global globalActionMap
-        # globalActionMap.actions['showClock'] = self.ShowHide
         self["actions"] = ActionMap(["OkCancelActions", "ColorActions", "InfobarCueSheetActions"], {
             "ok": self.okAction,
             "cancel": self.cancelAction,
@@ -374,14 +358,14 @@ class MovieGuide(DefaultScreen, SelectionEventInfo):
     # --- Actions definition ------------------------------------------------
     def prevAction(self):
         print_debug("PREV action")
-        if self.execing and self["list"].style == 'default':
+        if self.execing and self.eventlist.style == 'default':
             self.switchRating()
             self.displayEventList()
 
     def nextAction(self):
         print_debug("NEXT action")
         if self.execing:
-            if self["list"].style == 'default':
+            if self.eventlist.style == 'default':
                 if self.searchType == MT_MOVIE:
                     self.searchType = MT_SERIE
                 else:
@@ -392,7 +376,7 @@ class MovieGuide(DefaultScreen, SelectionEventInfo):
 
     def toggleAction(self):
         print_debug("TOGGLE action")
-        if self["list"].style == 'default':
+        if self.eventlist.style == 'default':
             self.sortOrder = not self.sortOrder
             self.displayEventList()
 
@@ -409,12 +393,12 @@ class MovieGuide(DefaultScreen, SelectionEventInfo):
 
     def redAction(self):
         print_debug("RED action")
-        if self["list"].style == 'default':
+        if self.eventlist.style == 'default':
             self.session.open(FilmwebRateChannelSelection)
 
     def greenAction(self):
         print_debug("GREEN action")
-        if self["list"].style == 'default':
+        if self.eventlist.style == 'default':
             self.list = []
             self.timeline = time()
             self.rating = RATE_FILMWEB
@@ -423,7 +407,7 @@ class MovieGuide(DefaultScreen, SelectionEventInfo):
 
     def yellowAction(self):
         print_debug("YELLOW action")
-        if self["list"].style == 'default':
+        if self.eventlist.style == 'default':
             rat = self.rating
             if rat == RATE_IMDB:
                 self.switchRating()
@@ -431,7 +415,7 @@ class MovieGuide(DefaultScreen, SelectionEventInfo):
 
     def blueAction(self):
         print_debug("BLUE action")
-        if self["list"].style == 'default':
+        if self.eventlist.style == 'default':
             self.sortIndex += 1
             if self.sortIndex > 4:
                 self.sortIndex = 0
@@ -458,7 +442,9 @@ class MovieGuide(DefaultScreen, SelectionEventInfo):
         start_time = cur[0]  # event.getBeginTime()
         duration = cur[10]  # event.getDuration()
         if duration and start_time <= now <= (start_time + duration) and service and service.ref:
-            self.session.nav.playService(service.ref)
+            self.selector.setCurrentSelection(service.ref)
+            self.selector.zap()
+            # self.session.nav.playService(service.ref)
         elif now < start_time:
             self.__tryAddTimer(service, event, cur)
 
@@ -969,14 +955,7 @@ class MovieGuide(DefaultScreen, SelectionEventInfo):
     def __updateServices(self):
         print_debug('---- Update services ...')
         self.services = []
-        txt = config.plugins.mfilmweb.selserv.getText()
-        if txt:
-            entries = txt.split('|')
-            for x in entries:
-                ref = eServiceReference(x)
-                sr = ServiceReference(ref)
-                print_info('--> SERV', str(x) + ', name: ' + sr.getServiceName())
-                self.services.append(sr)
+        self.tvsearcher.serviceList(self.services)
 
     def __updateClock(self):
         now = localtime(time())

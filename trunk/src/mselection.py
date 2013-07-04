@@ -100,6 +100,10 @@ class FilmwebRateChannelSelection(SimpleChannelSelection):
         # save service data to file
         self.__saveServices()
 
+        # aktualizacja serwisow w przypominaczu
+        from plugin import pReminder
+        pReminder.processProgramList(True)
+
     def __saveServices(self):
         try:
             from ServiceReference import ServiceReference
