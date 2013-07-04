@@ -14,6 +14,13 @@ Ustaw przeszukiwane kanały na ekranie konfiguracyjnym - patrz obrazek niżej. W
 <table cellpadding=2 cellspacing=2 border=0>
 <tbody><tr valign="top"><td>http://enigma2-plugin-extensions-filmweb.googlecode.com/svn/wiki/MOVIE-GUIDE-SCREEN.png</td><td>http://enigma2-plugin-extensions-filmweb.googlecode.com/svn/wiki/MOVIE-GUIDE-CHANNEL-SCREEN.png</td></tr></tbody></table>
 
+== Przegląd aktualnie wyświetlanych pozycji filmowych ==
+Nowy plugin wyświetla liste aktualnych pozycji filmowych na wybranych w przewodniku kanałach. Po naciśnięciu <OK> następuje przejście do oglądania wybranej pozycji. Po naciśnięciu <0> następuje prezentacja szczegółów w oknie "Film Web 2003". Wyjście poprzez <EXT>.
+
+
+<table cellpadding=2 cellspacing=2 border=0>
+<tbody><tr valign="top"><td>http://enigma2-plugin-extensions-filmweb.googlecode.com/svn/wiki/SHOW-INFO.png</td></tr></tbody></table>
+
 == Opcje Konfiguracyjne ==
 
 || Opcja || Znaczenie ||
