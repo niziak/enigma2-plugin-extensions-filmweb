@@ -80,6 +80,7 @@ init 4; sleep 10; init 3
   * Poprawki działania przełączenia pomiędzy silnikami w aplikacji
   * Poprawa pobierania tytułu oryginalnego dla silnika IMDB
   * Dodanie prezentacji informacji w formie okienka o tym, że na jednym z wybranych w Przewodniku kanałów będzie do 10 min. lub jest obecnie wyświetlany film oznaczony na portalu Filmweb jako "chcę obejrzeć" (opcja dostępna jedynie dla zalogowanych użytkowników - podany login i hasło w konfiguracji)
+  * Dodanie dodatkowego pluginu pozwalającego na wyświetlenie w oknie pozycji filmowych aktualnie prezentowanych na wybranych w Przewodniku kanałach (skrócona wersja przewodnika pokazująca tylko zdarzenia aktywne w danej chwili)
 
 === ver. 1.2.4 ===
   * Poprawka obsługi cache-a - poprawka zmienia zapis całości plików w miejsce określone konfiguracją
