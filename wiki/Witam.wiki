@@ -76,7 +76,10 @@ init 4; sleep 10; init 3
 
 = Informacja o zmianach w wersjach =
 ----
-=== ver. 1.2.5 ===
+=== ver. 1.2.6 (2013/XX/XX) ===
+  * 
+
+=== ver. 1.2.5 (2013/07/05) ===
   * Poprawki działania przełączenia pomiędzy silnikami w aplikacji
   * Poprawa pobierania tytułu oryginalnego dla silnika IMDB
   * Dodanie prezentacji informacji w formie okienka o tym, że na jednym z wybranych w Przewodniku kanałów będzie do 10 min. lub jest obecnie wyświetlany film oznaczony na portalu Filmweb jako "chcę obejrzeć" (opcja dostępna jedynie dla zalogowanych użytkowników - podany login i hasło w konfiguracji)
