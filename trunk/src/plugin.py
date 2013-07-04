@@ -30,6 +30,25 @@ import comps
 import engine
 import movieguide
 import tvsearch
+import rmdr
+
+from Screens.ChannelSelection import ChannelSelection
+
+pReminder = rmdr.Reminder()
+
+'''
+ChannelSelection_zap = ChannelSelection.zap
+
+def zap(self):
+    print_debug('ChannelSelection_zap')
+    if pReminder.session:
+        session = pReminder.session
+        serv = session.nav.getCurrentService()
+        print_debug('ZAP data: ', 'Session: %s, Service: %s' % (str(session), str(serv)))
+    ChannelSelection_zap(self)
+
+ChannelSelection.zap = zap
+'''
 
 def reloadlibs():
     reload(logger)
@@ -41,6 +60,15 @@ def reloadlibs():
     reload(tvsearch)
     reload(movieguide)
     reload(mainlib)
+    reload(rmdr)
+
+def shortinfo(session, **kwargs):
+    reloadlibs()
+    try:
+        session.open(rmdr.ShortInfoScreen)
+    except:
+        import traceback
+        traceback.print_exc()
 
 def guide(session, **kwargs):
     reloadlibs()
@@ -68,6 +96,15 @@ def eventinfo(session, servicelist, **kwargs):
         import traceback
         traceback.print_exc()
 
+def sessionstart(reason, **kwargs):
+    reloadlibs()
+    try:
+        if reason == 0:
+            pReminder.start(kwargs["session"])
+    except:
+        import traceback
+        traceback.print_exc()
+
 def Plugins(path, **kwargs):
     p = [PluginDescriptor(name=_("Filmweb Details"),
                            description=_("Query details from the Filmweb.pl Database"),
@@ -79,10 +116,22 @@ def Plugins(path, **kwargs):
                            where=PluginDescriptor.WHERE_PLUGINMENU,
                            needsRestart=False,
                            fnc=guide),
+         PluginDescriptor(name=_("Short Movie Info"),
+                           description=_("Show actually presented movies on selected channels"),
+                           where=PluginDescriptor.WHERE_PLUGINMENU,
+                           needsRestart=False,
+                           fnc=shortinfo),
          PluginDescriptor(name=_("Filmweb Details"),
             description=_("Query details from the Filmweb.pl Database"),
             where=PluginDescriptor.WHERE_EVENTINFO,
             fnc=eventinfo,
             needsRestart=False,
-            )]
+            ),
+         PluginDescriptor(where=PluginDescriptor.WHERE_SESSIONSTART,
+                          fnc=sessionstart)]
     return p
+
+
+
+
+

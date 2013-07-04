@@ -248,13 +248,15 @@ class ImdbEngine(object):
             title = mautils.before(title, '/')
         print_debug("title last", title)
         self.detailsData['title'] = title
+        print_debug("Title", str(title))
 
     def parseOrgTitle(self):
         print_debug("parseOrgTitle", "started")
-        title = mautils.between(self.inhtml, '<span class="title-extra">', '<i>(original title)')
+        title = mautils.between(self.inhtml, '<span class="title-extra" itemprop="name">', '<i>(original title)')
         print_debug("org title first: ", title)
         title = title.strip();
         self.detailsData['org_title'] = title
+        print_debug("Original Title", str(title))
 
     def parseYear(self):
         print_debug("parseYear", "started")
@@ -735,12 +737,13 @@ class FilmwebEngine(object):
                 userToken = None
             if self.statusComponent:
                 self.statusComponent.setText(_('Login done'))
-            print_info('Login data', str(userToken) + ', SID: ' + str(sessionId))
+            print_info('Login data', 'token: %s, SID: %s' % (str(userToken), str(sessionId)))
             if callback:
-                callback(userToken, sessionId, data, data2)
+                return callback(userToken, sessionId, data, data2)
         except:
             import traceback
             traceback.print_exc()
+        return None
 
     def __fetchDetailsOK(self, txt_, link, callback, sessionId):
         print_info("fetch details OK", str(COOKIES))
@@ -775,6 +778,42 @@ class FilmwebEngine(object):
         if (callback):
             return callback(self.detailsData)
         return self.detailsData
+
+    def queryUserData(self, callback=None):
+        return getPage(PAGE_URL, cookies=COOKIES).addCallback(self.__fetchUserDataOK, callback, True).addErrback(self.__fetchFailed)
+
+    def __fetchUserDataOK(self, txt_, callback, loop):
+        print_debug("Fetch User Data OK: ", str(COOKIES))
+        inhtml = mautils.html2utf8(txt_)
+        if inhtml:
+            if inhtml.find('Automatyczne przekierowanie') > -1:
+                df = None
+                if loop:
+                    df = self.__fetchUserDataOK(callback, PAGE_URL, False)
+                return df
+            res = self.__parseUserData(inhtml)
+            if callback:
+                return callback(res)
+        return None
+
+    def queryWanaSee(self, userLink, callback=None):
+        url = PAGE_URL + userLink + '/films/wanna-see'
+        print_debug("Query Wanna See: ", str(url))
+        return getPage(url, cookies=COOKIES).addCallback(self.__fetchWannaSeeOK, callback, url, True).addErrback(self.__fetchFailed)
+
+    def __fetchWannaSeeOK(self, txt_, callback, url, loop):
+        print_debug("Fetch Wanna See OK: ", str(COOKIES))
+        inhtml = mautils.html2utf8(txt_)
+        if inhtml:
+            if inhtml.find('Automatyczne przekierowanie') > -1:
+                df = None
+                if loop:
+                    df = self.__fetchWannaSeeOK(callback, url, False)
+                return df
+            res = self.__parseWanaSee(inhtml)
+            if callback:
+                return callback(res)
+        return None
 
     def __fetchEntries(self, fetchurl, typ, callback, tryOther=True, data=None):
         self.resultlist = []
@@ -811,6 +850,38 @@ class FilmwebEngine(object):
         if self.failureHandler:
             self.failureHandler(txt_)
 
+    def __parseUserData(self, inhtml):
+        print_debug("__parseUserData", "started")
+        fidx = inhtml.find('<div class="btn-group profileLinks hdrElem">')
+        print_debug("search idx", str(fidx))
+        userLink = None
+        userName = None
+        if fidx > -1:
+            userLink = mautils.between(inhtml[fidx:], '<a href="', '"')
+            userName = mautils.between(inhtml[fidx:], 'class="btn userName">', '</a>')
+        return (userLink, userName)
+
+    def __parseWanaSee(self, inhtml):
+        result = []
+        print_debug("__parseWanaSee", "started")
+        fidx = inhtml.find('>Oczekiwane')
+        print_debug("search idx", str(fidx))
+        if fidx > -1:
+            inhtml = mautils.after(inhtml[fidx:], '<tbody>')
+            # print_debug('INHTML: ', inhtml)
+            if inhtml:
+                elements = inhtml.split('</tr><td')
+                number_results = len(elements)
+                print_debug("Serach results count", str(number_results))
+                for element in elements:
+                    if element == '':
+                        continue
+                    link = mautils.between(element, '<a href="', '"')
+                    if link:
+                        img = mautils.between(element, '<img src="', '">')
+                        result.append((link, img))
+        return result
+
     def __parseEntries(self, typ):
         print_debug("__parseEntries", "started")
         if typ == MT_MOVIE:
@@ -836,7 +907,7 @@ class FilmwebEngine(object):
         else:
             elements = self.inhtml.split('<div class=hitDesc>')
             number_results = len(elements)
-            print_info("Serach results count", str(number_results))
+            print_debug("Serach results count", str(number_results))
             if elements == '':
                 number_results = 0
             else:
@@ -902,7 +973,7 @@ class FilmwebEngine(object):
                         rt = rt.strip()
                     else:
                         rt = '0.0'
-                    # (caption, url, basic_caption, title, rating, year, country)
+                    # (caption, url, basic_caption, title, rating, year, country, image URL)
                     self.resultlist.append((element, PAGE_URL + link, basic_data, title, rt, year, country, img))
 
     def parsePlot(self):
@@ -920,8 +991,9 @@ class FilmwebEngine(object):
         years = ''
         if year:
             years = str(year)
-            years = years.replace('serial TV', '')
+            years = years.replace('serial', '')
             years = years.replace('wideo', '')
+            years = years.replace('TV', '')
             years = years.strip()
         self.detailsData['year'] = years
 

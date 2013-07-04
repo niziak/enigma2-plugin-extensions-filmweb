@@ -182,6 +182,9 @@ class Filmweb(DefaultScreen):
 
     def nextAction(self):
         engine = None
+        year = self.searchYear
+        self.__clearSearch()
+        self.searchYear = year
         if self.engineType == 'IMDB':
             engine = 'Filmweb'
             self.searchTitle = self.regtitle
@@ -609,6 +612,7 @@ class Filmweb(DefaultScreen):
         self.sessionId = sessionId
         if callback:
             callback(param)
+        return None
 
     def fetchRateRes(self, res_):
         if res_ and res_.startswith('//OK'):

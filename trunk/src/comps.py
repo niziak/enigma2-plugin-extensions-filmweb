@@ -40,9 +40,28 @@ from Components.ChoiceList import ChoiceList
 from Components.MultiContent import MultiContentEntryText
 from Components.ProgressBar import ProgressBar
 
+sorted_data = lambda data, idx, ordx: [b for _, b in sorted(((tup[idx], tup) for tup in data), reverse=ordx)]
+sorted_data2 = lambda data, idx, idx2, ordx: [b for _, b in sorted((((tup[idx], tup[idx2]), tup) for tup in data), reverse=ordx)]
+
 ACTOR_IMG_PREFIX = "/actor_img_"
 
 actorPicload = {}
+
+def getRescalledPixmap(width, height, path):
+    try:
+        picload = ePicLoad()
+        sc = AVSwitch().getFramebufferScale()
+        picload.setPara((width, height, sc[0], sc[1], False, 1, "#00000000"))
+        res = picload.startDecode(path)
+        print_debug('startDecode result', str(res))
+        picload.waitFinished()
+        ptr = picload.getData()
+        return ptr  # .__deref__()
+    except:
+        import traceback
+        traceback.print_exc()
+    return None
+
 
 class PixLoader(Pixmap):
     def __init__(self, callback=None):

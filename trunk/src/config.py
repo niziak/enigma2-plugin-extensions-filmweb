@@ -29,7 +29,7 @@ from Screens.Screen import Screen
 from Components.ActionMap import ActionMap
 from Components.Sources.StaticText import StaticText
 from Components.ConfigList import ConfigListScreen
-from Components.config import config, configfile, getConfigListEntry, ConfigSelection, ConfigBoolean, ConfigInteger, ConfigDirectory, ConfigPassword, ConfigText, ConfigSubsection
+from Components.config import config, configfile, getConfigListEntry, ConfigSelection, ConfigYesNo, ConfigBoolean, ConfigInteger, ConfigDirectory, ConfigPassword, ConfigText, ConfigSubsection
 
 config.plugins.mfilmweb = ConfigSubsection()
 config.plugins.mfilmweb.user = ConfigText(default="", fixed_size=False)
@@ -42,7 +42,8 @@ config.plugins.mfilmweb.logs = ConfigSelection([('debug', _('Debug Level')), ('i
 config.plugins.mfilmweb.guideDays = ConfigInteger(default=1, limits=(1, 4))
 config.plugins.mfilmweb.sort = ConfigInteger(default=0)
 config.plugins.mfilmweb.sortOrder = ConfigBoolean()
-config.plugins.mfilmweb.imdbData = ConfigBoolean()
+config.plugins.mfilmweb.imdbData = ConfigYesNo(default=False)
+config.plugins.mfilmweb.showNotifications = ConfigYesNo(default=True)
 config.plugins.mfilmweb.engine = ConfigSelection([('FILMWEB', _('Filmweb Engine')), ('IMDB', _('IMDB Engine'))], default='FILMWEB')
 
 class FilmwebConfig(Screen, ConfigListScreen):
@@ -73,6 +74,7 @@ class FilmwebConfig(Screen, ConfigListScreen):
         self.list.append(getConfigListEntry(_("Select Engine"), config.plugins.mfilmweb.engine))
         self.list.append(getConfigListEntry(_("Number of days in movie guide search"), config.plugins.mfilmweb.guideDays))
         self.list.append(getConfigListEntry(_("Get IMDB data for Movie Guide entries"), config.plugins.mfilmweb.imdbData))
+        self.list.append(getConfigListEntry(_("Show -Want to See- Notifications"), config.plugins.mfilmweb.showNotifications))
         self["config"].list = self.list
         self["config"].l.setList(self.list)
 

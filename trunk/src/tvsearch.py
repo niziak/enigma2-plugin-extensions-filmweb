@@ -21,11 +21,13 @@
 
 import twisted.internet.defer as defer
 
-from enigma import eEPGCache
-
-from time import localtime, strftime, time
 from logger import print_info, print_debug
+from config import config
+
+from enigma import eEPGCache, eServiceReference
+from time import localtime, strftime, time
 from engine import TelemagEngine, FilmwebTvEngine, MT_MOVIE, MAPPING, MAPPING2
+from ServiceReference import ServiceReference
 
 class TvSearcher(object):
     def __init__(self):
@@ -56,14 +58,18 @@ class TvSearcher(object):
         ret = None
         if event and service:
             beginTime = event.getBeginTime()
-            result = self.searchForTime(service, beginTime - 30, typ)
+            tm = beginTime
+            if tm < time():
+                tm = time()
+            result = self.searchForTime(service, tm + 10, typ)
             if result:
                 result = yield result
-                for x in result:
-                    begin = int(x[0])
-                    inrange = (begin - 30) < beginTime < (begin + 30)
-                    if inrange:
-                        ret = self.processSearchForTimeResult(x)
+                if result:
+                    for x in result:
+                        begin = int(x[0])
+                        inrange = (begin - 30) < beginTime < (begin + 30)
+                        if inrange:
+                            ret = self.processSearchForTimeResult(x)
         if callback:
             callback(service, event, ret, param)
 
@@ -84,7 +90,7 @@ class TvSearcher(object):
             title = eventName
             if not title or len(title) == 0:
                 return None
-            rok = self.parseYear(description)
+            rok = self.__parseYear(description)
             if evt and title == 'Film fabularny':
                 title = evt.getEventName()
             title = self.__replaceTitle(title)
@@ -95,6 +101,15 @@ class TvSearcher(object):
             import traceback
             traceback.print_exc()
 
+    def serviceList(self, services):
+        txt = config.plugins.mfilmweb.selserv.getText()
+        if txt:
+            entries = txt.split('|')
+            for x in entries:
+                ref = eServiceReference(x)
+                sr = ServiceReference(ref)
+                print_info('--> SERV', str(x) + ', name: ' + sr.getServiceName())
+                services.append(sr)
 
     def __query(self, service, tms, typ):
         sname = service.getServiceName();
@@ -121,7 +136,7 @@ class TvSearcher(object):
         title = title.replace(' V ', ' 5 ')
         return title
 
-    def parseYear(self, description):
+    def __parseYear(self, description):
         opis = description.strip()
         rok = opis[-4:]
         if not rok.isdigit():
