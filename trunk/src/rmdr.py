@@ -98,7 +98,7 @@ class AbstractMessageScreen(DefaultScreen):
         if self.execing:
             cur = self["list"].index
             print_debug('Current', str(cur))
-            if cur:
+            if cur > -1:
                 service = self.eventListData[cur][0]
                 if service:
                     self.servicelist.setCurrentSelection(service.ref)
@@ -124,7 +124,9 @@ class AbstractMessageScreen(DefaultScreen):
                 pixmap = getRescalledPixmap(40, 54, picPath)
                 # pixmap = LoadPixmap(cached=True, path=picPath)
                 self.imgList.append(picPath)
-            cpt = '%s (%s)' % (xx[6], xx[7])
+            cpt = '%s' % (xx[6])
+            if xx[7]:
+                cpt = cpt + (' (%s)' % (xx[7]))
             srv = ''
             service = xx[9]
             if service:
@@ -132,13 +134,23 @@ class AbstractMessageScreen(DefaultScreen):
             evtl = ''
             if xx[5]:
                 evtl = xx[5]
+            if xx[10]:
+                evtl = evtl + (' - %s' % (xx[10]))
+            progress = 0
+            if xx[0] and xx[11]:
+                now = time()
+                co = now - xx[0]
+                dur = xx[11] - xx[0]
+                if co > 0 and dur > 0:
+                    progress = int(100 * (co / dur))
+                    if progress > 100:
+                        progress = 100
             # starpix = LoadPixmap(cached=True, path='/usr/lib/enigma2/python/Plugins/Extensions/Filmweb/resource/bigstar.png')
             # (poster, caption, service name, event data, service ref, star pixmap, rate, event ref)
-            self.eventList.append((pixmap, cpt, srv, evtl, xx[12]))
+            self.eventList.append((pixmap, cpt, srv, evtl, xx[12], progress))
             self.eventListData.append((service, xx[8]))
 
         self["list"].updateList(self.eventList)
-        self["list"].master.scrollbarMode = "showNever"
         # self["list"].changed((self.CHANGED_ALL,))
         print_debug("Loading data ... done")
 
