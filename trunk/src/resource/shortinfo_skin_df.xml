@@ -1,16 +1,21 @@
 <screen name="ShortInfo" position="center,center" size="1100,480" backgroundColor="transparent">
-    <ePixmap position="100,25" zPosition="1" size="462,39" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/Filmweb/resource/context_top.png" alphatest="blend" transparent="1" /> 
-    <ePixmap position="100,64" zPosition="1" size="462,302" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/Filmweb/resource/context_middle.png" alphatest="blend" transparent="1" />
-    <ePixmap position="100,366" zPosition="1" size="462,41" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/Filmweb/resource/context_bottom.png" alphatest="blend" transparent="1" />
+    <ePixmap position="50,25" zPosition="1" size="462,39" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/Filmweb/resource/context_top.png" alphatest="blend" transparent="1" /> 
+    <ePixmap position="50,64" zPosition="1" size="462,542" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/Filmweb/resource/context_middle.png" alphatest="blend" transparent="1" />
+    <ePixmap position="50,606" zPosition="1" size="462,41" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/Filmweb/resource/context_bottom.png" alphatest="blend" transparent="1" />
     
-    <widget source="list" render="Listbox" position="100,65" size="462,300" zPosition="3" scrollbarMode="showNever" transparent="1" backgroundColorSelected="transparent" selectionPixmap="/usr/lib/enigma2/python/Plugins/Extensions/Filmweb/resource/context_highlight.png">
+    <ePixmap position="468,59" zPosition="5" size="36,22" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/Filmweb/resource/scroll-top.png" alphatest="blend" transparent="1" />
+    <ePixmap position="468,592" zPosition="5" size="36,19" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/Filmweb/resource/scroll-bottom.png" alphatest="blend" transparent="1" />
+    <ePixmap position="468,81" zPosition="5" size="36,511" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/Filmweb/resource/scroll-middle.png" alphatest="blend" transparent="1" />
+    <widget source="list" render="Listbox" position="65,65" size="432,540" scrollbarMode="showNever" zPosition="3" transparent="1" backgroundColorSelected="transparent" selectionPixmap="/usr/lib/enigma2/python/Plugins/Extensions/Filmweb/resource/context-highlight2.png">
 	<convert type="TemplatedMultiContent"> 
 	{"templates": 
 	{"default": (60,[ 
-	MultiContentEntryPixmapAlphaTest(pos = (30, 3), size = (40, 54), png = 0),
-	MultiContentEntryText(pos = (80, 0), size = (370, 22), font=0, flags = RT_HALIGN_LEFT|RT_VALIGN_CENTER, text = 1, color=0x00F0B400, color_sel=0x00F0B400),
-	MultiContentEntryText(pos = (80, 20), size = (370, 20), font=1, flags = RT_HALIGN_LEFT|RT_VALIGN_CENTER, text = 2, color=0x0058bcff, color_sel=0x0058bcff),
-	MultiContentEntryText(pos = (80, 36), size = (370, 20), font=1, flags = RT_HALIGN_LEFT|RT_VALIGN_BOTTOM, text = 3) 	
+	MultiContentEntryPixmapAlphaTest(pos = (15, 3), size = (40, 54), png = 0),
+	MultiContentEntryText(pos = (65, 20), size = (370, 20), font=1, flags = RT_HALIGN_LEFT|RT_VALIGN_CENTER, text = 2, color=0x0058bcff, color_sel=0x0058bcff),
+	MultiContentEntryText(pos = (65, 36), size = (190, 20), font=1, flags = RT_HALIGN_LEFT|RT_VALIGN_BOTTOM, text = 3),	
+	MultiContentEntryText(pos = (355, 3), size = (67, 55), font=0, flags = RT_HALIGN_CENTER|RT_VALIGN_CENTER, text = 4, color=0x0058bcff, color_sel=0x0058bcff),
+	MultiContentEntryProgress(pos = (255, 38), size = (100, 10), percent = -5, borderWidth = 1, foreColor = 0x0058bcff),	
+	MultiContentEntryText(pos = (65, 0), size = (370, 22), font=0, flags = RT_HALIGN_LEFT|RT_VALIGN_CENTER, text = 1, color=0x00F0B400, color_sel=0x00F0B400)
 	])},
 	"fonts": [gFont("Regular", 18),gFont("Regular", 14),gFont("Regular", 28),gFont("Regular", 15)],
 	"itemHeight": 60

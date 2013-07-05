@@ -1,7 +1,7 @@
 #!/bin/sh
 
 PTH=usr/lib/enigma2/python/Plugins/Extensions/Filmweb
-VER=1.2.5
+VER=1.2.6
 ARC=mips32el
 #ARC=mipsel
 #ARC=unk
