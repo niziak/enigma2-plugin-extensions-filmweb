@@ -66,8 +66,7 @@ init 4; sleep 10; init 3
 ----
   * Dodanie obsługi miniseriali w Przewodniku Filmowym
   * Poprawa wyszukiwania w Przewodniku polegająca na wyszukiwaniu po tytule oryginalnym w przypadku gdy nie trafiono po tytule polskim
-  * Modyfikacja standardowego panelu informacyjnego tak by wyświetlana była na nim informacja z Filmweb o aktualnie oglądanej pozycji
-  * Modyfikacja skóry 
+  * Modyfikacja standardowego panelu informacyjnego tak by wyświetlana była na nim informacja z Filmweb o aktualnie oglądanej pozycji 
   * Dodanie wyświetlania informacji szczegółowych o aktorach
   * Dodanie w Przewodniku informacji o obsadzie
   * Dodanie w Przewodniku wyświetlania opisów dla filmu
@@ -77,7 +76,7 @@ init 4; sleep 10; init 3
 = Informacja o zmianach w wersjach =
 ----
 === ver. 1.2.6 (2013/XX/XX) ===
-  * 
+   * Modyfikacja skóry
 
 === ver. 1.2.5 (2013/07/05) ===
   * Poprawki działania przełączenia pomiędzy silnikami w aplikacji
