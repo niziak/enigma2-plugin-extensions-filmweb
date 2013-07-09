@@ -117,10 +117,10 @@ class TvSearcher(object):
         print_debug('Query service: ', str(sname) + ', reference: ' + sref)
         if sname and sref:
             sref = sref[:25]
-            if MAPPING2.get(sref):
-                return FilmwebTvEngine().query(service, typ, tms)
             if MAPPING.get(sref):
                 return TelemagEngine().query(service, typ, tms)
+            if MAPPING2.get(sref):
+                return FilmwebTvEngine().query(service, typ, tms)
         return None
 
     def __replaceTitle(self, title):

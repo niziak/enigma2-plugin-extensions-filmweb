@@ -25,8 +25,8 @@
 1:0:1:3B62:12C:13E:820000:0:0:0:,TVP HD,tvp_hd
 1:0:1:32DC:190:13E:820000:0:0:0:,CANAL+ HD PL,canal,Canal%2B
 1:0:1:12C1:2E7C:13E:820000:0:0:0:,CANAL+,canal,Canal%2B
-1:0:1:3779:44C:13E:820000:0:0:0:,CANAL+ FILM HD,canal_film,Canal%2B+Film
-1:0:1:12C2:2E7C:13E:820000:0:0:0:,CANAL+ FILM,canal_film,Canal%2B+Film
+1:0:1:3779:44C:13E:820000:0:0:0:,CANAL+ FILM HD,canal_film_hd,Canal%2B+Film
+1:0:1:12C2:2E7C:13E:820000:0:0:0:,CANAL+ FILM,canal_film_hd,Canal%2B+Film
 1:0:1:3782:44C:13E:820000:0:0:0::,CANAL+ FILM 2 HD,canal_film2,Canal+%20Film%202
 1:0:1:377B:44C:13E:820000:0:0:0::,CANAL+ FAMILY HD,canal_family,Canal+%20Family
 1:0:1:113E:2AF8:13E:820000:0:0:0::,CANAL+ FAMILY,canal_family,Canal+%20Family
@@ -64,7 +64,9 @@
 1:0:1:13F7:5DC:13E:820000:0:0:0:,Cinemax,cinemax,Cinemax
 1:0:1:C26:1E78:71:820000:0:0:0:,CINEMAX 2 HD,cinemax_2,Cinemax+2
 1:0:1:1CCA:1CE8:71:820000:0:0:0:,Cinemax 2,cinemax_2,Cinemax+2
-1:0:1:290B:1EDC:71:820000:0:0:0:,Zone Europa,zone_europa,Zone+Europa
+1:0:1:290B:1EDC:71:820000:0:0:0:,CBS Europa,cbs_europa,                                                                                    
+1:0:1:1406:5DC:13E:820000:0:0:0:,CBS Drama,cbs_drama,
+1:0:1:1407:5DC:13E:820000:0:0:0:,CBS Reality,cbs_reality,
 1:0:1:3781:44C:13E:820000:0:0:0:,ALE KINO+ HD,ale_kino,ale+kino%2B
 1:0:1:12C5:2E7C:13E:820000:0:0:0:,Ale Kino+,ale_kino,ale+kino%2B
 1:0:1:3B68:12C:13E:820000:0:0:0:,WOJNA i POKOJ HD,,Wojna+i+Pok%C3%B3j
@@ -105,9 +107,7 @@
 1:0:1:3785:44C:13E:820000:0:0:0:,Planet Water,
 1:0:1:3B66:12C:13E:820000:0:0:0:,ANIMAL PLANET HD,animal_planete_hd
 1:0:1:1402:5DC:13E:820000:0:0:0:,Animal Planet,animal_planet
-1:0:1:1407:5DC:13E:820000:0:0:0:,Zone Reality,
 1:0:1:3915:32C8:13E:820000:0:0:0:,TLC Polska,
-1:0:1:1406:5DC:13E:820000:0:0:0:,Club TV Polska,
 1:0:1:390A:32C8:13E:820000:0:0:0:,BBC Entertainmen,bbc_entertainment
 1:0:1:390C:32C8:13E:820000:0:0:0:,BBC Lifestyle,bbc_lifestyle
 1:0:1:2918:1EDC:71:820000:0:0:0:,Travel Channel,

@@ -532,8 +532,8 @@ class ImdbEngine(object):
                         else:
                             rt = '0.0'
 
-                        # (caption, url, basic_caption, title, rating, year, country)
-                        self.resultlist.append((element, 'http://www.imdb.com/title/' + link, basic_data, title, rt, year, '', img))
+                        # (caption, url, basic_caption, title, rating, year, country, img URL, origimal title)
+                        self.resultlist.append((element, 'http://www.imdb.com/title/' + link, basic_data, title, rt, year, '', img, None))
 
 
 class FilmwebEngine(object):
@@ -567,7 +567,6 @@ class FilmwebEngine(object):
         fetchurl = SEARCH_QUERY_URL + str(typ) + "?q=" + mautils.quote(title.encode('utf8'))
         if year:
             fetchurl += '&startYear=' + year + '&endYear=' + year
-        print_info("Filmweb Query", fetchurl)
         return self.__fetchEntries(fetchurl, typ, callback, tryOther, data)
 
     def searchWallpapers(self, link_, callback):
@@ -817,6 +816,7 @@ class FilmwebEngine(object):
 
     def __fetchEntries(self, fetchurl, typ, callback, tryOther=True, data=None):
         self.resultlist = []
+        print_info("Filmweb Fetch Entries: ", fetchurl)
         return getPage(fetchurl, cookies=COOKIES).addCallback(self.__fetchOK, callback, tryOther, fetchurl, typ, data).addErrback(self.__fetchFailed)
 
     def __fetchOK(self, txt_, callback, tryOther, fetchurl, typ, data):
@@ -835,6 +835,21 @@ class FilmwebEngine(object):
                 return df
             self.__parseEntries(typ)
         if len(self.resultlist) == 0:
+            idxf = fetchurl.find('&startYear=')
+            if idxf > -1:
+                st = fetchurl[idxf + 11:idxf + 15]
+                en = fetchurl[idxf + 24:idxf + 29]
+                print_debug('Year data in URL: ', 'start: %s, end: %s' % (str(st), str(en)))
+                if st and en:
+                    if st == en:
+                        sti = int(st) - 1
+                        eni = int(en) + 1
+                        nurl = '%s&startYear=%s&endYear=%s' % (fetchurl[:idxf], str(sti), str(eni))
+                        return self.__fetchEntries(nurl, typ, callback, tryOther, data)
+                    else:
+                        nurl = '%s' % (fetchurl[:idxf])
+                        return self.__fetchEntries(nurl, typ, callback, tryOther, data)
+
             if tryOther:
                 if typ == MT_SERIE:
                     typ = MT_MOVIE
@@ -940,9 +955,16 @@ class FilmwebEngine(object):
                     print_debug("The movie rating", rating)
                     # self.links.append('http://www.filmweb.pl' + link)
                     title = mautils.between(element, '">', '</a>')
-                    title = mautils.before(title, ' (')
-                    title = title.replace('\t', '')
-                    title = mautils.strip_tags(title)
+                    if title:
+                        orgtitle = None
+                        idxf = title.find('/')
+                        idxn = title.find('(')
+                        if idxf > -1 and idxn > -1:
+                            orgtitle = title[idxf:idxn]
+                            orgtitle = orgtitle.strip()
+                        title = mautils.before(title, ' (')
+                        title = title.replace('\t', '')
+                        title = mautils.strip_tags(title)
                     print_debug("The movie title", title)
                     # element = mautils.after(element, 'class=searchResultDetails')
                     year = mautils.between(element, ' (', ') </a>')
@@ -973,8 +995,8 @@ class FilmwebEngine(object):
                         rt = rt.strip()
                     else:
                         rt = '0.0'
-                    # (caption, url, basic_caption, title, rating, year, country, image URL)
-                    self.resultlist.append((element, PAGE_URL + link, basic_data, title, rt, year, country, img))
+                    # (caption, url, basic_caption, title, rating, year, country, image URL, original title)
+                    self.resultlist.append((element, PAGE_URL + link, basic_data, title, rt, year, country, img, orgtitle))
 
     def parsePlot(self):
         print_debug("parsePlot", "started")
@@ -1317,11 +1339,24 @@ class TelemagEngine(object):
 
     def query(self, ref, typ, dz):
         ch = self.__getChannel(ref)
-        print_debug('Fetching using TELEMAGAZYN-ENGINE - channel', ch)
+        print_debug('Fetching using TELEMAGAZYN-ENGINE - channel: ', str(ch))
         if not ch:
             return None
         tp = self.__getType(typ)
+
+        tms = time.strptime(dz, "%Y%m%d")
+        local = time.localtime(time.time())
+        now = time.strptime(time.strftime("%Y%m%d", local), "%Y%m%d")
+        # now = time.localtime(time.time())
+        tt = time.mktime(tms) - time.mktime(now)
+        d = datetime.timedelta(seconds=tt)
+        print_debug('Date manipulation: ', 'delta: %s, hour: %s, delta_days: %s' % (str(d), str(local[3]), str(d.days)))
+        if d.days == 0 and local[3] < 3:
+            tx = time.localtime(time.mktime(tms) - 3 * 60 * 60)
+            dz = time.strftime("%Y%m%d", tx)
+
         fetchurl = 'http://www.telemagazyn.pl/%s/%s/%s,3,1,dz,go,cpr.html' % (ch, tp, dz)
+        print_debug('Fetching: ', 'type: %s, URL: %s' % (str(tp), fetchurl))
         return getPage(fetchurl).addCallback(self.__fetchOK, (ref, typ, dz)).addErrback(self.__fetchFailed)
 
     def __fetchOK(self, res, tup):

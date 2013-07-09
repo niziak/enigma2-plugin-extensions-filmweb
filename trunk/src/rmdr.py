@@ -50,6 +50,7 @@ class AbstractMessageScreen(DefaultScreen):
         self.eventList = []
         self.eventListData = []
 
+        self.tmppath = config.plugins.mfilmweb.tmpPath.getValue()
         self.servicelist = self.session.instantiateDialog(ChannelSelection)
 
         self.createGUI()
@@ -118,7 +119,7 @@ class AbstractMessageScreen(DefaultScreen):
                     ex = xx[4][-4:]
                     if ex[0] == '.':
                         ext = ex[1:]
-                picPath = '/tmp/pstr_' + str(time()) + '.' + ext
+                picPath = self.tmppath + '/pstr_' + str(time()) + '.' + ext
                 print_debug("Picture path: ", ('%s for %s') % (picPath, xx[6]))
                 yield engine.loadPoster(xx[4], None, localfile=picPath)
                 pixmap = getRescalledPixmap(40, 54, picPath)
@@ -216,7 +217,7 @@ class Reminder(object):
             tuptime = localtime(time())
             hour = tuptime[3]
             datecheck = strftime("%Y-%m-%d", (tuptime))
-            if ((not self.wannaSeeLastUpdate or self.wannaSeeLastUpdate != datecheck) and hour > 4):
+            if ((not self.wannaSeeLastUpdate or self.wannaSeeLastUpdate != datecheck) and hour > 5):
                 self.wantSeeList = []
                 self.wannaSeeLastUpdate = datecheck
             self.__updateWannaSeeList()
@@ -229,7 +230,7 @@ class Reminder(object):
             tuptime = localtime(time())
             hour = tuptime[3]
             datecheck = strftime("%Y-%m-%d", (tuptime))
-            if force or ((not self.updateDate or self.updateDate != datecheck) and hour > 6):
+            if force or ((not self.updateDate or self.updateDate != datecheck) and hour > 3):
                 self.programList = []
                 self.processedList = []
                 self.updateDate = datecheck
