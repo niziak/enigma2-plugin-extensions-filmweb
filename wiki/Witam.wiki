@@ -72,6 +72,7 @@ init 4; sleep 10; init 3
    * Modyfikacja skóry
    * Poprawa trafności wyszukiwania bezpośredniego oraz rozróżniania seriali od filmów dla silnika FILMWEB
    * Poprawa mapowania kanałów w service.dat
+   * zmiana domyślnego silnika do pobierania EPG z Filmweb na Telemagazyn
 
 === ver. 1.2.5 (2013/07/05) ===
   * Poprawki działania przełączenia pomiędzy silnikami w aplikacji
