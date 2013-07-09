@@ -64,14 +64,7 @@ init 4; sleep 10; init 3
 
 = Planowane zmiany =
 ----
-  * Dodanie obsługi miniseriali w Przewodniku Filmowym
-  * Poprawa wyszukiwania w Przewodniku polegająca na wyszukiwaniu po tytule oryginalnym w przypadku gdy nie trafiono po tytule polskim
-  * Modyfikacja standardowego panelu informacyjnego tak by wyświetlana była na nim informacja z Filmweb o aktualnie oglądanej pozycji 
-  * Dodanie wyświetlania informacji szczegółowych o aktorach
-  * Dodanie w Przewodniku informacji o obsadzie
-  * Dodanie w Przewodniku wyświetlania opisów dla filmu
-  * Dodanie w Przewodniku obsługi wyświetlania tapet
-  * Dodanie w Przewodniku obsługi logowania do portalu oraz informacji związanej z rekomendacjami 
+  * 
 
 = Informacja o zmianach w wersjach =
 ----
