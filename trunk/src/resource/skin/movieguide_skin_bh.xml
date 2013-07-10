@@ -1,0 +1,79 @@
+<screen name="MovieGuide" position="0,0" size="1280,720" title="Movie Guide"  flags="wfNoBorder">
+    <ePixmap position="0,0" zPosition="-1" size="1280,720" pixmap="skin_default/frame_base-fs8.png" />
+    <ePixmap position="878,98" zPosition="1" size="380,520" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/Filmweb/resource/r380x520.png" alphatest="blend" transparent="1" /> 
+	<eLabel text="Movie Guide" position="80,30" size="800,44" font="Regular;36" halign="left" foregroundColor="#58bcff" backgroundColor="transpBlack" transparent="1"/>
+	<ePixmap position="838,118" zPosition="5" size="22,486" pixmap="skin_default/scroll.png" alphatest="blend" transparent="1" /> 
+	<ePixmap position="450,16" zPosition="2" size="811,78" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/Filmweb/resource/r1130x78.png" alphatest="blend" transparent="1" />
+	<widget name="clock-str" position="940,16" size="250,78" zPosition="5" font="Regular;20" halign="right" valign="center" foregroundColor="#58bcff" transparent="1" />
+	<widget name="clock" position="1200,27" zPosition="5" size="60,51" pixmap="/resource/clock_panel.png" alphatest="blend" transparent="1" />
+	<widget name="clock-min" position="1200,27" zPosition="7" size="60,51" pixmap="/resource/clock_panel.png" alphatest="blend" transparent="1" />
+	<widget name="clock-hr" position="1200,27" zPosition="6" size="60,51" pixmap="/resource/clock_panel.png" alphatest="blend" transparent="1" />
+	<widget source="list" render="Listbox" position="60,120" size="800,484" zPosition="3" scrollbarMode="showOnDemand" transparent="1">
+	<convert type="TemplatedMultiContent"> 
+	{"templates": 
+	{"default": (48,[ 
+	MultiContentEntryText(pos = (30, 0), size = (60, 48), font=2, flags = RT_HALIGN_CENTER|RT_VALIGN_CENTER, text = 4),
+	MultiContentEntryText(pos = (95, 0), size = (660, 25), font=0, flags = RT_HALIGN_LEFT|RT_VALIGN_TOP, text = 1, color=0x00F0B400, color_sel=0x00F0B400),
+	MultiContentEntryText(pos = (340, 25), size = (460, 22), font=1, flags = RT_HALIGN_LEFT|RT_VALIGN_BOTTOM, text = 3, color=0x0058bcff, color_sel=0x0058bcff), 
+	MultiContentEntryText(pos = (95, 25), size = (240, 22), font=1, flags = RT_HALIGN_LEFT|RT_VALIGN_BOTTOM, text = 2), 
+	MultiContentEntryPixmapAlphaTest(pos = (0, 9), size = (30, 30), png = 11)
+	]),
+	"progress": (20,[
+	MultiContentEntryText(pos = (0, 0), size = (200, 20), font=1, flags = RT_HALIGN_LEFT | RT_VALIGN_CENTER| RT_WRAP, text = 0),
+	MultiContentEntryProgress(pos = (205, 0), size = (550, 12), percent = -1),
+	], False)},
+	"fonts": [gFont("Regular", 20),gFont("Regular", 16),gFont("Regular", 28),gFont("Regular", 15)],
+	"itemHeight": 48
+	}
+	</convert>
+	</widget>
+
+	<widget name="sort" position="470,16" size="400,78" zPosition="5" valign="center" font="Regular;22" foregroundColor="white" transparent="1" />
+	<widget name="nstars" pixmap="/resource/stars-full.png" pixmap_bg="/resource/stars-empty.png" position="1155,150" zPosition="5" size="100,16" transparent="1" />
+	
+	<widget source="ServiceEvent" render="Label" position="890,120" zPosition="2" size="350,28" font="Regular;20" halign="left" foregroundColor="#F0B400" backgroundColor="transpBlack" transparent="1" noWrap="1">
+		<convert type="EventName">#MovieGuideEventConv;title</convert>
+	</widget>
+	<widget source="ServiceEvent" render="Label" position="1010,150" size="240,20" zPosition="2" halign="left" font="Regular;16" foregroundColor="#58bcff" backgroundColor="transpBlack" transparent="1" noWrap="1">
+		<convert type="ServiceName">Name</convert>
+	</widget>	
+	<widget source="ServiceEvent" render="Label" position="1010,170" zPosition="2" size="240,20" font="Regular;16" foregroundColor="grey" halign="left" transparent="1" >
+		<convert type="EventName">#MovieGuideEventConv;event_time</convert>
+	</widget>
+	<widget source="ServiceEvent" render="Label" position="1010,190" zPosition="2" size="240,20" font="Regular;16" halign="left" transparent="1">
+		<convert type="EventName">#MovieGuideEventConv;genre</convert>
+	</widget>
+	<widget source="ServiceEvent" render="Label" position="1010,210" zPosition="2" size="150,20" font="Regular;16" halign="left" transparent="1">
+		<convert type="EventName">#MovieGuideEventConv;year</convert>
+	</widget>
+	<widget source="ServiceEvent" render="Label" position="1080,210" zPosition="2" size="170,20" font="Regular;16" halign="left" transparent="1">
+		<convert type="EventName">#MovieGuideEventConv;country</convert>
+	</widget>
+	<widget source="ServiceEvent" render="Label" position="1010,230" zPosition="2" size="240,20" font="Regular;16" halign="left" transparent="1" >
+		<convert type="EventName">#MovieGuideEventConv;director</convert>
+	</widget>
+	<widget source="ServiceEvent" render="Label" position="1010,250" zPosition="2" size="240,20" font="Regular;16" halign="left" transparent="1" >
+		<convert type="EventName">#MovieGuideEventConv;writer</convert>
+	</widget>
+	<widget source="ServiceEvent" render="Label" position="1010,270" zPosition="2" size="240,20" font="Regular;16" halign="left" transparent="1" >
+		<convert type="EventName">#MovieGuideEventConv;runtime</convert>
+	</widget>
+	<widget source="ServiceEvent" render="Label" position="1010,290" zPosition="2" size="240,20" font="Regular;16" halign="left" transparent="1" >
+		<convert type="EventName">#MovieGuideEventConv;vote</convert>
+	</widget>	
+	<widget source="ServiceEvent" render="Label" position="895,320" zPosition="3" size="360,280" font="Regular;16" foregroundColor="#58bcff" transparent="1" >
+		<convert type="EventName">#MovieGuideEventConv;plot</convert>
+	</widget> 	
+	<widget source="ServiceEvent" render="Pixmap" position="895,150" zPosition="3" size="112,160" alphatest="on" transparent="1">
+		<convert type="EventName">#MovieGuideEventConv;poster:112,160</convert>
+	</widget> 
+	 
+	<ePixmap pixmap="skin_default/buttons/red25.png" position="26,650" size="250,40" alphatest="on"/>
+	<ePixmap pixmap="skin_default/buttons/green25.png" position="302,650" size="250,40" alphatest="on"/>
+	<ePixmap pixmap="skin_default/buttons/yellow25.png" position="578,650" size="250,40" alphatest="on"/>
+	<ePixmap pixmap="skin_default/buttons/blue25.png" position="854,650" size="250,40" alphatest="on"/>
+	<widget source="key_red" render="Label" position="26,654" size="250,40" zPosition="1" font="Regular;24" halign="center" valign="center" foregroundColor="white" transparent="1"/>
+	<widget source="key_green" render="Label" position="302,654" size="250,40" zPosition="1" font="Regular;24" halign="center" valign="center" foregroundColor="white" transparent="1"/>
+	<widget source="key_yellow" render="Label" position="578,654" size="250,40" zPosition="1" font="Regular;24" halign="center" valign="center" foregroundColor="white" transparent="1"/>
+	<widget source="key_blue" render="Label" position="854,654" size="250,40" zPosition="1" font="Regular;24" halign="center" valign="center" foregroundColor="white" transparent="1"/>
+</screen> 

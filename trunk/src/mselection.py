@@ -157,7 +157,7 @@ class FilmwebEPGSelection(EPGSelection):
         self.screen = screen
 
     def infoKeyPressed(self):
-        print_info("Info Key pressed", "")
+        print_debug("Info Key pressed", "")
         self.lookup()
 
     def zapTo(self):

@@ -19,32 +19,7 @@
 # GNU General Public License, version 3 or later
 ######################################################################
 
-from enigma import getDesktop, addFont
-from skin import loadSkin, loadSingleSkinData, dom_skins
+from enigma import eListboxPythonMultiContent
 
-import os
-import sys
-
-def findSkin(skinPath):
-    try:
-        for entry in reversed(dom_skins):
-            if entry[0].startswith(skinPath):
-                return  entry[1]
-    except:
-        import traceback
-        traceback.print_exc()
-    return None
-
-try:
-    mf = sys.modules[__name__].__file__
-    ppath = os.path.dirname(mf)
-    print 'Plugin path: ' + ppath
-    skin = "%s/resource/skin/skin.xml" % (ppath)
-    loadSkin(skin)
-    mpath = os.path.dirname(skin) + "/"
-    loadSingleSkinData(getDesktop(0), findSkin(mpath), mpath)
-except:
-    import traceback
-    traceback.print_exc()
-
-
+def MultiContentEntryProgressPixmap(pos=(0, 0), size=(0, 0), percent=None, pixmap=None, borderWidth=None, foreColor=None, foreColorSelected=None, backColor=None, backColorSelected=None):
+    return (eListboxPythonMultiContent.TYPE_PROGRESS_PIXMAP, pos[0], pos[1], size[0], size[1], percent, pixmap, borderWidth, foreColor, foreColorSelected, backColor, backColorSelected)

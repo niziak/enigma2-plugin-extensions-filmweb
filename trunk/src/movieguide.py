@@ -526,7 +526,7 @@ class MovieGuide(DefaultScreen, SelectionEventInfo):
 
     @defer.inlineCallbacks
     def refreshService(self, service, index, count=1):
-        print_info('----- Refreshing Service', service.getServiceName() + ", index: " + str(index))
+        print_debug('----- Refreshing Service', service.getServiceName() + ", index: " + str(index))
         try:
             filmeng = FilmwebEngine()
 

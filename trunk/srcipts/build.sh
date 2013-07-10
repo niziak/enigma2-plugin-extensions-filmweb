@@ -1,6 +1,7 @@
 #!/bin/sh
 
-PTH=usr/lib/enigma2/python/Plugins/Extensions/Filmweb
+CPTH=usr/lib/enigma2/python
+PTH=Plugins/Extensions/Filmweb
 VER=1.2.6
 ARC=mips32el
 #ARC=mipsel
@@ -40,8 +41,9 @@ echo "Package: $pkg, Version: $version, Architecture: $arch"
 rm -rf ${pkg}_${version}_${arch}.ipk
 
 cd tmp
-mkdir -p $PTH
-cp -R ../src/* $PTH
+mkdir -p $CPTH/$PTH
+cp -R ../src/* $CPTH/$PTH
+cp -R ../src-core/* $CPTH
 rm -rf `find . -type d -name .svn`
 rm -rf `find . -type f -name Filmweb.po`
 tar zcvf data.tar.gz ./usr
