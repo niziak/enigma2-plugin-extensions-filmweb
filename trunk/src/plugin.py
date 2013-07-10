@@ -99,8 +99,11 @@ def eventinfo(session, servicelist, **kwargs):
 def sessionstart(reason, **kwargs):
     reloadlibs()
     try:
-        if reason == 0:
+        if reason == 0:  # start
+            logger.print_info("AUTOSTART_E2: ", str(__name__))
             pReminder.start(kwargs["session"])
+        if reason == 1:  # stop
+            logger.print_info("STOP_E2: ", str(__name__))
     except:
         import traceback
         traceback.print_exc()

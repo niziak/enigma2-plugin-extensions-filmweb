@@ -84,7 +84,7 @@ class TvSearcher(object):
             tms = strftime("%Y-%m-%d %H:%M", (localtime(begin)))
             print_info('EVT', '[' + tms + ':' + str(duration) + '] - ' + eventName + ' / ' + service.getServiceName())
             evt = self.epg.lookupEventTime(service.ref, begin + 30)
-            print_info('Lookup event result: ', str(evt))
+            print_debug('Lookup event result: ', str(evt))
             if not evt:
                 return None
             title = eventName

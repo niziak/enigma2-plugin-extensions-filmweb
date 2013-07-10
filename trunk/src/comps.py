@@ -95,9 +95,9 @@ class DefaultScreen(Screen):
         print_debug('Plugin path', self.ppath)
         fn = resolveFilename(SCOPE_CURRENT_SKIN, 'skin_default/menu/BlackHoleEpgBackup.png')
         if (os.path.exists(fn)):
-            skin = "%s/resource/%s_skin_bh.xml" % (self.ppath, temat)
+            skin = "%s/resource/skin/%s_skin_bh.xml" % (self.ppath, temat)
         else:
-            skin = "%s/resource/%s_skin_df.xml" % (self.ppath, temat)
+            skin = "%s/resource/skin/%s_skin_df.xml" % (self.ppath, temat)
         f = open(skin, "r")
         self.skin = f.read()
         f.close()
@@ -136,7 +136,7 @@ def ActorEntryComponent(inst, img_url="", text=["--"], index=0, ext='jpg'):
             ext = ex[1:]
 
     def paintImage(idx=None, picInfo=None):
-        print_info("Paint Actor Image", str(idx))
+        print_debug("Paint Actor Image", str(idx))
         ptr = actorPicload[idx].getData()
         if ptr != None:
             print_debug("RES append", str(res) + " - img: " + str(ptr))

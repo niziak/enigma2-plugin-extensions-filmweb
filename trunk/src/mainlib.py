@@ -313,7 +313,7 @@ class Filmweb(DefaultScreen):
             self.processData()
 
     def switchGUI(self, to_mode=VT_MENU):
-        print_info("Switching GUI", "old mode=" + self.mode + ", new mode=" + to_mode)
+        print_debug("Switching GUI", "old mode=" + self.mode + ", new mode=" + to_mode)
         self.mode = to_mode
         if self.mode == VT_MENU:
             self["menu"].show()
@@ -452,7 +452,7 @@ class Filmweb(DefaultScreen):
         return "FILMWEB {Session: " + str(self.session) + ", Search Text:" + str(self.searchTitle) + "}"
 
     def switchView(self, to_mode=VT_MENU):
-        print_info("Switching view", "old mode=" + self.mode + ", new mode=" + to_mode)
+        print_debug("Switching view", "old mode=" + self.mode + ", new mode=" + to_mode)
         if self.mode == to_mode:
             return
         if self.initialize:
@@ -546,10 +546,10 @@ class Filmweb(DefaultScreen):
             self.wallpapers = []
             if self.sessionId and self.filmId:
                 if detailsData['wallpapers_link']:
-                    print_info("Parse wallpapers for link_" + str(detailsData['wallpapers_link']) + ', SID: ' + str(self.sessionId) + ', FID: ' + str(self.filmId))
+                    print_debug("Parse wallpapers for link_" + str(detailsData['wallpapers_link']) + ', SID: ' + str(self.sessionId) + ', FID: ' + str(self.filmId))
                     self.engine.searchWallpapers(detailsData['wallpapers_link'], self.searchWallpapersCallback)
                 if detailsData['photos_link']:
-                    print_info("Parse photos for link_" + str(detailsData['photos_link']) + ', SID: ' + str(self.sessionId) + ', FID: ' + str(self.filmId))
+                    print_debug("Parse photos for link_" + str(detailsData['photos_link']) + ', SID: ' + str(self.sessionId) + ', FID: ' + str(self.filmId))
                     self.engine.searchWallpapers(detailsData['photos_link'], self.searchWallpapersCallback)
 
 
@@ -670,9 +670,9 @@ class Filmweb(DefaultScreen):
 
             serviceHandler = eServiceCenter.getInstance()
             info = serviceHandler.info(ref)
-            print_info("Service info", str(info))
+            print_debug("Service info", str(info))
             self.event = info and info.getEvent(ref)
-            print_info("Event", str(self.event))
+            print_debug("Event", str(self.event))
             # self.eventName = evt and evt.getEventName()
 
     def queryDataCallback(self, service, event, ret, tryOther):

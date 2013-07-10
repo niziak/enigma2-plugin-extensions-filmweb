@@ -123,7 +123,7 @@ class AbstractMessageScreen(DefaultScreen):
                 print_debug("Picture path: ", ('%s for %s') % (picPath, xx[6]))
                 yield engine.loadPoster(xx[4], None, localfile=picPath)
                 pixmap = getRescalledPixmap(40, 54, picPath)
-                # pixmap = LoadPixmap(cached=True, path=picPath)
+                progressPixmap = LoadPixmap(cached=True, path="/usr/lib/enigma2/python/Plugins/Extensions/Filmweb/resource/stars-full.png")
                 self.imgList.append(picPath)
             cpt = '%s' % (xx[6])
             if xx[7]:
@@ -148,7 +148,7 @@ class AbstractMessageScreen(DefaultScreen):
                         progress = 100
             # starpix = LoadPixmap(cached=True, path='/usr/lib/enigma2/python/Plugins/Extensions/Filmweb/resource/bigstar.png')
             # (poster, caption, service name, event data, service ref, star pixmap, rate, event ref)
-            self.eventList.append((pixmap, cpt, srv, evtl, xx[12], progress))
+            self.eventList.append((pixmap, cpt, srv, evtl, xx[12], progress, progressPixmap))
             self.eventListData.append((service, xx[8]))
 
         self["list"].updateList(self.eventList)

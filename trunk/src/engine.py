@@ -143,7 +143,7 @@ class ImdbEngine(object):
         return getPage(link, cookies=COOKIES_IMDB, headers=headers).addCallback(self.__fetchDetailsOK, link, callback, sessionId).addErrback(self.__fetchFailed)
 
     def __fetchDetailsOK(self, txt_, link, callback, sessionId):
-        print_info("fetch details OK", str(COOKIES_IMDB))
+        print_debug("fetch details OK", str(COOKIES_IMDB))
         if self.statusComponent:
             self.statusComponent.setText(_("Movie details loading completed"))
         self.inhtml = mautils.html2utf8(txt_)
@@ -370,28 +370,28 @@ class ImdbEngine(object):
                 locf = locf + "/" + IMDB_POSTER_FILE
 
         if posterUrl:
-            print_info("Downloading poster", posterUrl + " to " + locf)
+            print_debug("Downloading poster", posterUrl + " to " + locf)
             return downloadPage(posterUrl, locf).addCallback(self.__fetchPosterOK, locf, callback).addErrback(self.__fetchFailed)
         return None
 
     def loadWallpaper(self, furl, localfile, callback):
         if not furl or not localfile:
             return None
-        print_info("Loading wallpaper", 'URL: ' + furl + ', Local File:' + localfile)
+        print_debug("Loading wallpaper", 'URL: ' + furl + ', Local File:' + localfile)
         # return downloadPage(furl, localfile).addCallback(callback, localfile).addErrback(self.__fetchFailed)
         return None
 
     def loadDescriptions(self, furl, callback):
         if not furl:
             return None
-        print_info("LOAD DESCS - link", furl + "/descs")
+        print_debug("LOAD DESCS - link", furl + "/descs")
         # return getPage(furl + "/descs", cookies=COOKIES).addCallback(self.__fetchExtraOK, callback).addErrback(self.__fetchFailed)
         return None
 
     def loadCast(self, furl, callback):
         if not furl:
             return None
-        print_info("LOAD CAST - link", furl + "/cast")
+        print_debug("LOAD CAST - link", furl + "/cast")
         # return getPage(furl + "/cast", cookies=COOKIES).addCallback(self.__fetchCastOK, callback).addErrback(self.__fetchFailed)
         return None
 
@@ -489,7 +489,7 @@ class ImdbEngine(object):
             # print_debug("---", str(self.inhtml))
             elements = self.inhtml.split('<tr class="')
             number_results = len(elements)
-            print_info("Serach results count", str(number_results))
+            print_debug("Serach results count", str(number_results))
             if elements == '':
                 number_results = 0
             else:
@@ -591,19 +591,19 @@ class FilmwebEngine(object):
     def loadWallpaper(self, furl, localfile, callback):
         if not furl or not localfile:
             return None
-        print_info("Loading wallpaper", 'URL: ' + furl + ', Local File:' + localfile)
+        print_debug("Loading wallpaper", 'URL: ' + furl + ', Local File:' + localfile)
         return downloadPage(furl, localfile).addCallback(callback, localfile).addErrback(self.__fetchFailed)
 
     def loadDescriptions(self, furl, callback):
         if not furl:
             return None
-        print_info("LOAD DESCS - link", furl + "/descs")
+        print_debug("LOAD DESCS - link", furl + "/descs")
         return getPage(furl + "/descs", cookies=COOKIES).addCallback(self.__fetchExtraOK, callback).addErrback(self.__fetchFailed)
 
     def loadCast(self, furl, callback):
         if not furl:
             return None
-        print_info("LOAD CAST - link", furl + "/cast")
+        print_debug("LOAD CAST - link", furl + "/cast")
         return getPage(furl + "/cast", cookies=COOKIES).addCallback(self.__fetchCastOK, callback).addErrback(self.__fetchFailed)
 
     def applyRating(self, rating, filmId, userToken, callback):
@@ -736,7 +736,7 @@ class FilmwebEngine(object):
                 userToken = None
             if self.statusComponent:
                 self.statusComponent.setText(_('Login done'))
-            print_info('Login data', 'token: %s, SID: %s' % (str(userToken), str(sessionId)))
+            print_debug('Login data', 'token: %s, SID: %s' % (str(userToken), str(sessionId)))
             if callback:
                 return callback(userToken, sessionId, data, data2)
         except:
@@ -745,7 +745,7 @@ class FilmwebEngine(object):
         return None
 
     def __fetchDetailsOK(self, txt_, link, callback, sessionId):
-        print_info("fetch details OK", str(COOKIES))
+        print_debug("fetch details OK", str(COOKIES))
         if self.statusComponent:
             self.statusComponent.setText(_("Movie details loading completed"))
         self.inhtml = mautils.html2utf8(txt_)
@@ -908,7 +908,7 @@ class FilmwebEngine(object):
         if fidx > -1:
             counts = mautils.between(self.inhtml, ttx, ')')
             count = mautils.castInt(counts.strip())
-            print_info("Movie/Serie count", str(count))
+            print_debug("Movie/Serie count", str(count))
             if count > 0:
                 self.inhtml = mautils.between(self.inhtml[fidx:], 'Wyniki:', '</form>')
                 print_debug("Serach data: ", str(self.inhtml))
@@ -988,7 +988,7 @@ class FilmwebEngine(object):
                         element += '\n' + rating.strip()
                     if cast:
                         element += '\n' + cast.strip()
-                    print_info("The movie serach title", element)
+                    print_debug("The movie serach title", element)
                     # self.titles.append(element)
                     if rating:
                         rt = mautils.before(rating, '/')
@@ -1109,7 +1109,7 @@ class FilmwebEngine(object):
             self.detailsData['film_id'] = fid
         else:
             self.detailsData['film_id'] = None
-        print_info("FILM ID", str(self.detailsData['film_id']))
+        print_debug("FILM ID", str(self.detailsData['film_id']))
 
     def parseLogin(self):
         print_debug("parseLogin", "started")
@@ -1513,7 +1513,7 @@ class FilmwebTvEngine(object):
         params['day'] = str(d.days)
         getdata = urllib.urlencode(params)
         fetchurl = 'http://www.filmweb.pl/guide/%s?%s' % (ch, getdata)
-        print_info('URL', str(fetchurl))
+        print_debug('URL', str(fetchurl))
         return getPage(fetchurl, method='GET', cookies=COOKIES, headers={'Referer':'http://www.filmweb.pl/guide', 'X-Requested-With':'XMLHttpRequest'}).addCallback(self.__fetchOK, (ref, typ, dz)).addErrback(self.__fetchFailed)
 
     def __fetchOK(self, res, tup):
