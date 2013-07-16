@@ -9,18 +9,20 @@
     <ePixmap position="468,81" zPosition="5" size="36,511" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/Filmweb/resource/scroll-middle.png" alphatest="blend" transparent="1" />
      -->
      
-    <widget source="list" render="Listbox" position="65,65" size="432,540" zPosition="3" transparent="1" backgroundColorSelected="transparent" selectionPixmap="/usr/lib/enigma2/python/Plugins/Extensions/Filmweb/resource/context-highlight2.png">
+    <widget source="list" render="Listbox" position="65,65" size="432,540" zPosition="3" transparent="1" selectionPixmap="/usr/lib/enigma2/python/Plugins/Extensions/Filmweb/resource/context-highlight2.png">
 	<convert type="ExTMultiContent"> 
 	{"templates": 
 	{"default": (60,[ 
-	MultiContentEntryPixmapAlphaTest(pos = (15, 3), size = (40, 54), png = 0),
+	MultiContentEntryPixmapAlphaBlend(pos = (15, 3), size = (40, 54), png = 0),
 	MultiContentEntryText(pos = (65, 20), size = (370, 20), font=1, flags = RT_HALIGN_LEFT|RT_VALIGN_CENTER, text = 2, color=0x0058bcff, color_sel=0x0058bcff),
-	MultiContentEntryText(pos = (65, 36), size = (190, 20), font=1, flags = RT_HALIGN_LEFT|RT_VALIGN_BOTTOM, text = 3),	
-	MultiContentEntryText(pos = (355, 3), size = (67, 55), font=0, flags = RT_HALIGN_CENTER|RT_VALIGN_CENTER, text = 4, color=0x0058bcff, color_sel=0x0058bcff),
-	MultiContentEntryProgressPixmap(pos = (255, 38), size = (100, 10), percent = -5, borderWidth = 0, pixmap=6, foreColor=0x77ffffff, foreColorSelected=0x77ffffff),
+	MultiContentEntryText(pos = (65, 36), size = (120, 20), font=1, flags = RT_HALIGN_LEFT|RT_VALIGN_BOTTOM, text = 3),
+	MultiContentEntryText(pos = (310, 36), size = (40, 20), font=1, flags = RT_HALIGN_LEFT|RT_VALIGN_BOTTOM, text = 8),	
+	MultiContentEntryText(pos = (370, 16), size = (40, 46), font=2, flags = RT_HALIGN_CENTER|RT_VALIGN_CENTER, text = 4, color=0x0058bcff, color_sel=0x0058bcff),
+	MultiContentEntryPixmapAlphaBlend(pos = (190, 38), size = (113, 14), png = 7),
+	MultiContentEntryProgressPixmap(pos = (192, 42), size = (109, 6), percent = -5, borderWidth = 0, pixmap=6),
 	MultiContentEntryText(pos = (65, 0), size = (370, 22), font=0, flags = RT_HALIGN_LEFT|RT_VALIGN_CENTER, text = 1, color=0x00F0B400, color_sel=0x00F0B400)
 	],True,"showNever")},
-	"fonts": [gFont("Ubuntu-MC", 16),gFont("Regular", 14),gFont("Regular", 28),gFont("Regular", 15)],
+	"fonts": [gFont("Ubuntu-MC", 16),gFont("Regular", 14),gFont("Bebas", 28),gFont("Regular", 15)],
 	"itemHeight": 60
 	}
 	</convert>

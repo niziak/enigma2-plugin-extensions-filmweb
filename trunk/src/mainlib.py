@@ -663,16 +663,16 @@ class Filmweb(DefaultScreen):
     def beforeProcessData(self):
         if not self.event and not self.searchTitle:
             s = self.session.nav.getCurrentService()
-            print_debug("Current Service", str(s))
+            print_debug("Current Service: ", str(s))
             ref = self.session.nav.getCurrentlyPlayingServiceReference()
-            print_debug("Current Service ref", str(ref))
+            print_debug("Current Service ref: ", str(ref))
             self.service = ServiceReference(ref)
 
             serviceHandler = eServiceCenter.getInstance()
             info = serviceHandler.info(ref)
-            print_debug("Service info", str(info))
+            print_debug("Service info: ", str(info))
             self.event = info and info.getEvent(ref)
-            print_debug("Event", str(self.event))
+            print_debug("Event: ", str(self.event))
             # self.eventName = evt and evt.getEventName()
 
     def queryDataCallback(self, service, event, ret, tryOther):
