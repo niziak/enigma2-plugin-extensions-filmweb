@@ -69,7 +69,7 @@ init 4; sleep 10; init 3
 = Informacja o zmianach w wersjach =
 ----
 === ver. 1.2.7 (2013/XX/XX) ===
-   * TBD
+   * Poprawki w wyświetlaniu elementów na ekranach
 
 === ver. 1.2.6 (2013/07/16) ===
    * Modyfikacja skóry
