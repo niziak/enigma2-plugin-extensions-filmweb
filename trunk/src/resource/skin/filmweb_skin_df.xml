@@ -3,30 +3,30 @@
   <ePixmap pixmap="skin_default/buttons/green.png" position="356,505" size="140,40" alphatest="on" />
   <ePixmap pixmap="skin_default/buttons/yellow.png" position="604,505" size="140,40" alphatest="on" />
   <ePixmap pixmap="skin_default/buttons/blue.png" position="852,505" size="140,40" alphatest="on" />
-  <widget name="key_red" position="128,508" size="140,40" zPosition="2" font="Regular;16" valign="left" halign="center"
+  <widget name="key_red" position="118,508" size="140,40" zPosition="2" font="Regular;16" valign="center" halign="center"
     backgroundColor="transpBlack" transparent="1" />
-  <widget name="key_green" position="356,508" size="140,40" zPosition="2" font="Regular;16" valign="left" halign="center"
+  <widget name="key_green" position="356,508" size="140,40" zPosition="2" font="Regular;16" valign="center" halign="center"
     backgroundColor="transpBlack" transparent="1" />
-  <widget name="key_yellow" position="644,508" size="140,40" zPosition="2" font="Regular;16" valign="left" halign="center"
+  <widget name="key_yellow" position="604,508" size="140,40" zPosition="2" font="Regular;16" valign="center" halign="center"
     backgroundColor="transpBlack" transparent="1" />
-  <widget name="key_blue" position="852,508" size="140,40" zPosition="2" font="Regular;16" valign="left" halign="center"
+  <widget name="key_blue" position="852,508" size="140,40" zPosition="2" font="Regular;16" valign="center" halign="center"
     backgroundColor="transpBlack" transparent="1" />
-  <widget name="title_label" position="10,0" size="850,30" zPosition="5" valign="center" font="Regular;22" foregroundColor="#f0b400"
+  <widget name="title_label" position="10,0" size="850,30" zPosition="5" valign="center" font="Ubuntu-BC;22" foregroundColor="#f0b400"
     transparent="1" />
-  <widget name="details_label" position="170,40" size="900,228" zPosition="5" font="Regular;19" transparent="1" />
-  <widget name="plot_label" position="550,250" size="535,240" zPosition="5" font="Regular;18" transparent="1" />
-  <widget name="cast_label" position="10,250" size="535,240" zPosition="5" scrollbarMode="showOnDemand" transparent="1" />
-  <widget name="extra_label" position="10,30" size="1070,470" zPosition="5" font="Regular;18" transparent="1" />
-  <widget name="rating_label" position="870,56" size="210,25" zPosition="5" halign="center" font="Regular;18"
+  <widget name="details_label" position="170,30" size="900,228" zPosition="5" font="Bebas;22" transparent="1" />
+  <widget name="plot_label" position="550,265" size="535,240" zPosition="5" font="Ubuntu-M;18" transparent="1" />
+  <widget name="cast_label" position="10,265" size="535,240" zPosition="5" scrollbarMode="showOnDemand" transparent="1" />
+  <widget name="extra_label" position="10,30" size="1070,470" zPosition="5" font="Ubuntu-M;18" transparent="1" />
+  <widget name="rating_label" position="170,235" size="210,25" zPosition="6" halign="left" font="Bebas;26"
     foregroundColor="#f0b400" transparent="1" />
-  <widget name="login_label" position="870,5" size="210,20" zPosition="5" halign="center" font="Regular;18"
+  <widget name="login_label" position="870,5" size="210,20" zPosition="5" halign="center" font="Bebas;25"
     foregroundColor="#58bcff" transparent="1" />
   <widget name="status_bar" position="10,545" size="840,20" zPosition="2" font="Regular;14" foregroundColor="#cccccc"
     transparent="1" />
   <widget name="copyright" position="850,545" size="230,20" zPosition="5" font="Regular;14" foregroundColor="#f0b400"
     transparent="1" />
   <widget name="poster" position="20,26" size="140,216" zPosition="5" alphatest="blend" />
-  <widget name="wallpaper" position="870,81" size="210,170" zPosition="0" alphatest="on" />
+  <widget name="wallpaper" position="720,2" size="390,235" zPosition="0" alphatest="on" />
   <widget name="menu" position="10,80" size="1070,400" zPosition="5" scrollbarMode="showOnDemand" transparent="1" />
   <widget name="nstars" pixmap="/resource/starsbar_filled.png" pixmap_bg="/resource/starsbar_empty.png" position="870,35" zPosition="5" size="210,21" transparent="1" />
 </screen>
