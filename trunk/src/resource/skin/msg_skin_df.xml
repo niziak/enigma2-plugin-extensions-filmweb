@@ -1,4 +1,4 @@
-<screen name="MSG" position="center,center" size="1100,480" backgroundColor="transparent">
+<screen name="MSG" position="0,0" size="1280,720" flags="wfNoBorder" backgroundColor="transparent">
     <ePixmap position="600,25" zPosition="1" size="462,39" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/Filmweb/resource/context_top.png" alphatest="blend" transparent="1" /> 
     <ePixmap position="600,64" zPosition="1" size="462,62" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/Filmweb/resource/context_middle.png" alphatest="blend" transparent="1" />
     <ePixmap position="600,126" zPosition="1" size="462,41" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/Filmweb/resource/context_bottom.png" alphatest="blend" transparent="1" />

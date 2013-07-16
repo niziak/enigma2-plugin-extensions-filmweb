@@ -3,11 +3,11 @@
 	<ePixmap pixmap="skin_default/buttons/green.png" position="220,0" size="140,40" alphatest="on" />
 	<ePixmap pixmap="skin_default/buttons/yellow.png" position="400,0" size="140,40" alphatest="on" />
 	<ePixmap pixmap="skin_default/buttons/blue.png" position="580,0" size="140,40" alphatest="on" />
-	<widget source="key_red" render="Label" position="80,0" zPosition="1" size="140,40" font="Regular;16" halign="left" valign="center" backgroundColor="#9f1313" transparent="1" />
-	<widget source="key_green" render="Label" position="260,0" zPosition="1" size="140,40" font="Regular;16" halign="left" valign="center" backgroundColor="#1f771f" transparent="1" />
-	<widget source="key_yellow" render="Label" position="440,0" zPosition="1" size="140,40" font="Regular;16" halign="left" valign="center" backgroundColor="#a08500" transparent="1" />
-	<widget source="key_blue" render="Label" position="620,0" zPosition="1" size="120,40" font="Regular;16" halign="left" valign="center" backgroundColor="#18188b" transparent="1" />
-	<widget name="clock-str" position="760,23" size="250,40" zPosition="5" font="Regular;18" halign="right" valign="center" foregroundColor="#58bcff" transparent="1" />
+	<widget source="key_red" render="Label" position="40,2" zPosition="1" size="140,40" font="Ubuntu-MC;16" halign="center" valign="center" backgroundColor="#9f1313" transparent="1" />
+	<widget source="key_green" render="Label" position="220,2" zPosition="1" size="140,40" font="Ubuntu-MC;16" halign="center" valign="center" backgroundColor="#1f771f" transparent="1" />
+	<widget source="key_yellow" render="Label" position="400,2" zPosition="1" size="140,40" font="Ubuntu-MC;16" halign="center" valign="center" backgroundColor="#a08500" transparent="1" />
+	<widget source="key_blue" render="Label" position="580,2" zPosition="1" size="120,40" font="Ubuntu-MC;16" halign="center" valign="center" backgroundColor="#18188b" transparent="1" />
+	<widget name="clock-str" position="760,23" size="250,40" zPosition="5" font="Bebas;18" halign="right" valign="center" foregroundColor="#58bcff" transparent="1" />
 	<widget name="clock" position="1040,0" zPosition="5" size="60,51" pixmap="/resource/clock_panel.png" alphatest="blend" transparent="1" />
 	<widget name="clock-min" position="1040,0" zPosition="7" size="60,51" pixmap="/resource/clock_panel.png" alphatest="blend" transparent="1" />
 	<widget name="clock-hr" position="1040,0" zPosition="6" size="60,51" pixmap="/resource/clock_panel.png" alphatest="blend" transparent="1" />	
@@ -25,13 +25,13 @@
 	MultiContentEntryText(pos = (0, 0), size = (200, 20), font=1, flags = RT_HALIGN_LEFT | RT_VALIGN_CENTER| RT_WRAP, text = 0),
 	MultiContentEntryProgress(pos = (205, 0), size = (540, 12), percent = -1),
 	], False)},
-	"fonts": [gFont("Regular", 17),gFont("Regular", 14),gFont("Regular", 24)],
+	"fonts": [gFont("Regular", 17),gFont("Regular", 14),gFont("Regular", 24),gFont("Bebas", 18)],
 	"itemHeight": 40
 	}
 	</convert> 
 	</widget>
 	
-	<widget name="sort" position="760,0" size="300,40" zPosition="5" valign="center" font="Regular;18" foregroundColor="white" transparent="1" />
+	<widget name="sort" position="760,0" size="300,40" zPosition="5" valign="center" font="Ubuntu-M;15" foregroundColor="white" transparent="1" />
 	<widget name="nstars" pixmap="/resource/stars-full.png" pixmap_bg="/resource/stars-empty.png" position="1000,80" zPosition="5" size="100,16" transparent="1" />
 	
 	<widget source="ServiceEvent" render="Label" position="760,50" zPosition="2" size="330,28" font="Regular;20" halign="left" foregroundColor="#F0B400" backgroundColor="transpBlack" transparent="1" noWrap="1">
@@ -40,31 +40,31 @@
 	<widget source="ServiceEvent" render="Pixmap" position="760,80" zPosition="3" size="112,160" alphatest="on" transparent="1">
 		<convert type="EventName">#MovieGuideEventConv;poster:112,160</convert>
 	</widget> 
-	<widget source="ServiceEvent" render="Label" position="875,80" size="220,20" zPosition="2" halign="left" font="Regular;16" foregroundColor="#58bcff" backgroundColor="transpBlack" transparent="1" noWrap="1">
+	<widget source="ServiceEvent" render="Label" position="875,80" size="220,20" zPosition="2" halign="left" font="Bebas;20" foregroundColor="#58bcff" backgroundColor="transpBlack" transparent="1" noWrap="1">
 		<convert type="ServiceName">Name</convert>
 	</widget>	
 	<widget source="ServiceEvent" render="Label" position="875,100" zPosition="2" size="220,20" font="Regular;16" foregroundColor="grey" halign="left" transparent="1" >
 		<convert type="EventName">#MovieGuideEventConv;event_time</convert>
 	</widget>
-	<widget source="ServiceEvent" render="Label" position="875,120" zPosition="2" size="220,20" font="Regular;16" halign="left" transparent="1">
+	<widget source="ServiceEvent" render="Label" position="875,120" zPosition="2" size="220,20" font="Bebas;20" halign="left" transparent="1">
 		<convert type="EventName">#MovieGuideEventConv;genre</convert>
 	</widget>
-	<widget source="ServiceEvent" render="Label" position="875,140" zPosition="2" size="150,20" font="Regular;16" halign="left" transparent="1">
+	<widget source="ServiceEvent" render="Label" position="875,140" zPosition="2" size="150,20" font="Bebas;20" halign="left" transparent="1">
 		<convert type="EventName">#MovieGuideEventConv;year</convert>
 	</widget>
-	<widget source="ServiceEvent" render="Label" position="945,140" zPosition="2" size="170,20" font="Regular;16" halign="left" transparent="1">
+	<widget source="ServiceEvent" render="Label" position="945,140" zPosition="2" size="170,20" font="Bebas;20" halign="left" transparent="1">
 		<convert type="EventName">#MovieGuideEventConv;country</convert>
 	</widget>
-	<widget source="ServiceEvent" render="Label" position="875,160" zPosition="2" size="220,20" font="Regular;16" halign="left" transparent="1" >
+	<widget source="ServiceEvent" render="Label" position="875,160" zPosition="2" size="220,20" font="Bebas;20" halign="left" transparent="1" >
 		<convert type="EventName">#MovieGuideEventConv;director</convert>
 	</widget>
-	<widget source="ServiceEvent" render="Label" position="875,180" zPosition="2" size="220,20" font="Regular;16" halign="left" transparent="1" >
+	<widget source="ServiceEvent" render="Label" position="875,180" zPosition="2" size="220,20" font="Bebas;20" halign="left" transparent="1" >
 		<convert type="EventName">#MovieGuideEventConv;writer</convert>
 	</widget>
-	<widget source="ServiceEvent" render="Label" position="875,200" zPosition="2" size="220,20" font="Regular;16" halign="left" transparent="1" >
+	<widget source="ServiceEvent" render="Label" position="875,200" zPosition="2" size="220,20" font="Bebas;20" halign="left" transparent="1" >
 		<convert type="EventName">#MovieGuideEventConv;runtime</convert>
 	</widget>
-	<widget source="ServiceEvent" render="Label" position="875,220" zPosition="2" size="220,20" font="Regular;16" halign="left" transparent="1" >
+	<widget source="ServiceEvent" render="Label" position="875,220" zPosition="2" size="220,20" font="Bebas;20" halign="left" transparent="1" >
 		<convert type="EventName">#MovieGuideEventConv;vote</convert>
 	</widget>	
 	<widget source="ServiceEvent" render="Label" position="765,250" zPosition="3" size="330,240" font="Regular;16" foregroundColor="#58bcff" transparent="1" >
