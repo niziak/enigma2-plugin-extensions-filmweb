@@ -68,11 +68,16 @@ init 4; sleep 10; init 3
 
 = Informacja o zmianach w wersjach =
 ----
-=== ver. 1.2.6 (2013/XX/XX) ===
+=== ver. 1.2.7 (2013/XX/XX) ===
+   * TBD
+
+=== ver. 1.2.6 (2013/07/16) ===
    * Modyfikacja skóry
    * Poprawa trafności wyszukiwania bezpośredniego oraz rozróżniania seriali od filmów dla silnika FILMWEB
    * Poprawa mapowania kanałów w service.dat
    * zmiana domyślnego silnika do pobierania EPG z Filmweb na Telemagazyn
+   * Dodanie definicji skóry z nowymi fontami
+   * Poprawa nowego pluginu - skóra + dodatkowe funkcjonalności
 
 === ver. 1.2.5 (2013/07/05) ===
   * Poprawki działania przełączenia pomiędzy silnikami w aplikacji
