@@ -24,19 +24,18 @@ import twisted.internet.defer as defer
 from enigma import eTimer
 from time import localtime, strftime, time
 
-from __common__ import _
 from logger import print_info, print_debug
 from tvsearch import TvSearcher
 from engine import FilmwebEngine, MT_MOVIE, PAGE_URL
 from config import config
 from comps import DefaultScreen, sorted_data
 
+from ServiceReference import ServiceReference
 from Components.ActionMap import ActionMap
 from Components.Sources.List import List
 from Tools.LoadPixmap import LoadPixmap
 from Screens.ChannelSelection import ChannelSelection
 from comps import getRescalledPixmap
-from skin import loadPixmap
 
 class AbstractMessageScreen(DefaultScreen):
     def __init__(self, session, eventList, name):
@@ -123,8 +122,9 @@ class AbstractMessageScreen(DefaultScreen):
                 print_debug("Picture path: ", ('%s for %s') % (picPath, xx[6]))
                 yield engine.loadPoster(xx[4], None, localfile=picPath)
                 pixmap = getRescalledPixmap(40, 54, picPath)
-                progressPixmap = LoadPixmap(cached=True, path="/usr/lib/enigma2/python/Plugins/Extensions/Filmweb/resource/stars-full.png")
                 self.imgList.append(picPath)
+            progressPixmap = LoadPixmap(cached=True, path="/usr/lib/enigma2/python/Plugins/Extensions/Filmweb/resource/progress-fg.png")
+            progressBgPixmap = LoadPixmap(cached=True, path="/usr/lib/enigma2/python/Plugins/Extensions/Filmweb/resource/progress-bg.png")
             cpt = '%s' % (xx[6])
             if xx[7]:
                 cpt = cpt + (' (%s)' % (xx[7]))
@@ -135,8 +135,9 @@ class AbstractMessageScreen(DefaultScreen):
             evtl = ''
             if xx[5]:
                 evtl = xx[5]
+            evte = ''
             if xx[10]:
-                evtl = evtl + (' - %s' % (xx[10]))
+                evte = xx[10]
             progress = 0
             if xx[0] and xx[11]:
                 now = time()
@@ -146,9 +147,8 @@ class AbstractMessageScreen(DefaultScreen):
                     progress = int(100 * (co / dur))
                     if progress > 100:
                         progress = 100
-            # starpix = LoadPixmap(cached=True, path='/usr/lib/enigma2/python/Plugins/Extensions/Filmweb/resource/bigstar.png')
             # (poster, caption, service name, event data, service ref, star pixmap, rate, event ref)
-            self.eventList.append((pixmap, cpt, srv, evtl, xx[12], progress, progressPixmap))
+            self.eventList.append((pixmap, cpt, srv, evtl, xx[12], progress, progressPixmap, progressBgPixmap, evte))
             self.eventListData.append((service, xx[8]))
 
         self["list"].updateList(self.eventList)
@@ -171,6 +171,10 @@ class AbstractMessageScreen(DefaultScreen):
 class RemMessage(AbstractMessageScreen):
     def __init__(self, session, eventList):
         AbstractMessageScreen.__init__(self, session, eventList, 'msg')
+
+    def okAction(self):
+        AbstractMessageScreen.okAction(self)
+        self.close()
 
 class ShortInfoScreen(AbstractMessageScreen):
     def __init__(self, session):
@@ -369,8 +373,12 @@ class Reminder(object):
                         evx = evtp[1].replace(PAGE_URL, '')
                         print_debug('Checking movie: ', evx)
                         if evx in self.wantSeeList:
-                            print_info('Adding movie to notification list: ', evx)
-                            lista.append(evtp)
+                            ref = self.session.nav.getCurrentlyPlayingServiceReference()
+                            print_debug("Current Service ref: ", str(ref))
+                            serv = ServiceReference(ref)
+                            if str(serv) != str(evtp[9]):
+                                print_info('Adding movie to notification list: ', evx)
+                                lista.append(evtp)
             if len(lista) > 0:
                 self.session.open(RemMessage, lista)
 

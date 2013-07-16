@@ -43,14 +43,15 @@ class TvSearcher(object):
         if not tim:
             tim = time()
         result = None
-        tms = strftime("%Y%m%d", (localtime(tim)))
-        print_debug('----->> Query date', tms + ', service: ' + service.getServiceName())
-        df = self.__query(service, tms, typ)
-        print_debug('QUERY DEFERED: ', str(df))
-        if df:
-            result = yield df
-        print_debug('Query result: ', str(result))
-        print_debug('Service: ', service.getServiceName())
+        if service:
+            tms = strftime("%Y%m%d", (localtime(tim)))
+            print_debug('----->> Query ', 'date: %s, service: %s' % (tms, service.getServiceName()))
+            df = self.__query(service, tms, typ)
+            print_debug('QUERY DEFERED: ', str(df))
+            if df:
+                result = yield df
+            print_debug('Query result: ', str(result))
+            print_debug('Service: ', service.getServiceName())
         defer.returnValue(result)
 
     @defer.inlineCallbacks
@@ -114,7 +115,7 @@ class TvSearcher(object):
     def __query(self, service, tms, typ):
         sname = service.getServiceName();
         sref = str(service)
-        print_debug('Query service: ', str(sname) + ', reference: ' + sref)
+        print_debug('Query ', 'service: %s, reference: %s' % (str(sname), sref))
         if sname and sref:
             sref = sref[:25]
             if MAPPING.get(sref):

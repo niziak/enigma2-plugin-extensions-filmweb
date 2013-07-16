@@ -1,19 +1,19 @@
 <screen name="MSG" position="center,center" size="1100,480" backgroundColor="transparent">
     <ePixmap position="600,25" zPosition="1" size="462,39" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/Filmweb/resource/context_top.png" alphatest="blend" transparent="1" /> 
-    <ePixmap position="600,64" zPosition="1" size="462,122" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/Filmweb/resource/context_middle.png" alphatest="blend" transparent="1" />
-    <ePixmap position="600,186" zPosition="1" size="462,41" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/Filmweb/resource/context_bottom.png" alphatest="blend" transparent="1" />
+    <ePixmap position="600,64" zPosition="1" size="462,62" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/Filmweb/resource/context_middle.png" alphatest="blend" transparent="1" />
+    <ePixmap position="600,126" zPosition="1" size="462,41" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/Filmweb/resource/context_bottom.png" alphatest="blend" transparent="1" />
     
-    <widget source="list" render="Listbox" position="600,65" size="462,120" zPosition="3" scrollbarMode="showNever" transparent="1" backgroundColorSelected="transparent" selectionPixmap="/usr/lib/enigma2/python/Plugins/Extensions/Filmweb/resource/context_highlight.png">
+    <widget source="list" render="Listbox" position="615,65" size="432,60" zPosition="3" transparent="1" selectionPixmap="/usr/lib/enigma2/python/Plugins/Extensions/Filmweb/resource/context-highlight2.png">
 	<convert type="TemplatedMultiContent"> 
 	{"templates": 
 	{"default": (60,[ 
-	MultiContentEntryPixmapAlphaTest(pos = (30, 3), size = (40, 54), png = 0),
-	MultiContentEntryText(pos = (80, 0), size = (370, 22), font=0, flags = RT_HALIGN_LEFT|RT_VALIGN_CENTER, text = 1, color=0x00F0B400, color_sel=0x00F0B400),
-	MultiContentEntryText(pos = (80, 20), size = (370, 20), font=1, flags = RT_HALIGN_LEFT|RT_VALIGN_CENTER, text = 2, color=0x0058bcff, color_sel=0x0058bcff),
-	MultiContentEntryText(pos = (80, 36), size = (370, 20), font=1, flags = RT_HALIGN_LEFT|RT_VALIGN_BOTTOM, text = 3),
-	MultiContentEntryText(pos = (360, 3), size = (67, 55), font=0, flags = RT_HALIGN_CENTER|RT_VALIGN_CENTER, text = 4, color=0x0058bcff, color_sel=0x0058bcff)	 	
+	MultiContentEntryPixmapAlphaBlend(pos = (15, 3), size = (40, 54), png = 0),
+	MultiContentEntryText(pos = (65, 0), size = (370, 22), font=0, flags = RT_HALIGN_LEFT|RT_VALIGN_CENTER, text = 1, color=0x00F0B400, color_sel=0x00F0B400),
+	MultiContentEntryText(pos = (65, 20), size = (370, 20), font=1, flags = RT_HALIGN_LEFT|RT_VALIGN_CENTER, text = 2, color=0x0058bcff, color_sel=0x0058bcff),
+	MultiContentEntryText(pos = (65, 36), size = (370, 20), font=1, flags = RT_HALIGN_LEFT|RT_VALIGN_BOTTOM, text = 3),
+	MultiContentEntryText(pos = (370, 16), size = (40, 46), font=2, flags = RT_HALIGN_CENTER|RT_VALIGN_CENTER, text = 4, color=0x0058bcff, color_sel=0x0058bcff)	
 	],True,"showNever")},
-	"fonts": [gFont("Regular", 18),gFont("Regular", 14),gFont("Regular", 28),gFont("Regular", 15)],
+	"fonts": [gFont("Regular", 18),gFont("Regular", 14),gFont("Bebas", 28),gFont("Regular", 15)],
 	"itemHeight": 60
 	}
 	</convert>
