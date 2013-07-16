@@ -69,7 +69,7 @@ init 4; sleep 10; init 3
 = Informacja o zmianach w wersjach =
 ----
 === ver. 1.2.7 (2013/XX/XX) ===
-   * Poprawki w wyświetlaniu elementów na ekranach
+   * Całkowita przebudowa skóry
 
 === ver. 1.2.6 (2013/07/16) ===
    * Modyfikacja skóry
@@ -78,6 +78,7 @@ init 4; sleep 10; init 3
    * zmiana domyślnego silnika do pobierania EPG z Filmweb na Telemagazyn
    * Dodanie definicji skóry z nowymi fontami
    * Poprawa nowego pluginu - skóra + dodatkowe funkcjonalności
+   * Poprawki w wyświetlaniu elementów na ekranach
 
 === ver. 1.2.5 (2013/07/05) ===
   * Poprawki działania przełączenia pomiędzy silnikami w aplikacji
