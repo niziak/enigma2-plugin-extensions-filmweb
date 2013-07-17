@@ -6,7 +6,7 @@
 Wciśnij klawisz EPG długo a zostanie wyświetlony ekran wyboru pozycji na bieżącym kanale - patrz obrazek niżej. Potem wybierz pozycję która Cię interesuje i wciśnij CZERWONY, a przejdziesz do prezentacji informacji o wybranej pozycji - patrz obrazek niżej.
 
 <table cellpadding=2 cellspacing=2 border=0>
-<tbody><tr valign="top"><td>http://enigma2-plugin-extensions-filmweb.googlecode.com/svn/wiki/EPG-SEL-SCREEN.png</td><td>http://enigma2-plugin-extensions-filmweb.googlecode.com/svn/wiki/MAIN1.png</td></tr></tbody></table>
+<tbody><tr valign="top"><td>http://enigma2-plugin-extensions-filmweb.googlecode.com/svn/wiki/EPG-SEL-SCREEN.png</td><td>http://enigma2-plugin-extensions-filmweb.googlecode.com/svn/wiki/sss-12.png</td></tr></tbody></table>
 
 == Przewodnik Filmowy (Movie Guide) ==
 Ustaw przeszukiwane kanały na ekranie konfiguracyjnym - patrz obrazek niżej. Wyboru dokonujesz poprzez wciśnięcie klawisza OK. Kanał zostanie podświetlony na niebiesko. Podobnie jeżeli chcesz odznaczyć na zaznaczonym kanale naciśnij OK. Wyjście z okna konfiguracji na klawiszu EXIT - konfiguracja automatycznie się zapisuje. Po skonfigurowaniu naciśnij GREEN a dostaniesz opisy filmów na wybranych kanałach - patrz obrazek niżej.
