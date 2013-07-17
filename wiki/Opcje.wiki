@@ -12,7 +12,7 @@ Wciśnij klawisz EPG długo a zostanie wyświetlony ekran wyboru pozycji na bie�
 Ustaw przeszukiwane kanały na ekranie konfiguracyjnym - patrz obrazek niżej. Wyboru dokonujesz poprzez wciśnięcie klawisza OK. Kanał zostanie podświetlony na niebiesko. Podobnie jeżeli chcesz odznaczyć na zaznaczonym kanale naciśnij OK. Wyjście z okna konfiguracji na klawiszu EXIT - konfiguracja automatycznie się zapisuje. Po skonfigurowaniu naciśnij GREEN a dostaniesz opisy filmów na wybranych kanałach - patrz obrazek niżej.
 
 <table cellpadding=2 cellspacing=2 border=0>
-<tbody><tr valign="top"><td>http://enigma2-plugin-extensions-filmweb.googlecode.com/svn/wiki/MG1.png</td><td>http://enigma2-plugin-extensions-filmweb.googlecode.com/svn/wiki/MG2.png</td></tr></tbody></table>
+<tbody><tr valign="top"><td>http://enigma2-plugin-extensions-filmweb.googlecode.com/svn/wiki/sss-13.png</td><td>http://enigma2-plugin-extensions-filmweb.googlecode.com/svn/wiki/MG2.png</td></tr></tbody></table>
 
 == Przegląd aktualnie wyświetlanych pozycji filmowych ==
 Nowy plugin wyświetla liste aktualnych pozycji filmowych na wybranych w przewodniku kanałach. Po naciśnięciu OK następuje przejście do oglądania wybranej pozycji. Po naciśnięciu "0" następuje prezentacja szczegółów w oknie "Film Web 2003". Wyjście poprzez EXIT.
