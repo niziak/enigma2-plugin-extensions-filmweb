@@ -93,7 +93,7 @@ class DefaultScreen(Screen):
         mf = sys.modules[__name__].__file__
         self.ppath = os.path.dirname(mf)
         print_debug('Plugin path', self.ppath)
-        fn = resolveFilename(SCOPE_CURRENT_SKIN, 'skin_default/menu/BlackHoleEpgBackup.png')
+        fn = resolveFilename(SCOPE_CURRENT_SKIN, 'skin_default/buttons/blue-big.png')
         if (os.path.exists(fn)):
             skin = "%s/resource/skin/%s_skin_bh.xml" % (self.ppath, temat)
         else:
@@ -175,7 +175,8 @@ class Scroller(object):
     def __init__(self, component=None):
         self.scroller = None
         self.component = component
-        self.pixpath = resolveFilename(SCOPE_CURRENT_SKIN, 'skin_default/scroll.png')
+        # self.pixpath = resolveFilename(SCOPE_CURRENT_SKIN, 'skin_default/scroll.png')
+        self.pixpath = '/usr/lib/enigma2/python/Plugins/Extensions/Filmweb/resource/scroll.png'
         if (os.path.exists(self.pixpath)):
             self.scroller = Pixmap()
         if self.component:

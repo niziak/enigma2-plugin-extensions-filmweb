@@ -910,8 +910,8 @@ class FilmwebEngine(object):
             count = mautils.castInt(counts.strip())
             print_debug("Movie/Serie count", str(count))
             if count > 0:
-                self.inhtml = mautils.between(self.inhtml[fidx:], 'Wyniki:', '</form>')
-                print_debug("Serach data: ", str(self.inhtml))
+                self.inhtml = mautils.between(self.inhtml[fidx:], '<div id="searchResult">', '</form>')
+                # print_debug("Serach data: ", str(self.inhtml))
             else:
                 self.inhtml = None
         else:
@@ -920,7 +920,7 @@ class FilmwebEngine(object):
         if self.inhtml is None:
             pass
         else:
-            elements = self.inhtml.split('<div class=hitDesc>')
+            elements = self.inhtml.split('<div class="hitDesc">')
             number_results = len(elements)
             print_debug("Serach results count", str(number_results))
             if elements == '':
@@ -929,11 +929,11 @@ class FilmwebEngine(object):
                 for element in elements:
                     if element == '':
                         continue
-                    if (element.find('class="hdr hdr-medium" href="') < 0):
+                    if (element.find('hdr hdr-medium hitTitle" href="') < 0):
                         continue
-                    element = mautils.after(element, 'class="hdr hdr-medium" href="')
+                    element = mautils.after(element, 'hdr hdr-medium hitTitle" href="')
 
-                    img = mautils.between(element, 'class=hitImage>', '</a>')
+                    img = mautils.between(element, '<div class="hitImage">', '</a>')
                     img = mautils.between(img, '<img src="', '">')
                     print_debug("The movie IMAGE link: ", img)
 
