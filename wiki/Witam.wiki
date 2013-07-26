@@ -72,7 +72,7 @@ init 4; sleep 10; init 3
 ----
 
 === ver. 1.2.8 (2013/XX/XX) ===
-   * 
+   * Wersja nie planowana obecnie. Brak środków na rozwój pluginu.
 
 === ver. 1.2.7 (2013/07/26) ===
    * Poprawka działania ładowania pluginu
