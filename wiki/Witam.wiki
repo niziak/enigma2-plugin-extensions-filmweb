@@ -65,7 +65,8 @@ init 4; sleep 10; init 3
 = Informacja o zmianach w wersjach =
 ----
 === ver. 1.2.7 (2013/XX/XX) ===
-   * Całkowita przebudowa skóry
+   * Poprawka działania ładowania pluginu
+   * Dostosowanie do zmian w portalu filmweb
 
 === ver. 1.2.6 (2013/07/16) ===
    * Modyfikacja skóry
