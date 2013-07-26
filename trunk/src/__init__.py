@@ -20,31 +20,42 @@
 ######################################################################
 
 from enigma import getDesktop, addFont
-from skin import loadSkin, loadSingleSkinData, dom_skins
+from skin import loadSkin, loadSingleSkinData
 
 import os
 import sys
 
 def findSkin(skinPath):
     try:
-        for entry in reversed(dom_skins):
+        import skin
+        for entry in reversed(skin.dom_skins):
             if entry[0].startswith(skinPath):
                 return  entry[1]
-    except:
-        import traceback
-        traceback.print_exc()
+    except Exception:
+        try:
+            import skin
+            for key in reversed(skin.dom_screens.keys()):
+                if skin.dom_screens[key][1].startswith(skinPath):
+                    return skin.dom_screens[key][0]
+        except Exception:
+            import traceback
+            traceback.print_exc()
+
     return None
 
 try:
     mf = sys.modules[__name__].__file__
     ppath = os.path.dirname(mf)
     print 'Plugin path: ' + ppath
-    skin = "%s/resource/skin/skin.xml" % (ppath)
+    skin = "/usr/lib/enigma2/python/Plugins/Extensions/Filmweb/resource/skin/skin.xml"
     loadSkin(skin)
     mpath = os.path.dirname(skin) + "/"
-    loadSingleSkinData(getDesktop(0), findSkin(mpath), mpath)
+    skind = findSkin(mpath)
+    if not skind:
+        import xml.etree.cElementTree
+        skind = xml.etree.cElementTree.parse(skin).getroot()
+    loadSingleSkinData(getDesktop(0), skind, mpath)
 except:
     import traceback
     traceback.print_exc()
-
 

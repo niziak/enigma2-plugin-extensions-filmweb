@@ -122,7 +122,10 @@ class AbstractMessageScreen(DefaultScreen):
                 print_debug("Picture path: ", ('%s for %s') % (picPath, xx[6]))
                 yield engine.loadPoster(xx[4], None, localfile=picPath)
                 pixmap = getRescalledPixmap(40, 54, picPath)
-                self.imgList.append(picPath)
+                if pixmap:
+                    self.imgList.append(picPath)
+            if not pixmap:
+                pixmap = getRescalledPixmap(40, 54, '/usr/lib/enigma2/python/Plugins/Extensions/Filmweb/resource/bigstar.png')
             progressPixmap = LoadPixmap(cached=True, path="/usr/lib/enigma2/python/Plugins/Extensions/Filmweb/resource/progress-fg.png")
             progressBgPixmap = LoadPixmap(cached=True, path="/usr/lib/enigma2/python/Plugins/Extensions/Filmweb/resource/progress-bg.png")
             cpt = '%s' % (xx[6])

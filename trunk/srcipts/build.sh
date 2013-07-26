@@ -2,11 +2,11 @@
 
 CPTH=usr/lib/enigma2/python
 PTH=Plugins/Extensions/Filmweb
-VER=1.2.7
-#ARC=mips32el
+VER=1.2.8
+ARC=mips32el
 #ARC=mipsel
 #ARC=unk
-ARC=sh4
+#ARC=sh4
 
 opkg_extract_value() {
 	sed -e "s/^[^:]*:[[:space:]]*//"
