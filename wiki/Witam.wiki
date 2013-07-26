@@ -2,6 +2,12 @@
 
 <wiki:toc max_depth="2" />
 ----
+= Wesprzyj prace nad pluginem =
+
+*Czy chcesz by plugin był w dalszym ciągu rozwijany ? Kliknij DONATE by wesprzeć prace nad pluginem.*
+
+<a href="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=marcin.slowik@gmail.com&lc=PL&item_name=filmweb-enigma2&currency_code=PLN&bn=PP-DonationsBF:btn_donateCC_LG.gif:NonHosted" rel="nofollow"><img src="https://www.paypalobjects.com/pl_PL/PL/i/btn/btn_donateCC_LG.gif" alt="PayPal — Płać wygodnie i bezpiecznie"/></a>
+
 = Wprowadzenie =
 ----
 Plugin został przygotowany w PYTHON-ie i działa w środowisku ENIGMA2 zainstalowanym na STB. Działanie polega na wyszukiwaniu informacji dotyczących filmów i seriali z EPG w portalu Filmweb i wyświetlaniu tych informacji na ekranie telewizora. W przypadku, gdy rezultatem wyszukiwania jest więcej niż jeden wynik plugin umożliwia wybór odpowiedniej pozycji z menu. Użytkownik dostaje pełną informację o filmie czy serialu czyli tytuł, tytuł oryginalny, rok produkcji, czas trwania, opis skrócony, opisy, plakat itp. Plugin umożliwia również zalogowanie do portalu i wykonanie operacji dostępnych dla zalogowanego użytkownika takich jak własna ocena.
