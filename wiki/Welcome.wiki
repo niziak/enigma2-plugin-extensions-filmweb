@@ -2,6 +2,13 @@
 
 <wiki:toc max_depth="2" />
 ----
+= Support work on plugin development =
+
+*Do you want the plugin development will continue further? Click DONATE to support development work.*
+
+<a href="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=UFSCZ5VWBL6MU&lc=GB&item_name=filmweb-enigma2&currency_code=EUR&bn=PP-DonationsBF:btn_donateCC_LG.gif:NonHosted" rel="nofollow"><img src="https://www.paypalobjects.com/en_US/GB/i/btn/btn_donateCC_LG.gif" alt="PayPal – The safer, easier way to pay online."/></a>
+
+----
 = Introduction =
 ----
 Plugin has been prepared in the PYTHON dev-language and works in the Enigma2 environment installed on the STB (Dreambox, VU+ etc.). This plugin does a query on Polish portal Filmweb.pl for information about movie or TV series selected in EPG and shows the info in a popup window on TV screen. When the query returns the ambigous results the list of possible choices is presented on TV screen so user can select correct movie and gets the information about it (rating, wallpaper, poster, description, title, original title, cast, plot, director, writer, release year). Using the plugin it's possible to login to the portal and enter your own rating for selected movie or TV series. 
