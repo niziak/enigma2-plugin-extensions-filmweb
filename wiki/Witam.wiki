@@ -6,9 +6,8 @@
 
 *Czy chcesz by plugin był w dalszym ciągu rozwijany ? Kliknij DONATE by wesprzeć prace nad pluginem.*
 
-<a href="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=marcin.slowik@gmail.com&lc=PL&item_name=filmweb-enigma2&currency_code=PLN&bn=PP-DonationsBF:btn_donateCC_LG.gif:NonHosted" rel="nofollow"><img src="https://www.paypalobjects.com/pl_PL/PL/i/btn/btn_donateCC_LG.gif" alt="PayPal — Płać wygodnie i bezpiecznie"/></a>
+<a href="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=marcin.slowik@gmail.com&lc=PL&item_name=filmweb-enigma2&currency_code=PLN&bn=PP-DonationsBF:btn_donateCC_LG.gif:NonHosted" rel="nofollow"><img src="https://www.paypalobjects.com/en_US/GB/i/btn/btn_donateCC_LG.gif" alt="PayPal — Płać wygodnie i bezpiecznie"/></a>
 
-<a href="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=UFSCZ5VWBL6MU&lc=GB&item_name=filmweb-enigma2&currency_code=EUR&bn=PP-DonationsBF:btn_donateCC_LG.gif:NonHosted" rel="nofollow"><img src="https://www.paypalobjects.com/en_US/GB/i/btn/btn_donateCC_LG.gif" alt="PayPal – The safer, easier way to pay online."/></a>
 
 = Wprowadzenie =
 ----
