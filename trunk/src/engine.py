@@ -564,9 +564,11 @@ class FilmwebEngine(object):
         return getPage(link, cookies=COOKIES).addCallback(self.__fetchDetailsOK, link, callback, sessionId).addErrback(self.__fetchFailed)
 
     def query(self, typ, title, year=None, tryOther=False, callback=None, data=None):
+        print_info('--> QUERY <--' , 'type:%s, title:%s, year:%s, tryOther:%s, callback:%s, data:%s' % (str(typ), title, str(year), str(tryOther), str(callback), str(data)))
         fetchurl = SEARCH_QUERY_URL + str(typ) + "?q=" + mautils.quote(title.encode('utf8'))
         if year:
             fetchurl += '&startYear=' + year + '&endYear=' + year
+        print_debug('__fetchEntries [2]')
         return self.__fetchEntries(fetchurl, typ, callback, tryOther, data)
 
     def searchWallpapers(self, link_, callback):
@@ -816,7 +818,7 @@ class FilmwebEngine(object):
 
     def __fetchEntries(self, fetchurl, typ, callback, tryOther=True, data=None):
         self.resultlist = []
-        print_info("Filmweb Fetch Entries: ", fetchurl)
+        print_info("--> Filmweb Fetch Entries <-- ", fetchurl)
         return getPage(fetchurl, cookies=COOKIES).addCallback(self.__fetchOK, callback, tryOther, fetchurl, typ, data).addErrback(self.__fetchFailed)
 
     def __fetchOK(self, txt_, callback, tryOther, fetchurl, typ, data):
@@ -829,11 +831,15 @@ class FilmwebEngine(object):
                 df = None
                 if self.loopx == 0:
                     self.loopx = 1
+                    print_debug('__fetchEntries [1]')
                     df = self.__fetchEntries(fetchurl, typ, callback, tryOther, data)
                 else:
                     self.loopx = 0
                 return df
             self.__parseEntries(typ)
+
+        print_debug('__fetchOK - reslist: ', str(len(self.resultlist)))
+
         if len(self.resultlist) == 0:
             idxf = fetchurl.find('&startYear=')
             if idxf > -1:
@@ -845,9 +851,11 @@ class FilmwebEngine(object):
                         sti = int(st) - 1
                         eni = int(en) + 1
                         nurl = '%s&startYear=%s&endYear=%s' % (fetchurl[:idxf], str(sti), str(eni))
+                        print_debug('__fetchEntries [3]')
                         return self.__fetchEntries(nurl, typ, callback, tryOther, data)
                     else:
                         nurl = '%s' % (fetchurl[:idxf])
+                        print_debug('__fetchEntries [4]')
                         return self.__fetchEntries(nurl, typ, callback, tryOther, data)
 
             if tryOther:
@@ -855,7 +863,9 @@ class FilmwebEngine(object):
                     typ = MT_MOVIE
                 else:
                     typ = MT_SERIE
+                print_debug('__fetchEntries [5]')
                 return self.__fetchEntries(fetchurl, typ, callback, False, data)
+
         if callback:
             return callback(self.resultlist, typ, data)
         return None
@@ -898,7 +908,7 @@ class FilmwebEngine(object):
         return result
 
     def __parseEntries(self, typ):
-        print_debug("__parseEntries", "started")
+        print_debug("__parseEntries", "started for type: %s" % (str(typ)))
         if typ == MT_MOVIE:
             ttx = 'Filmy ('
         else:
@@ -910,7 +920,12 @@ class FilmwebEngine(object):
             count = mautils.castInt(counts.strip())
             print_debug("Movie/Serie count", str(count))
             if count > 0:
-                self.inhtml = mautils.between(self.inhtml[fidx:], '<div id="searchResult">', '</form>')
+                self.inhtml = self.inhtml[fidx:]
+                if self.inhtml.find('<div id=searchResult>') > -1:
+                    self.inhtml = mautils.between(self.inhtml[fidx:], '<div id=searchResult>', '</form>')
+                else:
+                    self.inhtml = mautils.between(self.inhtml[fidx:], '<div id="searchResult">', '</form>')
+
                 # print_debug("Serach data: ", str(self.inhtml))
             else:
                 self.inhtml = None
@@ -920,13 +935,18 @@ class FilmwebEngine(object):
         if self.inhtml is None:
             pass
         else:
-            elements = self.inhtml.split('<div class="hitDesc">')
+            if self.inhtml.find('<div class=hitDesc>') > -1:
+                elements = self.inhtml.split('<div class=hitDesc>')
+            else:
+                elements = self.inhtml.split('<div class="hitDesc>"')
+
             number_results = len(elements)
             print_debug("Serach results count", str(number_results))
             if elements == '':
                 number_results = 0
             else:
                 for element in elements:
+                    # print_debug("ELEMENT: ", str(element))
                     if element == '':
                         continue
                     if (element.find('hdr hdr-medium hitTitle" href="') < 0):

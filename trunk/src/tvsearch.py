@@ -43,6 +43,7 @@ class TvSearcher(object):
         if not tim:
             tim = time()
         result = None
+        print_debug('Search for time --> ', 'service: %s, time: %s, type: %s' % (str(service), str(tim), str(typ)))
         if service:
             tms = strftime("%Y%m%d", (localtime(tim)))
             print_debug('----->> Query ', 'date: %s, service: %s' % (tms, service.getServiceName()))
@@ -71,6 +72,7 @@ class TvSearcher(object):
                         inrange = (begin - 30) < beginTime < (begin + 30)
                         if inrange:
                             ret = self.processSearchForTimeResult(x)
+        print_debug('Data for event --> ', 'result: %s' % (str(ret)))
         if callback:
             callback(service, event, ret, param)
 
@@ -83,9 +85,9 @@ class TvSearcher(object):
             service = result[4]
 
             tms = strftime("%Y-%m-%d %H:%M", (localtime(begin)))
-            print_info('EVT', '[' + tms + ':' + str(duration) + '] - ' + eventName + ' / ' + service.getServiceName())
+            print_info('(processSearchForTimeResult) EVT --> ', ('[%s:%s] - %s / %s' % (tms, str(duration), eventName, str(service.getServiceName()))))
             evt = self.epg.lookupEventTime(service.ref, begin + 30)
-            print_debug('Lookup event result: ', str(evt))
+            print_debug('(processSearchForTimeResult) Lookup event --> ', 'result: %s' % (str(evt)))
             if not evt:
                 return None
             title = eventName
@@ -109,13 +111,13 @@ class TvSearcher(object):
             for x in entries:
                 ref = eServiceReference(x)
                 sr = ServiceReference(ref)
-                print_info('--> SERV', str(x) + ', name: ' + sr.getServiceName())
+                print_debug("SERV --> ", 'serv: ' + str(x) + '- name: ' + str(sr.getServiceName()))
                 services.append(sr)
 
     def __query(self, service, tms, typ):
         sname = service.getServiceName();
         sref = str(service)
-        print_debug('Query ', 'service: %s, reference: %s' % (str(sname), sref))
+        print_debug('Query --> ', ('service: %s, reference: %s' % (str(sname), sref)))
         if sname and sref:
             sref = sref[:25]
             if MAPPING.get(sref):
