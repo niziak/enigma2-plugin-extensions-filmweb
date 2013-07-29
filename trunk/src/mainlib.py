@@ -649,7 +649,7 @@ class Filmweb(DefaultScreen):
             self.resultlist = []
 
             self.beforeProcessData()
-            print_info("Getting data for event: ", str(self.event))
+            print_info("--> Getting data for event: ", str(self.event))
             if self.event or self.searchTitle:
                 self.tvsearcher.dataForEvent(self.service, self.event, self.searchType, self.queryDataCallback, tryOther)
             else:
@@ -667,6 +667,7 @@ class Filmweb(DefaultScreen):
             ref = self.session.nav.getCurrentlyPlayingServiceReference()
             print_debug("Current Service ref: ", str(ref))
             self.service = ServiceReference(ref)
+            print_debug("SERVICE REFERENCE ---> ", str(self.service))
 
             serviceHandler = eServiceCenter.getInstance()
             info = serviceHandler.info(ref)
@@ -681,11 +682,13 @@ class Filmweb(DefaultScreen):
         elif self.event:
             self.searchTitle = self.event.getEventName()
 
+        print_info('SEARCH query callback - searchTitle: ', self.searchTitle)
         if ret:
             self.searchTitle = ret[5]
             self.searchYear = ret[3]
-            print_debug("Search data:", "title:%s, year:%s, type:%s" % (self.searchTitle, self.searchYear, self.searchType))
+            print_debug("Search data [ret] --> ", "title:%s, year:%s, type:%s" % (self.searchTitle, self.searchYear, self.searchType))
         elif event and tryOther:
+            print_debug("Search data [evt + tryOther] --> ", "title:%s, year:%s, type:%s" % (self.searchTitle, self.searchYear, self.searchType))
             if self.searchType == MT_MOVIE:
                 self.searchType = MT_SERIE
             else:
@@ -696,12 +699,21 @@ class Filmweb(DefaultScreen):
         if not self.searchTitle:
             return
 
+        if not tryOther and not self.searchYear:
+            if self.searchType == MT_MOVIE:
+                self.searchType = MT_SERIE
+            else:
+                self.searchType = MT_MOVIE
+            tryOther = True
+
+
         if tryOther and (self.searchTitle.find('odc.') > -1 or self.searchTitle.find('serial') > -1):
             self.searchType = MT_SERIE
-        print_debug("Search type", str(self.searchType) + ", try other: " + str(tryOther));
+        print_debug("[queryDataCallback] Search --> ", 'type: %s, tryOther: %s' % (str(self.searchType), str(tryOther)));
         idx = self.searchTitle.find(' - ')
         if idx > 0:
             self.searchTitle = self.searchTitle[:idx]
+        print_info('SEARCH query callback final - searchTitle: ', self.searchTitle)
         self["status_bar"].setText(_("Query Filmweb: %s...") % (self.searchTitle))
         self.engine.query(self.searchType, self.searchTitle, self.searchYear, tryOther, self.queryCallback)
 
