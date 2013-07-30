@@ -17,7 +17,7 @@
   <widget name="plot_label" position="550,250" size="535,240" zPosition="5" font="Bebas;18" transparent="1" />  
   <widget name="cast_label" position="10,250" size="535,240" zPosition="5" scrollbarMode="showOnDemand" transparent="1" />
   <widget name="extra_label" position="10,30" size="1070,470" zPosition="5" font="Regular;18" transparent="1" />
-  <widget name="rating_label" position="170,220" size="210,25" zPosition="6" halign="left" font="Bebas;20"
+  <widget name="rating_label" position="170,220" size="210,25" zPosition="6" halign="left" font="Bebas;24"
     foregroundColor="#f0b400" transparent="1" />
   <widget name="login_label" position="870,5" size="210,20" zPosition="5" halign="center" font="Regular;20"
     foregroundColor="#58bcff" transparent="1" />
