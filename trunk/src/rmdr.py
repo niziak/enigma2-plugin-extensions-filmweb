@@ -216,7 +216,7 @@ class Reminder(object):
     def start(self, session):
         print_info('Start reminder for session', str(session))
         # odpalenie timera co 10 min. - 600000
-        self.updatetimer.start(60000, False)
+        self.updatetimer.start(1200000, False)
         self.session = session
 
     def processWannaSeeList(self):
@@ -241,7 +241,7 @@ class Reminder(object):
                 self.programList = []
                 self.processedList = []
                 self.updateDate = datecheck
-            self.__updateProgramList()
+                self.__updateProgramList()
         except:
             import traceback
             traceback.print_exc()

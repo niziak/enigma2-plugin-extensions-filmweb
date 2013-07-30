@@ -51,9 +51,9 @@ from Components.config import config
 
 TITLE_MAX_SIZE = 67
 WALLPAPER_REFRESH_TIME = 15000
-RATE_CHOICES = [(_("Watched"), "0"), (_("Misunderstanding"), "1"), (_("Very Bad"), "2"), \
+RATE_CHOICES = [(_("Misunderstanding"), "1"), (_("Very Bad"), "2"), \
                 (_("Poor"), "3"), (_("It can be"), "4"), (_("Average"), "5"), (_("Good Enough"), "6"), \
-                (_("Good"), "7"), (_("Very Good"), "8"), (_("Sensational"), "9"), (_("Masterwork"), "10")]
+                (_("Good"), "7"), (_("Very Good"), "8"), (_("Sensational"), "9"), (_("Masterwork"), "10"), (_("Watched"), "0")]
 
 VT_NONE = 'none'
 VT_MENU = 'MENU'
