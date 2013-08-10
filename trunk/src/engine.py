@@ -914,11 +914,11 @@ class FilmwebEngine(object):
         else:
             ttx = 'Seriale ('
         fidx = self.inhtml.find(ttx)
-        print_debug("search idx", str(fidx))
+        print_debug("search idx:", str(fidx))
         if fidx > -1:
             counts = mautils.between(self.inhtml, ttx, ')')
             count = mautils.castInt(counts.strip())
-            print_debug("Movie/Serie count", str(count))
+            print_debug("Movie/Serie count:", str(count))
             if count > 0:
                 self.inhtml = self.inhtml[fidx:]
                 if self.inhtml.find('<div id=searchResult>') > -1:
@@ -938,10 +938,10 @@ class FilmwebEngine(object):
             if self.inhtml.find('<div class=hitDesc>') > -1:
                 elements = self.inhtml.split('<div class=hitDesc>')
             else:
-                elements = self.inhtml.split('<div class="hitDesc>"')
+                elements = self.inhtml.split('<div class="hitDesc">')
 
             number_results = len(elements)
-            print_debug("Serach results count", str(number_results))
+            print_debug("Serach results count:", str(number_results))
             if elements == '':
                 number_results = 0
             else:
@@ -949,15 +949,19 @@ class FilmwebEngine(object):
                     # print_debug("ELEMENT: ", str(element))
                     if element == '':
                         continue
-                    if (element.find('hdr hdr-medium hitTitle" href="') < 0):
+                    if element.find('<div class=hitDescWrapper>') > -1:
+                        element = mautils.after(element, '<div class=hitDescWrapper>')
+                    elif element.find('<div class="hitDescWrapper">') > -1:
+                        element = mautils.after(element, '<div class="hitDescWrapper">')
+                    else:
                         continue
-                    element = mautils.after(element, 'hdr hdr-medium hitTitle" href="')
-
                     img = mautils.between(element, '<div class="hitImage">', '</a>')
+                    if not img:
+                        img = mautils.between(element, '<div class=hitImage>', '</a>')
                     img = mautils.between(img, '<img src="', '">')
                     print_debug("The movie IMAGE link: ", img)
 
-                    link = mautils.before(element, '"')
+                    link = mautils.between(element, '<h3><a href="', '"')
                     print_debug("The movie link", link)
                     cast = mautils.after(element, '<div class="text">')
                     cast = mautils.between(cast, '"filmInfo inline">', '</dl>')
@@ -972,11 +976,16 @@ class FilmwebEngine(object):
                     rating = mautils.strip_tags(rating)
                     rating = rating.replace('\t', '')
                     rating = rating.replace('\n', '')
-                    print_debug("The movie rating", rating)
+                    print_debug("The movie rating:", rating)
                     # self.links.append('http://www.filmweb.pl' + link)
-                    title = mautils.between(element, '">', '</a>')
+
+                    # print_debug("ELEMENT TITLE: ", str(element))
+
+                    orgtitle = None
+
+                    title = mautils.between(element, '<a', '</a>')
                     if title:
-                        orgtitle = None
+                        title = mautils.after(title, '>')
                         idxf = title.find('/')
                         idxn = title.find('(')
                         if idxf > -1 and idxn > -1:
@@ -986,16 +995,27 @@ class FilmwebEngine(object):
                         title = title.replace('\t', '')
                         title = mautils.strip_tags(title)
                     print_debug("The movie title", title)
-                    # element = mautils.after(element, 'class=searchResultDetails')
-                    year = mautils.between(element, ' (', ') </a>')
+
+                    if not orgtitle:
+                        orgtitle = mautils.between(element, '<ul class="inline sep-line"><li>', '</li>')
+                        if orgtitle:
+                            if orgtitle[:3] == '<ul':
+                                orgtitle = None
+                    if orgtitle:
+                        orgtitle = mautils.strip_tags(orgtitle)
+                    print_debug("The movie original title:", orgtitle)
+
+                    year = mautils.between(element, '<span class="hdr hdr-medium hitTitle">(', ')</span>')
                     year = year.replace(" ", '')
                     year = mautils.strip_tags(year)
-                    print_debug("The movie year", year)
+                    print_debug("The movie year:", year)
+
                     country = ''
                     country_idx = element.find('countryIds')
                     if country_idx != -1:
                         country = mautils.between(element[country_idx:], '">', '</a>')
-                    print_debug("The movie country", country)
+                    print_debug("The movie country:", country)
+
                     element = title.strip()
                     if year:
                         element += ' (' + year.strip() + ')'
@@ -1008,7 +1028,7 @@ class FilmwebEngine(object):
                         element += '\n' + rating.strip()
                     if cast:
                         element += '\n' + cast.strip()
-                    print_debug("The movie serach title", element)
+                    print_debug("The movie serach title:", element)
                     # self.titles.append(element)
                     if rating:
                         rt = mautils.before(rating, '/')
