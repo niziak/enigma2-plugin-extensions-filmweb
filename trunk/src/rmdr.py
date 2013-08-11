@@ -201,7 +201,9 @@ class ShortInfoScreen(AbstractMessageScreen):
 class Reminder(object):
     def __init__(self):
         self.updatetimer = eTimer()
-        self.updatetimer.callback.append(self.__check)
+        self.updatetimer.callback.append(self.__update)
+        self.checkertimer = eTimer()
+        self.checkertimer.callback.append(self.__check)
         self.session = None
         self.updateDate = None
         self.wannaSeeLastUpdate = None
@@ -217,6 +219,8 @@ class Reminder(object):
         print_info('Start reminder for session', str(session))
         # odpalenie timera co 10 min. - 600000
         self.updatetimer.start(1200000, False)
+        self.checkertimer.start(60000, False)
+        self.__update()
         self.session = session
 
     def processWannaSeeList(self):
@@ -224,7 +228,7 @@ class Reminder(object):
             tuptime = localtime(time())
             hour = tuptime[3]
             datecheck = strftime("%Y-%m-%d", (tuptime))
-            if ((not self.wannaSeeLastUpdate or self.wannaSeeLastUpdate != datecheck) and hour > 5):
+            if (((not self.wannaSeeLastUpdate) or (self.wannaSeeLastUpdate != datecheck)) and hour > 5):
                 self.wantSeeList = []
                 self.wannaSeeLastUpdate = datecheck
             self.__updateWannaSeeList()
@@ -237,7 +241,7 @@ class Reminder(object):
             tuptime = localtime(time())
             hour = tuptime[3]
             datecheck = strftime("%Y-%m-%d", (tuptime))
-            if force or ((not self.updateDate or self.updateDate != datecheck) and hour > 3):
+            if force or (((not self.updateDate) or (self.updateDate != datecheck)) and hour > 3):
                 self.programList = []
                 self.processedList = []
                 self.updateDate = datecheck
@@ -354,14 +358,17 @@ class Reminder(object):
             return (url, caption, lista[0][7], rate)
         return None
 
+    def __update(self):
+        print_debug('Update parameter lists', '')
+        self.processProgramList(False)
+        self.processWannaSeeList()
+
     def __check(self):
         print_debug('Check reminder', '')
-        self.processProgramList(False)
 
         if not config.plugins.mfilmweb.showNotifications.value:
             return
 
-        self.processWannaSeeList()
         if not self.processing and len(self.wantSeeList) > 0 and len(self.programList) > 0:
             tm = time()
             # biezacy czas plus 10 min.

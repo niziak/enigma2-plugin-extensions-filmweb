@@ -1,9 +1,6 @@
-<screen name="MSG" position="0,0" size="1280,720" flags="wfNoBorder" backgroundColor="transparent">
-    <ePixmap position="600,25" zPosition="1" size="462,39" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/Filmweb/resource/context_top.png" alphatest="blend" transparent="1" /> 
-    <ePixmap position="600,64" zPosition="1" size="462,62" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/Filmweb/resource/context_middle.png" alphatest="blend" transparent="1" />
-    <ePixmap position="600,126" zPosition="1" size="462,41" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/Filmweb/resource/context_bottom.png" alphatest="blend" transparent="1" />
-    
-    <widget source="list" render="Listbox" position="615,65" size="432,60" zPosition="3" transparent="1" selectionPixmap="/usr/lib/enigma2/python/Plugins/Extensions/Filmweb/resource/context-highlight2.png">
+<screen name="MSG" position="0,0" size="1280,720" flags="wfNoBorder" backgroundColor="transparent" title="Z chwilę będzie leciało w TV">
+
+    <widget source="list" render="Listbox" position="715,50" size="432,60" zPosition="3" transparent="1" backgroundColor="transpBlack">    
 	<convert type="TemplatedMultiContent"> 
 	{"templates": 
 	{"default": (60,[ 
