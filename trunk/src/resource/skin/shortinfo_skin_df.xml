@@ -1,7 +1,5 @@
-<screen name="ShortInfo" position="0,0" size="1280,720" flags="wfNoBorder" backgroundColor="transparent">
-    <ePixmap position="50,25" zPosition="1" size="462,39" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/Filmweb/resource/context_top.png" alphatest="blend" transparent="1" /> 
-    <ePixmap position="50,64" zPosition="1" size="462,542" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/Filmweb/resource/context_middle.png" alphatest="blend" transparent="1" />
-    <ePixmap position="50,606" zPosition="1" size="462,41" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/Filmweb/resource/context_bottom.png" alphatest="blend" transparent="1" />
+<screen name="ShortInfo" position="100,100" size="432,560" title="Co aktualne leci w TV" >
+
     
     <!-- 
     <ePixmap position="468,59" zPosition="5" size="36,22" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/Filmweb/resource/scroll-top.png" alphatest="blend" transparent="1" />
@@ -9,7 +7,7 @@
     <ePixmap position="468,81" zPosition="5" size="36,511" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/Filmweb/resource/scroll-middle.png" alphatest="blend" transparent="1" />
      -->
      
-    <widget source="list" render="Listbox" position="65,65" size="432,540" zPosition="3" transparent="1" selectionPixmap="/usr/lib/enigma2/python/Plugins/Extensions/Filmweb/resource/context-highlight2.png">
+    <widget source="list" render="Listbox" position="0,0" size="432,540" zPosition="3" transparent="1" backgroundColor="transpBlack" >
 	<convert type="ExTMultiContent"> 
 	{"templates": 
 	{"default": (60,[ 
@@ -22,8 +20,8 @@
 	MultiContentEntryProgressPixmap(pos = (192, 42), size = (109, 6), percent = -5, borderWidth = 0, pixmap=6),
 	MultiContentEntryText(pos = (65, 0), size = (370, 22), font=0, flags = RT_HALIGN_LEFT|RT_VALIGN_CENTER, text = 1, color=0x00F0B400, color_sel=0x00F0B400)
 	],True,"showNever")},
-	"fonts": [gFont("Ubuntu-MC", 16),gFont("Regular", 14),gFont("Bebas", 28),gFont("Regular", 15)],
-	"itemHeight": 60
+	"fonts": [gFont("Ubuntu-MC", 16),gFont("Regular", 14),gFont("Bebas", 30),gFont("Regular", 15)],
+	"itemHeight": 60 
 	}
 	</convert>
 	</widget>
