@@ -81,7 +81,8 @@ init 4; sleep 10; init 3
    * Nowa skóra autorstwa Tytus77
    * Poprawa ładowania informacji w pluginie
    * Dostosowanie do zmian w portalu filmweb
-
+   * Poprawa problemu ze skinem - zgłoszenie pio777
+----
 === ver. 1.2.7 (2013/07/26) ===
    * Poprawka działania ładowania skóry pluginu
    * Poprawa ładowania czcionek dla pluginu
