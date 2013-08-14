@@ -1,23 +1,32 @@
-<screen name="FilmwebData" position="center,85" size="1220,600" title="Film Web 2013">
-  <ePixmap pixmap="MetrixHD_MOD/buttons/key_red.png" position="190,570" size="140,40" alphatest="on" />
-  <ePixmap pixmap="MetrixHD_MOD/buttons/key_green.png" position="426,570" size="140,40" alphatest="on" />
-  <ePixmap pixmap="MetrixHD_MOD/buttons/key_yellow.png" position="664,570" size="140,40" alphatest="on" />
-  <ePixmap pixmap="MetrixHD_MOD/buttons/key_blue.png" position="892,570" size="140,40" alphatest="on" />
-  <widget name="key_red" position="204,565" size="140,40" zPosition="2" font="Regular;22" valign="left" halign="center" backgroundColor="transpBlack" transparent="1" />
-  <widget name="key_green" position="426,565" size="140,40" zPosition="2" font="Regular;22" valign="left" halign="center" backgroundColor="transpBlack" transparent="1" />
-  <widget name="key_yellow" position="703,565" size="162,40" zPosition="2" font="Regular;22" valign="left" halign="center" backgroundColor="transpBlack" transparent="1" />
-  <widget name="key_blue" position="892,565" size="140,40" zPosition="2" font="Regular;22" valign="left" halign="center" backgroundColor="transpBlack" transparent="1" />
-  <widget name="title_label" position="5,0" size="1000,40" zPosition="5" halign="center" font="Ubuntu-BC;34" foregroundColor="#f0b400" transparent="1" />
-  <widget name="details_label" position="320,70" size="900,228" zPosition="5" font="Bebas;25" transparent="1" />
-  <widget name="plot_label" position="745,230" size="515,280" zPosition="5" font="Regular;20" halign="left" transparent="1" />
-  <widget name="cast_label" position="320,310" size="410,240" zPosition="5" scrollbarMode="showOnDemand" font="Regular;17"  transparent="1" />
+<screen name="FilmwebData" position="center,95" size="1210,580" title="Film Web - informacja o filmie">
+
+  <ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/Filmweb/resource/dfres/menu.png" position="0,550" size="100,30" alphatest="on"  />
+  <ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/Filmweb/resource/dfres/key_right.png" position="115,550" size="100,30" alphatest="on" /> 
+  <ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/Filmweb/resource/dfres/key_0.png" position="240,550" size="100,30" alphatest="on" />   
+  <ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/Filmweb/resource/dfres/key_red.png" position="340,550" size="140,40" alphatest="on" />
+  <ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/Filmweb/resource/dfres/key_green.png" position="510,550" size="140,40" alphatest="on" />
+  <ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/Filmweb/resource/dfres/key_yellow.png" position="682,550" size="140,40" alphatest="on" />
+  <ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/Filmweb/resource/dfres/key_blue.png" position="860,550" size="140,40" alphatest="on" />
+  <ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/Filmweb/resource/dfres/filmweb.png" position="1080,545" size="130,35" alphatest="on" />
+  
+  <widget name="key_red" position="348,545" size="140,40" zPosition="2" font="Ubuntu-BC;17" valign="left" halign="center" backgroundColor="transpBlack" transparent="1" />
+  <widget name="key_green" position="515,545" size="140,40" zPosition="2" font="Ubuntu-BC;17" valign="left" halign="center" backgroundColor="transpBlack" transparent="1" />
+  <widget name="key_yellow" position="718,545" size="162,40" zPosition="2" font="Ubuntu-BC;17" valign="left" halign="center" backgroundColor="transpBlack" transparent="1" />
+  <widget name="key_blue" position="860,545" size="140,40" zPosition="2" font="Ubuntu-BC;17" valign="left" halign="center" backgroundColor="transpBlack" transparent="1" />
+  
+  <widget name="title_label" position="0,0" size="1000,40" zPosition="5" halign="left" font="Ubuntu-BC;30" foregroundColor="#f0b400" transparent="1" />
+  <widget name="details_label" position="315,70" size="900,228" zPosition="5" font="Bebas;25" transparent="1" />
+  <widget name="plot_label" position="732,230" size="480,280" zPosition="5" font="Ubuntu-M;18" halign="left" transparent="1" />
+  <widget name="cast_label" position="315,310" size="410,200" zPosition="5" scrollbarMode="showOnDemand" transparent="1" />
   <widget name="extra_label" position="10,40" size="1200,480" zPosition="5" font="Ubuntu-M;22" transparent="1" />
-  <widget name="rating_label" position="1000,24" size="210,27" zPosition="5" halign="center" font="Bebas;38" foregroundColor="#f0b400" transparent="1" />
-  <widget name="login_label" position="1020,535" size="210,20" zPosition="5" halign="center" font="Bebas;20" foregroundColor="#58bcff" transparent="1" />
-  <widget name="status_bar" position="10,535" size="1070,30" zPosition="2" font="Regular;14" foregroundColor="#cccccc" transparent="1" />
-  <widget name="copyright" position="1030,587" size="230,20" zPosition="5" font="Regular;14" foregroundColor="#f0b400" transparent="1" />
-  <widget name="poster" position="5,20" size="300,540" zPosition="5" alphatest="blend" />
-  <widget name="wallpaper" position="880,60" size="220,170" zPosition="0" alphatest="on" />
-  <widget name="menu" position="60,110" size="1150,400" zPosition="5" scrollbarMode="showOnDemand" transparent="1" />
-  <widget name="nstars" pixmap="/resource/starsbar_filled.png" pixmap_bg="/resource/starsbar_empty.png" position="1000,0" zPosition="5" size="210,21" transparent="1" />
+  <widget name="rating_label" position="950,35" size="210,27" zPosition="5" halign="center" font="Bebas;30" foregroundColor="#f0b400" transparent="1" />
+  <widget name="login_label" position="850,5" size="100,20" zPosition="5" valign="right" font="Bebas;25" foregroundColor="#58bcff" transparent="1" />
+  <widget name="status_bar" position="5,533" size="1070,30" zPosition="2" font="Regular;14" foregroundColor="#cccccc" transparent="1" />
+  <widget name="copyright" position="1020,520" size="280,20" zPosition="5" font="Bebas;20" foregroundColor="#f0b400" transparent="1" />
+  
+  <widget name="poster" position="0,15" size="300,540" zPosition="5" alphatest="blend" />
+  <widget name="wallpaper" position="732,60" size="480,170" zPosition="0" alphatest="on" />
+  <widget name="menu" position="10,110" size="1200,400" zPosition="5" scrollbarMode="showOnDemand" transparent="1" />
+  <widget name="nstars" pixmap="/resource/starsbar_filled.png" pixmap_bg="/resource/starsbar_empty.png" position="950,5" zPosition="5" size="210,25" transparent="1" />
+
 </screen>
