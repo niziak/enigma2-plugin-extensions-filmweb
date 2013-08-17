@@ -935,10 +935,10 @@ class FilmwebEngine(object):
         if self.inhtml is None:
             pass
         else:
-            if self.inhtml.find('<div class=hitDesc>') > -1:
-                elements = self.inhtml.split('<div class=hitDesc>')
-            else:
+            if self.inhtml.find('<div class="hitDesc">') > -1:
                 elements = self.inhtml.split('<div class="hitDesc">')
+            else:
+                elements = self.inhtml.split('<div class=hitDesc>')
 
             number_results = len(elements)
             print_debug("Serach results count:", str(number_results))
@@ -961,7 +961,8 @@ class FilmwebEngine(object):
                     img = mautils.between(img, '<img src="', '">')
                     print_debug("The movie IMAGE link: ", img)
 
-                    link = mautils.between(element, '<h3><a href="', '"')
+
+                    link = mautils.between(element, 'href="', '"')
                     print_debug("The movie link", link)
                     cast = mautils.after(element, '<div class="text">')
                     cast = mautils.between(cast, '"filmInfo inline">', '</dl>')
