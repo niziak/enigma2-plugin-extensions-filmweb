@@ -2,7 +2,7 @@
 
 CPTH=usr/lib/enigma2/python
 PTH=Plugins/Extensions/Filmweb
-VER=1.2.9
+VER=1.2.8.3
 ARC=mips32el
 #ARC=mipsel
 #ARC=unk
