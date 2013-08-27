@@ -15,6 +15,7 @@
   * Tytus77
   * pio777
   * andrzejmodrzejewski
+  * Robert Felisiak
 
 = Wprowadzenie =
 ----
