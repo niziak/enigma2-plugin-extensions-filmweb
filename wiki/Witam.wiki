@@ -18,6 +18,7 @@
   * Robert Fel...ak
   * Andrzej Mia...icz
   * Grzegorz Wi...ski
+  * Bogdan Mro...ski
 
 = Wprowadzenie =
 ----
