@@ -1,9 +1,0 @@
-Package: enigma2-plugin-extensions-filmweb
-Description: Filmweb.pl info download plugin
-Maintainer: Marcin Slowik <marcin.slowik@gmail.com>
-License: GNU GPL v3
-Section: base
-Priority: optional
-Homepage: http://code.google.com/p/enigma2-plugin-extensions-filmweb/wiki/Welcome
-Depends: enigma2, python-html, python-twisted-web, openssl, python-pyopenssl
-Source: https://code.google.com/p/enigma2-plugin-extensions-filmweb/source/browse/#svn%2Ftrunk
