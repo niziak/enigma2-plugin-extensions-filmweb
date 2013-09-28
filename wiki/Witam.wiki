@@ -2,24 +2,9 @@
 
 <wiki:toc max_depth="2" />
 ----
-= Wesprzyj prace nad pluginem =
+= Koniec pluginu =
 
-*Czy chcesz by plugin był w dalszym ciągu rozwijany ? Kliknij DONATE by wesprzeć prace nad pluginem.*
-
-*Wesprzyj prace a otrzymasz na maila nową wersję pluginu*
-
-<a href="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=marcin.slowik@gmail.com&lc=PL&item_name=filmweb-enigma2&currency_code=PLN&bn=PP-DonationsBF:btn_donateCC_LG.gif:NonHosted" rel="nofollow"><img src="https://www.paypalobjects.com/en_US/GB/i/btn/btn_donateCC_LG.gif" alt="PayPal — Płać wygodnie i bezpiecznie"/></a>
-
-
-*Serdeczne podziękowania dotychczasowym darczyńcom:*
-  * Tytus77
-  * pio777
-  * Andrzej Mo...ski
-  * Robert Fel...ak
-  * Andrzej Mia...icz
-  * Grzegorz Wi...ski
-  * Bogdan Mro...ski
-  * Michal D...k
+Nie będę kontyuował pracy nad pluginem z racji tego, że są Polacy którzy uważają, że za 5 PLN mogą rozpowszechniać nie swoje oprogramowanie gdzie chcą i jak chcą. Nie będę przytaczał nazwisk ale mógłbym. 
 
 = Wprowadzenie =
 ----
