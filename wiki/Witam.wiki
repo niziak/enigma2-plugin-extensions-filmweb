@@ -2,9 +2,6 @@
 
 <wiki:toc max_depth="2" />
 ----
-= Koniec pluginu =
-
-Nie będę kontyuował pracy nad pluginem z racji tego, że są Polacy którzy uważają, że za 5 PLN mogą rozpowszechniać nie swoje oprogramowanie gdzie chcą i jak chcą. Nie będę przytaczał nazwisk ale mógłbym. 
 
 = Wprowadzenie =
 ----
