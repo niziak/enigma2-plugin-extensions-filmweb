@@ -30,7 +30,7 @@ ipkg install /tmp/enigma2-plugin-extensions-filmweb_1.1.3_mipsel.ipk
 }}}
   * Restart Enigmy
 {{{
-init 4 ; sleep 10; init 3
+init 4; sleep 10; init 3;
 }}}
 
 
